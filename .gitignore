@@ -1,0 +1,5 @@
+# 本地记忆与缓存（含个人隐私数据，勿上传）
+.workbuddy/
+
+# macOS
+.DS_Store
