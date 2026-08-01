@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wb-growth-v4';
+const CACHE_NAME = 'wb-growth-v5';
 const ASSETS = [
   './index.html',
   './manifest.webmanifest',
@@ -27,16 +27,30 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  const url = new URL(e.request.url);
+  // 同源资源走「网络优先」：在线时永远拿最新页面，离线再回退缓存
+  if (url.origin === self.location.origin) {
+    e.respondWith(
+      fetch(e.request)
+        .then((resp) => {
+          if (resp && resp.status === 200 && resp.type === 'basic') {
+            const clone = resp.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          }
+          return resp;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  // 跨域资源走「缓存优先」
   e.respondWith(
-    caches.match(e.request).then((cached) => {
-      return cached || fetch(e.request).then((resp) => {
-        // Optional: cache future same-origin GET assets lazily
-        if (resp && resp.status === 200 && resp.type === 'basic') {
-          const clone = resp.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-        }
-        return resp;
-      });
-    })
+    caches.match(e.request).then((cached) => cached || fetch(e.request).then((resp) => {
+      if (resp && resp.status === 200 && resp.type === 'basic') {
+        const clone = resp.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+      }
+      return resp;
+    }))
   );
 });
