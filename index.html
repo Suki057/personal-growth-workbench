@@ -125,7 +125,12 @@
   .m-title { font-size: 16px; font-weight: 700; }
   .m-count { font-size: 12px; color: var(--primary-deep); margin-top: 3px; }
   .m-count b { font-size: 14px; }
-  .m-tasks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .m-sublist { margin-top: 8px; }
+  .m-subrow { display: flex; align-items: center; gap: 10px; margin-top: 11px; }
+  .m-subname { font-size: 13px; color: var(--text); flex: 0 0 auto; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .m-subbar { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .m-subbar .bar { flex: 1; }
+  .m-subpct { font-size: 12px; font-weight: 700; color: var(--primary-deep); min-width: 34px; text-align: right; flex: 0 0 auto; }
   .tag { font-size: 11.5px; color: #4d7a63; background: var(--primary-soft); padding: 4px 10px; border-radius: 20px; }
   .m-progress { display: flex; align-items: center; gap: 10px; }
   .bar { flex: 1; height: 9px; border-radius: 20px; background: #eaf4ee; overflow: hidden; }
@@ -1034,11 +1039,14 @@
   /* ============ 首页模块卡片 ============ */
   function buildHomeModulesData() {
     return CATS.filter(c => c.id !== "home").map(cat => {
-      const tasks = cat.horizons ? cat.horizons.slice() : (cat.subs || []).map(sid => {
-        const mod = getModule(sid);
-        return mod ? labelOf(sid, mod.title) : sid;
-      });
-      return { id: cat.id, icon: cat.icon, name: labelOf(cat.id, cat.label), count: tasks.length, progress: catActivity(cat.id, 0), tasks };
+      const isOkr = !!cat.horizons;
+      const items = isOkr
+        ? cat.horizons.map(h => ({ id: h, title: labelOf(h, h), progress: getSubProgress("okr", h) }))
+        : (cat.subs || []).map(sid => {
+            const mod = getModule(sid);
+            return { id: sid, title: mod ? labelOf(sid, mod.title) : sid, progress: getActivity(sid) };
+          });
+      return { id: cat.id, icon: cat.icon, name: labelOf(cat.id, cat.label), count: items.length, progress: catActivity(cat.id, 0), items };
     });
   }
   function renderHomeModules() {
@@ -1051,9 +1059,11 @@
       card.innerHTML = `
         <div class="m-top"><div class="m-ico">${m.icon}</div><div>
           <div class="m-title">${m.name}</div><div class="m-count"><b>${m.count}</b> 个子项</div></div></div>
-        <div class="m-tasks">${m.tasks.map(t => `<span class="tag">${t}</span>`).join("")}</div>
-        <div class="m-progress"><div class="bar"><span style="width:0%"></span></div><div class="m-pct">${m.progress}%</div></div>`;
-      card.querySelector(".bar > span").style.width = m.progress + "%";
+        <div class="m-sublist">${m.items.map(it => `
+          <div class="m-subrow">
+            <div class="m-subname">${it.title}</div>
+            <div class="m-subbar"><div class="bar"><span style="width:${it.progress}%"></span></div><div class="m-subpct">${it.progress}%</div></div>
+          </div>`).join("")}</div>`;
       card.addEventListener("click", () => { document.querySelectorAll(".module").forEach(c => c.classList.remove("selected")); card.classList.add("selected"); openCat(m.id); });
       modEl.appendChild(card);
     });
@@ -1625,6 +1635,16 @@
     const streak = streakOf(data.map(r => r.date));
     return Math.min(100, data.length * 4 + streak * 4);
   }
+  function getSubProgress(catId, subId) {
+    if (catId === "okr") {
+      const data = storeGet("wb_okr", []);
+      const objs = data.filter(o => o.horizon === subId);
+      if (!objs.length) return 0;
+      const arr = objs.map(o => o.krs.length ? Math.round(o.krs.reduce((s, k) => s + (k.p || 0), 0) / o.krs.length) : 0);
+      return Math.round(arr.reduce((s, a) => s + a, 0) / arr.length);
+    }
+    return getActivity(subId);
+  }
   function catActivity(catId, def) {
     const cat = CATS.find(c => c.id === catId);
     const subs = catId === "okr" ? ["okr"] : cat.subs;
@@ -1634,11 +1654,19 @@
   }
   function refreshHomeProgress() {
     modulesData.forEach(m => {
-      m.progress = catActivity(m.id, m.progress);
+      const cat = CATS.find(c => c.id === m.id);
+      const isOkr = cat && !!cat.horizons;
+      m.items.forEach(it => { it.progress = isOkr ? getSubProgress("okr", it.id) : getActivity(it.id); });
       const card = [...document.querySelectorAll(".module")].find(c => c.dataset.id === m.id);
       if (!card) return;
-      card.querySelector(".bar > span").style.width = m.progress + "%";
-      card.querySelector(".m-pct").textContent = m.progress + "%";
+      const rows = card.querySelectorAll(".m-subrow");
+      m.items.forEach((it, idx) => {
+        const row = rows[idx]; if (!row) return;
+        const bar = row.querySelector(".bar > span");
+        const pct = row.querySelector(".m-subpct");
+        if (bar) bar.style.width = it.progress + "%";
+        if (pct) pct.textContent = it.progress + "%";
+      });
     });
     const pend = dueWords().length;
     const pill = document.getElementById("reviewPill");
