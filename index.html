@@ -359,6 +359,26 @@
   .section-title { letter-spacing: 1.5px; }
   .section-title::before { width: 4px; height: 18px; border-radius: 2px; background: linear-gradient(180deg, var(--gold), var(--gold-deep)); }
 
+  /* —— 首页「今日待办」进度卡 —— */
+  .home-todo-card { cursor: default; }
+  .ht-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .ht-emoji { font-size: 20px; }
+  .ht-title { font-size: 16px; font-weight: 800; color: var(--text); font-family: var(--font-head); letter-spacing: .4px; }
+  .ht-count { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--primary-deep); background: var(--primary-soft); padding: 3px 10px; border-radius: 20px; }
+
+  /* —— 待办事项清单 —— */
+  .todo-add { display: flex; gap: 8px; margin-bottom: 14px; }
+  .todo-input { flex: 1; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 14px; background: var(--bg-soft); color: var(--text); }
+  .todo-input:focus { outline: none; border-color: var(--primary); }
+  .todo-list { display: flex; flex-direction: column; gap: 8px; }
+  .todo-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--bg-soft); border-radius: 12px; transition: background .15s; }
+  .todo-item:hover { background: var(--primary-soft); }
+  .todo-box { width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--primary); flex: 0 0 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: #fff; cursor: pointer; background: transparent; transition: background .15s, border-color .15s; user-select: none; }
+  .todo-item.done .todo-box { background: var(--accent); border-color: var(--accent); }
+  .todo-text { flex: 1; text-align: left; font-size: 14px; color: var(--text); cursor: pointer; word-break: break-word; }
+  .todo-item.done .todo-text { text-decoration: line-through; color: var(--text-soft); }
+  .todo-del { color: var(--text-soft); font-size: 20px; line-height: 1; cursor: pointer; opacity: .45; padding: 0 4px; transition: opacity .15s, color .15s; }
+  .todo-del:hover { opacity: 1; color: var(--accent); }
 </style>
 </head>
 <body>
@@ -389,12 +409,9 @@
         </div>
       </div>
       <section class="top-row top-single anim">
-        <div class="card countdown-card">
-          <div class="c-emoji">🎊🎯</div>
-          <div class="c-body">
-            <div class="c-label">距离2027年还有</div>
-            <div class="c-line"><span class="num" id="cdNum">153</span><span class="c-unit">天</span></div>
-          </div>
+        <div class="card home-todo-card" id="homeTodoCard">
+          <div class="ht-top"><span class="ht-emoji">📋</span><span class="ht-title">今日待办</span><span class="ht-count" id="htCount">0/0</span></div>
+          <div class="m-progress"><div class="bar"><span id="htBar" style="width:0%"></span></div><div class="m-pct" id="htPct">0%</div></div>
         </div>
       </section>
       <section class="modules" id="modules"></section>
@@ -525,6 +542,7 @@
   const CATS_DEFAULT = [
     { id: "home",   icon: "🏠", label: "首页",       leaf: true },
     { id: "okr",    icon: "🎯", label: "目标OKR", open: true, horizons: ["今年","近三年","近五年目标"] },
+    { id: "todo",   icon: "✅", label: "待办事项", subs: ["todo_today","todo_week","todo_month"] },
     { id: "image",  icon: "💃", label: "形象提升",  subs: ["dance","fatloss"] },
     { id: "ability",icon: "📚", label: "能力提升",  subs: ["photo","bazi","english","video","media"] },
     { id: "money",  icon: "💰", label: "赚钱方式",  subs: ["fulltime","side"] },
@@ -536,6 +554,14 @@
     const okr = CATS.find(c => c.id === "okr");
     if (okr && Array.isArray(okr.horizons) && okr.horizons.some(h => (h || "").indexOf("近十年") >= 0 || (h || "").indexOf("【今年】") >= 0)) {
       okr.horizons = ["今年", "近三年", "近五年目标"];
+      storeSet("wb_cats", CATS);
+    }
+  })();
+  (function () {
+    if (!CATS.find(c => c.id === "todo")) {
+      const idx = CATS.findIndex(c => c.id === "okr");
+      const todoCat = { id: "todo", icon: "✅", label: "待办事项", subs: ["todo_today","todo_week","todo_month"] };
+      if (idx >= 0) CATS.splice(idx + 1, 0, todoCat); else CATS.push(todoCat);
       storeSet("wb_cats", CATS);
     }
   })();
@@ -642,6 +668,18 @@
     okr: {
       cat: "okr", title: "目标OKR", app: { name: "飞书OKR / Tita / Weekdone", icon: "🎯" },
       mode: "okr", blurb: "对标「飞书 OKR」「Tita」「Weekdone」：设定目标(Objective)与关键结果(Key Result)，进度自动汇总。"
+    },
+    todo_today: {
+      cat: "todo", title: "今日", app: { name: "待办清单", icon: "📌" },
+      mode: "todo", blurb: "今日待办：勾选完成的事项，进度自动汇总到首页与类目概览。"
+    },
+    todo_week: {
+      cat: "todo", title: "本周", app: { name: "待办清单", icon: "🗓️" },
+      mode: "todo", blurb: "本周待办：规划这一周要推进的事，逐项勾掉更有掌控感。"
+    },
+    todo_month: {
+      cat: "todo", title: "本月", app: { name: "待办清单", icon: "📆" },
+      mode: "todo", blurb: "本月待办：把月度大目标拆成可勾选的小步骤，看着进度条涨上来。"
     }
   };
 
@@ -779,6 +817,9 @@
   const fmt = (d) => { const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,"0"), day = String(d.getDate()).padStart(2,"0"); return `${y}-${m}-${day}`; };
   function storeGet(key, def) { try { const v = JSON.parse(localStorage.getItem(key)); return v == null ? def : v; } catch(e) { return def; } }
   function storeSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function getTodos(id){ const all = storeGet("wb_todos", {}); return all[id] || []; }
+  function setTodos(id, arr){ const all = storeGet("wb_todos", {}); all[id] = arr; storeSet("wb_todos", all); }
   function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), 2200); }
 
   /* ===== 玻璃风弹窗 ===== */
@@ -1085,20 +1126,20 @@
     });
   }
   renderHomeModules();
+  renderHomeTodo();
 
   /* ============ 日期 & 倒计时 ============ */
   const now = new Date();
   document.getElementById("dateBig").textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
   document.getElementById("dateSmall").textContent = weekMap[now.getDay()] + " · 宜成长，忌拖延";
-  const targetDate = new Date("2027-01-01T00:00:00");
-  document.getElementById("cdNum").textContent = Math.max(0, Math.ceil((targetDate - now) / (1000 * 60 * 60 * 24)));
+  /* 倒计时卡片已移除（v23），改由首页「今日待办」进度条取代 */
 
   /* ============ 视图切换 ============ */
   function showView(name) {
     document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
     document.getElementById("view-" + name).classList.add("active");
     window.scrollTo(0, 0);
-    if (name === "home") { renderHomeModules(); refreshHomeProgress(); updateImageProgressLight(); }
+    if (name === "home") { renderHomeModules(); refreshHomeProgress(); renderHomeTodo(); updateImageProgressLight(); }
   }
   function backToCat(catId) { showView("home"); openCat(catId); }
 
@@ -1160,15 +1201,91 @@
     else if (m.mode === "bazi") html += renderBazi();
     else if (m.mode === "vocab") html += renderVocab();
     else if (m.mode === "kpi") html += renderKPI(id, m.account);
+    else if (m.mode === "todo") html += renderTodo(id);
     else html += renderTracker(id, m);
     view.innerHTML = html;
     if (id === "okr") bindOKR(horizon);
     else if (m.mode === "bazi") bindBazi();
     else if (m.mode === "vocab") bindVocab();
     else if (m.mode === "kpi") bindKPI(id);
+    else if (m.mode === "todo") bindTodo(id);
     else bindTracker(id, m);
   }
 
+  /* ============ 待办事项（todo） ============ */
+  function renderTodo(id) {
+    const list = getTodos(id);
+    const total = list.length, done = list.filter(t => t.done).length;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    let html = '<div class="card todo-card">'
+      + '<div class="section-title" style="margin-bottom:12px;">✅ 待办清单（' + done + '/' + total + ' 已完成）</div>'
+      + '<div class="m-progress" style="margin-bottom:14px;"><div class="bar"><span style="width:' + pct + '%"></span></div><div class="m-pct">' + pct + '%</div></div>'
+      + '<div class="todo-add"><input id="todoInput" class="todo-input" type="text" placeholder="添加一项待办，回车保存…" /><button id="todoAddBtn" class="btn-primary" style="width:auto;padding:11px 16px;">添加</button></div>'
+      + '<div class="todo-list" id="todoList">';
+    if (!list.length) html += '<div class="empty-hint" style="padding:14px 4px;">还没有待办事项，添加第一项吧 ✍️</div>';
+    else {
+      list.forEach((t, i) => {
+        html += '<div class="todo-item' + (t.done ? ' done' : '') + '" data-i="' + i + '">'
+          + '<div class="todo-box">' + (t.done ? '✓' : '') + '</div>'
+          + '<div class="todo-text">' + escapeHtml(t.t) + '</div>'
+          + '<div class="todo-del">×</div>'
+          + '</div>';
+      });
+    }
+    html += '</div></div>';
+    return html;
+  }
+  function bindTodo(id) {
+    const inp = document.getElementById("todoInput");
+    if (inp) inp.addEventListener("keydown", e => { if (e.key === "Enter") addTodoItem(id); });
+    const addBtn = document.getElementById("todoAddBtn");
+    if (addBtn) addBtn.addEventListener("click", () => addTodoItem(id));
+    const list = document.getElementById("todoList");
+    if (list) {
+      list.querySelectorAll(".todo-item").forEach(row => {
+        const i = +row.dataset.i;
+        row.querySelector(".todo-box").addEventListener("click", () => toggleTodo(id, i));
+        row.querySelector(".todo-text").addEventListener("click", () => toggleTodo(id, i));
+        row.querySelector(".todo-del").addEventListener("click", () => delTodoItem(id, i));
+      });
+    }
+  }
+  function addTodoItem(id) {
+    const inp = document.getElementById("todoInput");
+    const v = inp ? inp.value.trim() : "";
+    if (!v) return;
+    const list = getTodos(id);
+    list.push({ t: v, done: false });
+    setTodos(id, list);
+    renderModule(id);
+    refreshHomeProgress();
+  }
+  function toggleTodo(id, i) {
+    const list = getTodos(id);
+    if (!list[i]) return;
+    list[i].done = !list[i].done;
+    setTodos(id, list);
+    renderModule(id);
+    refreshHomeProgress();
+  }
+  function delTodoItem(id, i) {
+    const list = getTodos(id);
+    if (!list[i]) return;
+    list.splice(i, 1);
+    setTodos(id, list);
+    renderModule(id);
+    refreshHomeProgress();
+  }
+  function renderHomeTodo() {
+    const el = document.getElementById("homeTodoCard");
+    if (!el) return;
+    const list = getTodos("todo_today");
+    const total = list.length, done = list.filter(t => t.done).length;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    const cnt = document.getElementById("htCount"); if (cnt) cnt.textContent = done + "/" + total;
+    const bar = document.getElementById("htBar"); if (bar) bar.style.width = pct + "%";
+    const pctEl = document.getElementById("htPct"); if (pctEl) pctEl.textContent = pct + "%";
+  }
   /* ============ 通用 Tracker ============ */
   function renderTracker(id, m) {
     const data = storeGet("wb_" + id, []);
@@ -1649,6 +1766,7 @@
   /* ============ 首页进度联动 ============ */
   function getActivity(modId) {
     const m = getModule(modId); if (!m) return 0;
+    if (m.mode === "todo") { const list = getTodos(modId); if (!list.length) return 0; return Math.round(list.filter(t => t.done).length / list.length * 100); }
     if (m.mode === "fatlog") {
       const d = storeGet("wb_fatlog_v1", null); if (!d || !d.records.length) return 0;
       const recs = d.records.slice().sort((a,b)=>a.date<b.date?-1:1);
@@ -1684,6 +1802,7 @@
     const pend = dueWords().length;
     const pill = document.getElementById("reviewPill");
     if (pill) { if (pend > 0) { pill.style.display = "inline-flex"; pill.textContent = "🧠 今日待复习 " + pend + " 词"; } else { pill.style.display = "none"; } }
+    renderHomeTodo();
   }
   function updateImageProgressLight() {}
 
