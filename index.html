@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>WorkBuddy · 个人成长工作台</title>
+<title>Suki-私人管理</title>
 <meta name="theme-color" content="#5cb88a" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-<meta name="apple-mobile-web-app-title" content="成长工作台" />
+<meta name="apple-mobile-web-app-title" content="Suki-私人管理" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <style>
@@ -41,8 +41,8 @@
   .hamburger:hover { background: #c7e8d4; }
   .appbar .ab-title { font-size: 15px; font-weight: 700; color: var(--text); }
   .appbar .ab-sub { font-size: 11px; color: var(--text-soft); margin-left: 2px; }
-  .brand { display: flex; align-items: center; gap: 12px; padding: 6px 8px 18px; border-bottom: 1px dashed var(--line); margin-bottom: 8px; }
-  .avatar { width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, #8fd9b6, #5cb88a); display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 6px 14px rgba(92,184,138,0.35); flex-shrink: 0; }
+  .brand { display: flex; align-items: center; justify-content: center; padding: 8px 8px 18px; border-bottom: 1px dashed var(--line); margin-bottom: 8px; }
+  .avatar { width: 84px; height: 84px; border-radius: 24px; object-fit: cover; box-shadow: 0 8px 24px rgba(63,157,114,0.22); flex-shrink: 0; cursor: pointer; background: var(--primary-soft); }
   .brand-text .name { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
   .brand-text .sub { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
   .nav { display: flex; flex-direction: column; gap: 4px; }
@@ -378,16 +378,15 @@
 
   <aside class="sidebar">
     <div class="brand">
-      <div class="avatar">🌱</div>
-      <div class="brand-text"><div class="name">我的成长工作台</div><div class="sub">WorkBuddy · 自律打卡</div></div>
+      <img class="avatar" id="sideAvatar" src="sidebar-icon.png" alt="头像" title="双击更换图片" />
+      <input type="file" id="avatarInput" accept="image/*" style="display:none" />
     </div>
     <nav class="nav" id="nav"></nav>
   </aside>
 
   <div class="appbar">
     <button class="hamburger" onclick="toggleNav()" aria-label="菜单">☰</button>
-    <span class="ab-title">成长工作台</span>
-    <span class="ab-sub">WorkBuddy</span>
+    <span class="ab-title">Suki-私人管理</span>
   </div>
   <div class="nav-backdrop" onclick="closeNav()"></div>
 
@@ -406,13 +405,13 @@
         <div class="card countdown-card">
           <div class="c-emoji">🎊🎯</div>
           <div class="c-body">
-            <div class="c-label">距离 2027.1.1 还有</div>
+            <div class="c-label">距离2027年还有</div>
             <div class="c-line"><span class="num" id="cdNum">153</span><span class="c-unit">天</span></div>
           </div>
         </div>
       </section>
       <section class="modules" id="modules"></section>
-      <div class="footer-note">🌱 养成系自律打卡 · 每一步都算数 · WorkBuddy 个人成长工作台</div>
+      <div class="footer-note">🌱 养成系自律打卡 · 每一步都算数 · Suki-私人管理</div>
     </div>
 
     <!-- ========== 类目概览 ========== -->
@@ -1678,18 +1677,13 @@
      减脂塑形：本地存储 + 图表 + 记录 + BMI + 小结 + AI 分析
      ==================================================================== */
   const FAT_KEY = "wb_fatlog_v1";
+  // 一次性清空旧版体重/体脂率数据
+  if (!localStorage.getItem("wb_fatlog_cleared_v9")) {
+    localStorage.removeItem(FAT_KEY);
+    localStorage.setItem("wb_fatlog_cleared_v9", "1");
+  }
   function seedFat() {
-    const today = new Date(); const recs = []; let w = 62.8;
-    for (let i = 10; i >= 1; i--) {
-      const d = new Date(today); d.setDate(today.getDate() - i);
-      w = +(w - (0.16 + Math.random() * 0.12)).toFixed(1);
-      const weight = w;
-      const bodyfat = +(27.5 + (weight - 55) * 0.25 + (Math.random() * 0.5 - 0.25)).toFixed(1);
-      const intake = Math.round(1250 + Math.random() * 450);
-      const burn = Math.round(160 + Math.random() * 220);
-      recs.push({ date: fmt(d), weight, bodyfat, intake, burn });
-    }
-    return { goal: { startWeight: recs[0].weight, targetWeight: 55, targetBodyfat: 22, height: 165 }, records: recs };
+    return { goal: { startWeight: 62.8, targetWeight: 55, targetBodyfat: 22, height: 165 }, records: [] };
   }
   function loadFat() {
     try { const d = JSON.parse(localStorage.getItem(FAT_KEY)); if (d && d.records) return d; } catch (e) {}
@@ -1938,6 +1932,27 @@
     };
     reader.readAsText(f);
   }
+
+  // 侧边栏头像：双击更换
+  (function initAvatar() {
+    const img = document.getElementById("sideAvatar");
+    const input = document.getElementById("avatarInput");
+    if (!img || !input) return;
+    const saved = localStorage.getItem("wb_sidebar_icon");
+    if (saved) img.src = saved;
+    img.addEventListener("dblclick", () => input.click());
+    input.addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        localStorage.setItem("wb_sidebar_icon", reader.result);
+        img.src = reader.result;
+        toast("头像已更新 🖼️");
+      };
+      reader.readAsDataURL(f);
+    });
+  })();
 
   // 首屏初始化
   refreshHomeProgress();

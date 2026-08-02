@@ -1,11 +1,12 @@
-const CACHE_NAME = 'wb-growth-v8';
+const CACHE_NAME = 'wb-growth-v9';
 const ASSETS = [
   './index.html',
   './manifest.webmanifest',
   './icon-192.png',
   './icon-512.png',
   './icon-maskable-512.png',
-  './apple-touch-icon.png'
+  './apple-touch-icon.png',
+  './sidebar-icon.png'
 ];
 
 self.addEventListener('install', (e) => {
