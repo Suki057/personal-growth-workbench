@@ -888,20 +888,29 @@
   const CHEVRON = '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   let openSwipe = null;
   const DEL_W = 76;
+  // 收起所有已展开的左滑删除（避免删除键在重新打开侧栏时残留显示）
+  function resetOpenSwipe() {
+    if (openSwipe) {
+      const c = openSwipe.querySelector(".swipe-content");
+      if (c) { c.style.transition = ""; c.style.transform = ""; }
+      openSwipe = null;
+    }
+  }
   function attachSwipe(container, content, onDelete) {
     const del = document.createElement("div"); del.className = "swipe-del";
     del.innerHTML = '🗑️<span>删除</span>';
     container.insertBefore(del, content);
     let sx = 0, sy = 0, dragging = false, decided = false, dx = 0;
     const closeMe = () => { content.style.transition = ""; content.style.transform = ""; if (openSwipe === container) openSwipe = null; };
-    const closeOthers = () => { if (openSwipe && openSwipe !== container) { openSwipe.style.transition = ""; openSwipe.style.transform = ""; openSwipe = null; } };
+    const closeOthers = () => { if (openSwipe && openSwipe !== container) { const c = openSwipe.querySelector(".swipe-content"); if (c) { c.style.transition = ""; c.style.transform = ""; } openSwipe = null; } };
     content.addEventListener("pointerdown", (e) => { if (e.pointerType === "mouse" && e.button !== 0) return; sx = e.clientX; sy = e.clientY; dragging = true; decided = false; dx = 0; content._moved = false; content.style.transition = "none"; });
     content.addEventListener("pointermove", (e) => {
       if (!dragging) return;
       const mx = e.clientX - sx, my = e.clientY - sy;
       if (!decided) {
-        if (Math.abs(mx) > 8 && Math.abs(mx) > Math.abs(my)) { decided = true; closeOthers(); }
-        else if (Math.abs(my) > 8) { dragging = false; return; }
+        // 需明确横向拖动（>10px 且横向大于纵向）才判定为左滑，避免点击/轻抖误触
+        if (Math.abs(mx) > 10 && Math.abs(mx) > Math.abs(my) + 4) { decided = true; closeOthers(); }
+        else if (Math.abs(my) > 10) { dragging = false; return; }
       }
       if (decided) {
         const nx = Math.min(0, Math.max(-DEL_W, mx));
@@ -919,9 +928,9 @@
     };
     content.addEventListener("pointerup", endDrag);
     content.addEventListener("pointercancel", () => { dragging = false; content.style.transition = ""; content.style.transform = ""; });
+    // 捕获阶段拦截：左滑刚结束 或 已展开删除时，吞掉随后的 click，避免误触发“打开”
     content.addEventListener("click", (e) => {
-      if (content._moved) { content._moved = false; e.stopPropagation(); e.preventDefault(); return; }
-      if (openSwipe === container) { closeMe(); e.stopPropagation(); e.preventDefault(); return; }
+      if (content._moved || openSwipe === container) { e.stopImmediatePropagation(); e.preventDefault(); content._moved = false; return; }
     }, true);
     del.addEventListener("click", (e) => { e.stopPropagation(); onDelete(); });
   }
@@ -958,7 +967,7 @@
         addBtn.addEventListener("click", (e) => { e.stopPropagation(); cat.open = true; storeSet("wb_cats", CATS); buildNav(); addSubItem(cat.id, "horizons"); });
         sub.appendChild(addBtn);
         wrap.appendChild(sub);
-        headContent.addEventListener("click", () => { wrap.classList.toggle("open"); cat.open = wrap.classList.contains("open"); storeSet("wb_cats", CATS); });
+        headContent.addEventListener("click", () => { resetOpenSwipe(); wrap.classList.toggle("open"); cat.open = wrap.classList.contains("open"); storeSet("wb_cats", CATS); });
       } else {
         const sub = document.createElement("div"); sub.className = "sub-list";
         (cat.subs || []).forEach(sid => {
@@ -975,7 +984,7 @@
         addBtn.addEventListener("click", (e) => { e.stopPropagation(); cat.open = true; storeSet("wb_cats", CATS); buildNav(); addSubItem(cat.id); });
         sub.appendChild(addBtn);
         wrap.appendChild(sub);
-        headContent.addEventListener("click", () => { wrap.classList.toggle("open"); cat.open = wrap.classList.contains("open"); storeSet("wb_cats", CATS); });
+        headContent.addEventListener("click", () => { resetOpenSwipe(); wrap.classList.toggle("open"); cat.open = wrap.classList.contains("open"); storeSet("wb_cats", CATS); });
       }
       makeEditable(headContent, cat.id, cat.label);
       navEl.appendChild(wrap);
@@ -987,7 +996,7 @@
   }
 
   function toggleNav() { document.body.classList.toggle("nav-open"); }
-  function closeNav() { document.body.classList.remove("nav-open"); }
+  function closeNav() { resetOpenSwipe(); document.body.classList.remove("nav-open"); }
   // 手机端默认展开侧栏；桌面端默认隐藏（点进子类目后保持隐藏）
   (function () {
     const mq = window.matchMedia("(max-width: 820px)");
@@ -1117,6 +1126,7 @@
   /* ============ 模块详情入口 ============ */
   let currentModule = null, currentHorizon = null;
   function openModule(id, horizon) {
+    resetOpenSwipe();
     const m = getModule(id);
     if (m.mode === "fatlog") { showView("fatlog"); renderFatlog(); return; }
     currentModule = id; currentHorizon = horizon || null;
