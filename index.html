@@ -903,13 +903,13 @@
     let sx = 0, sy = 0, dragging = false, decided = false, dx = 0;
     const closeMe = () => { content.style.transition = ""; content.style.transform = ""; if (openSwipe === container) openSwipe = null; };
     const closeOthers = () => { if (openSwipe && openSwipe !== container) { const c = openSwipe.querySelector(".swipe-content"); if (c) { c.style.transition = ""; c.style.transform = ""; } openSwipe = null; } };
-    content.addEventListener("pointerdown", (e) => { if (e.pointerType === "mouse" && e.button !== 0) return; sx = e.clientX; sy = e.clientY; dragging = true; decided = false; dx = 0; content._moved = false; content.style.transition = "none"; });
+    content.addEventListener("pointerdown", (e) => { if (e.pointerType === "mouse" && e.button !== 0) return; sx = e.clientX; sy = e.clientY; dragging = true; decided = false; dx = 0; content._moved = false; content.style.transition = "none"; closeOthers(); });
     content.addEventListener("pointermove", (e) => {
       if (!dragging) return;
       const mx = e.clientX - sx, my = e.clientY - sy;
       if (!decided) {
-        // 需明确横向拖动（>10px 且横向大于纵向）才判定为左滑，避免点击/轻抖误触
-        if (Math.abs(mx) > 10 && Math.abs(mx) > Math.abs(my) + 4) { decided = true; closeOthers(); }
+        // 需明确横向拖动（>12px 且横向明显大于纵向）才判定为左滑，避免点击/轻抖误触
+        if (Math.abs(mx) > 12 && Math.abs(mx) > Math.abs(my) + 6) { decided = true; closeOthers(); }
         else if (Math.abs(my) > 10) { dragging = false; return; }
       }
       if (decided) {
@@ -922,7 +922,8 @@
       if (!dragging) return;
       dragging = false; content.style.transition = "";
       if (decided) {
-        if (dx < -DEL_W / 2) { content.style.transform = "translateX(" + (-DEL_W) + "px)"; openSwipe = container; }
+        // 需拖过约 60% 才吸附常开，轻触/小幅拖动自动回弹收起
+        if (dx < -DEL_W * 0.6) { content.style.transform = "translateX(" + (-DEL_W) + "px)"; openSwipe = container; }
         else closeMe();
       }
     };
