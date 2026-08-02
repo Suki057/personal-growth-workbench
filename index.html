@@ -68,7 +68,7 @@
     .main { padding: 70px 14px 36px; min-width: 0; }
     .top-row { grid-template-columns: 1fr; }
     .modules { grid-template-columns: 1fr; }
-    .cat-grid { grid-template-columns: 1fr; }
+    .cat-list { gap: 10px; }
     .mod-layout { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
     .chart-grid { grid-template-columns: 1fr; }
@@ -116,21 +116,22 @@
   .section-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
   .section-title::before { content: ""; width: 5px; height: 16px; border-radius: 3px; background: var(--primary); display: inline-block; }
 
-  .modules { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-  .module { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 20px 22px; border: var(--glass-border); transition: transform .2s, box-shadow .2s, border-color .2s; cursor: pointer; }
+  .modules { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .module { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 26px 18px; border: var(--glass-border); transition: transform .2s, box-shadow .2s, border-color .2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }
   .module:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--primary-soft); }
   .module.selected { border-color: var(--primary); box-shadow: var(--shadow-hover); }
-  .m-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-  .m-ico { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #e6f6ec, #cdeedb); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
-  .m-title { font-size: 16px; font-weight: 700; }
-  .m-count { font-size: 12px; color: var(--primary-deep); margin-top: 3px; }
-  .m-count b { font-size: 14px; }
-  .m-sublist { margin-top: 8px; }
-  .m-subrow { display: flex; align-items: center; gap: 10px; margin-top: 11px; }
-  .m-subname { font-size: 13px; color: var(--text); flex: 0 0 auto; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .m-subbar { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
-  .m-subbar .bar { flex: 1; }
-  .m-subpct { font-size: 12px; font-weight: 700; color: var(--primary-deep); min-width: 34px; text-align: right; flex: 0 0 auto; }
+  .m-ico { width: 64px; height: 64px; border-radius: 20px; background: linear-gradient(135deg, #e6f6ec, #cdeedb); display: flex; align-items: center; justify-content: center; font-size: 34px; flex-shrink: 0; box-shadow: 0 6px 16px rgba(92,184,138,0.22); }
+  .m-title { font-size: 17px; font-weight: 700; color: var(--text); }
+  .empty-hint { text-align: center; color: var(--text-soft); font-size: 14px; padding: 30px 10px; }
+  /* 类目详情：子类目行（左标题 + 右进度） */
+  .cat-list { display: flex; flex-direction: column; gap: 12px; }
+  .cat-row { display: flex; align-items: center; gap: 12px; background: var(--glass-bg); border: var(--glass-border); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 15px 18px; cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s; margin-top: 0; }
+  .cat-row:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--primary-soft); }
+  .cat-row .c-ico { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, #e6f6ec, #cdeedb); display: flex; align-items: center; justify-content: center; font-size: 20px; flex: 0 0 auto; }
+  .cat-row .m-subname { flex: 0 0 auto; max-width: 42%; font-size: 15px; color: var(--text); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cat-row .m-subbar { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .cat-row .m-subbar .bar { flex: 1; }
+  .cat-row .m-subpct { font-size: 13px; font-weight: 700; color: var(--primary-deep); min-width: 40px; text-align: right; flex: 0 0 auto; }
   .tag { font-size: 11.5px; color: #4d7a63; background: var(--primary-soft); padding: 4px 10px; border-radius: 20px; }
   .m-progress { display: flex; align-items: center; gap: 10px; }
   .bar { flex: 1; height: 9px; border-radius: 20px; background: #eaf4ee; overflow: hidden; }
@@ -138,17 +139,7 @@
   .m-pct { font-size: 13px; font-weight: 700; color: var(--primary-deep); min-width: 38px; text-align: right; }
   .footer-note { margin-top: 30px; text-align: center; font-size: 12px; color: var(--text-soft); }
 
-  /* ============ 类目概览 ============ */
-  .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-  .cat-card { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 20px 22px; transition: transform .2s, box-shadow .2s; }
-  .cat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
-  .cat-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-  .cat-ico { width: 46px; height: 46px; border-radius: 13px; background: linear-gradient(135deg, #e6f6ec, #cdeedb); display: flex; align-items: center; justify-content: center; font-size: 23px; }
-  .cat-name { font-size: 16px; font-weight: 700; }
-  .cat-app { font-size: 12px; color: var(--primary-deep); margin-top: 3px; }
-  .cat-desc { font-size: 13px; color: var(--text-soft); line-height: 1.6; margin-bottom: 14px; min-height: 42px; }
-  .enter-btn { border: none; background: linear-gradient(135deg, #5cb88a, #3f9d72); color: #fff; border-radius: 20px; padding: 8px 18px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 5px 14px rgba(63,157,114,0.25); }
-  .enter-btn:hover { filter: brightness(1.05); }
+  /* ============ 类目概览（子类目行样式见上方 .cat-list / .cat-row） ============ */
 
   /* ============ 模块详情通用 ============ */
   .app-ref { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-soft); color: var(--primary-deep); font-size: 12.5px; font-weight: 600; padding: 6px 13px; border-radius: 20px; margin-top: 10px; }
@@ -423,7 +414,7 @@
           <div class="greet" id="catGreet"></div>
         </div>
       </div>
-      <section class="cat-grid" id="catGrid"></section>
+      <section class="cat-list" id="catGrid"></section>
     </div>
 
     <!-- ========== 模块详情 ========== -->
@@ -1037,32 +1028,24 @@
 
   /* ============ 首页模块卡片 ============ */
   function buildHomeModulesData() {
-    return CATS.filter(c => c.id !== "home").map(cat => {
-      const isOkr = !!cat.horizons;
-      const items = isOkr
-        ? cat.horizons.map(h => ({ id: h, title: labelOf(h, h), progress: getSubProgress("okr", h) }))
-        : (cat.subs || []).map(sid => {
-            const mod = getModule(sid);
-            return { id: sid, title: mod ? labelOf(sid, mod.title) : sid, progress: getActivity(sid) };
-          });
-      return { id: cat.id, icon: cat.icon, name: labelOf(cat.id, cat.label), count: items.length, progress: catActivity(cat.id, 0), items };
-    });
+    return CATS.filter(c => c.id !== "home").map(cat => ({
+      id: cat.id, icon: cat.icon, name: labelOf(cat.id, cat.label)
+    }));
   }
   function renderHomeModules() {
     const modEl = document.getElementById("modules");
     modEl.innerHTML = "";
     modulesData = buildHomeModulesData();
+    if (!modulesData.length) {
+      modEl.innerHTML = '<div class="empty-hint">还没有类目，点击左上角菜单「＋ 新增类目」开始吧 🌱</div>';
+      return;
+    }
     modulesData.forEach((m, i) => {
       const card = document.createElement("div");
       card.className = "module anim"; card.style.animationDelay = (0.1 + i * 0.07) + "s"; card.dataset.id = m.id;
       card.innerHTML = `
-        <div class="m-top"><div class="m-ico">${m.icon}</div><div>
-          <div class="m-title">${m.name}</div><div class="m-count"><b>${m.count}</b> 个子项</div></div></div>
-        <div class="m-sublist">${m.items.map(it => `
-          <div class="m-subrow">
-            <div class="m-subname">${it.title}</div>
-            <div class="m-subbar"><div class="bar"><span style="width:${it.progress}%"></span></div><div class="m-subpct">${it.progress}%</div></div>
-          </div>`).join("")}</div>`;
+        <div class="m-ico">${m.icon}</div>
+        <div class="m-title">${m.name}</div>`;
       card.addEventListener("click", () => { document.querySelectorAll(".module").forEach(c => c.classList.remove("selected")); card.classList.add("selected"); openCat(m.id); });
       modEl.appendChild(card);
     });
@@ -1088,17 +1071,28 @@
   function openCat(catId) {
     const cat = CATS.find(c => c.id === catId);
     if (!cat) { toast("该类目已删除"); showView("home"); return; }
-    document.getElementById("catTitle").textContent = labelOf(cat.id, cat.label);
-    const subIds = catId === "okr" ? ["okr"] : cat.subs;
-    document.getElementById("catGreet").textContent = "以下工具对标市面主流 App，点击「进入」开始使用。";
+    const catName = labelOf(cat.id, cat.label);
+    document.getElementById("catTitle").textContent = catName;
+    document.getElementById("catGreet").textContent = "「" + catName + "」的子类目，左侧为名称，右侧为当前进度，点击任意一行进入。";
     const grid = document.getElementById("catGrid");
-    grid.innerHTML = subIds.map(sid => {
-      const m = getModule(sid);
-      return `<div class="cat-card">
-        <div class="cat-top"><div class="cat-ico">${m.app.icon}</div>
-          <div><div class="cat-name">${labelOf(sid, m.title)}</div><div class="cat-app">对标 ${m.app.name}</div></div></div>
-        <div class="cat-desc">${m.blurb}</div>
-        <button class="enter-btn" onclick="openModule('${sid}'${sid==='okr'?",'"+(cat.horizons&&cat.horizons[0]||"今年")+"'":""})">进入 →</button>
+    grid.className = "cat-list";
+    let rows = [];
+    if (catId === "okr") {
+      rows = (cat.horizons || []).map(h => ({ id: h, title: labelOf(h, h), prog: getSubProgress("okr", h), ico: "🎯", horizon: h }));
+    } else {
+      rows = (cat.subs || []).map(sid => { const m = getModule(sid); return { id: sid, title: labelOf(sid, m.title), prog: getActivity(sid), ico: m.app.icon, horizon: null }; });
+    }
+    if (!rows.length) {
+      grid.innerHTML = '<div class="empty-hint">还没有子类目，点击左上角菜单展开该类目后点「＋」添加。</div>';
+      showView("cat");
+      return;
+    }
+    grid.innerHTML = rows.map(r => {
+      const horizon = r.horizon ? `,'${r.horizon}'` : "";
+      return `<div class="cat-row" onclick="openModule('${r.id}'${horizon})">
+        <div class="c-ico">${r.ico}</div>
+        <div class="m-subname">${r.title}</div>
+        <div class="m-subbar"><div class="bar"><span style="width:${r.prog}%"></span></div><div class="m-subpct">${r.prog}%</div></div>
       </div>`;
     }).join("");
     showView("cat");
@@ -1652,21 +1646,6 @@
     return Math.round(acts.reduce((s,a)=>s+a,0) / acts.length);
   }
   function refreshHomeProgress() {
-    modulesData.forEach(m => {
-      const cat = CATS.find(c => c.id === m.id);
-      const isOkr = cat && !!cat.horizons;
-      m.items.forEach(it => { it.progress = isOkr ? getSubProgress("okr", it.id) : getActivity(it.id); });
-      const card = [...document.querySelectorAll(".module")].find(c => c.dataset.id === m.id);
-      if (!card) return;
-      const rows = card.querySelectorAll(".m-subrow");
-      m.items.forEach((it, idx) => {
-        const row = rows[idx]; if (!row) return;
-        const bar = row.querySelector(".bar > span");
-        const pct = row.querySelector(".m-subpct");
-        if (bar) bar.style.width = it.progress + "%";
-        if (pct) pct.textContent = it.progress + "%";
-      });
-    });
     const pend = dueWords().length;
     const pill = document.getElementById("reviewPill");
     if (pill) { if (pend > 0) { pill.style.display = "inline-flex"; pill.textContent = "🧠 今日待复习 " + pend + " 词"; } else { pill.style.display = "none"; } }
