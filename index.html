@@ -365,7 +365,7 @@
 
   <div class="appbar">
     <button class="hamburger" onclick="toggleNav()" aria-label="菜单">☰</button>
-    <span class="ab-title">Suki-私人管理</span>
+    <span class="ab-title" id="appTitle">Suki-私人管理</span>
   </div>
   <div class="nav-backdrop" onclick="closeNav()"></div>
 
@@ -1946,6 +1946,39 @@
         toast("头像已更新 🖼️");
       };
       reader.readAsDataURL(f);
+    });
+  })();
+
+  // 顶部标题：双击重命名并持久化
+  (function initAppTitle() {
+    const el = document.getElementById("appTitle");
+    if (!el) return;
+    const KEY = "wb_app_title";
+    const DEFAULT = "Suki-私人管理";
+    const saved = localStorage.getItem(KEY);
+    if (saved) el.textContent = saved;
+    el.title = "双击重命名";
+    el.style.cursor = "text";
+    el.addEventListener("dblclick", () => {
+      if (el.parentNode && el.parentNode.querySelector(".rename-input")) return;
+      const cur = el.textContent;
+      const inp = document.createElement("input");
+      inp.value = cur; inp.className = "rename-input";
+      inp.style.width = "170px"; inp.style.fontSize = "15px"; inp.style.fontWeight = "700";
+      el.replaceWith(inp); inp.focus(); inp.select();
+      const restore = () => { inp.replaceWith(el); };
+      const commit = () => {
+        const v = inp.value.trim();
+        const final = v || cur;
+        localStorage.setItem(KEY, final);
+        el.textContent = final;
+        restore();
+      };
+      inp.addEventListener("blur", commit);
+      inp.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter") inp.blur();
+        else if (ev.key === "Escape") { inp.value = cur; inp.blur(); }
+      });
     });
   })();
 
