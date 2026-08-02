@@ -62,11 +62,24 @@
   .sub-item.active { color: var(--primary-deep); font-weight: 600; background: var(--primary-soft); }
 
   /* 主内容 */
-  .main { flex: 1; padding: 84px 36px 48px; overflow-y: auto; height: 100vh; }
+  .main { flex: 1; min-width: 0; padding: 84px 36px 48px; overflow-y: auto; height: 100vh; }
   @media (max-width: 820px) {
-    .main { padding: 74px 18px 40px; }
+    body { overflow-x: hidden; }
+    .main { padding: 70px 14px 36px; min-width: 0; }
     .top-row { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: 1fr 1fr; }
+    .modules { grid-template-columns: 1fr; }
+    .cat-grid { grid-template-columns: 1fr; }
+    .mod-layout { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .chart-grid { grid-template-columns: 1fr; }
+    .pillars { grid-template-columns: repeat(2, 1fr); }
+    .summary-grid { grid-template-columns: 1fr !important; }
+    .vocab-grid { grid-template-columns: repeat(2, 1fr); }
+    .dayun-row { flex-wrap: wrap; overflow-x: visible; }
+    .dayun-pillar { flex: 1 1 28%; min-width: 0; }
+    .top-row.top-single .countdown-card { width: 100%; }
+    .table-head { display: none; }
+    .modal { width: 92vw; max-width: 460px; }
   }
   .view { display: none; }
   .view.active { display: block; animation: fadeUp .4s ease both; }
@@ -164,6 +177,15 @@
   .hist-row .hv b { color: var(--primary-deep); }
   .del-btn { border: none; background: #fdecec; color: #d9534f; border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
   .del-btn:hover { background: #f9d6d6; }
+
+  /* 减脂记录：手机卡片式（桌面不渲染此结构） */
+  .fatlog-card-m { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; background: var(--glass-bg); box-shadow: var(--glass-shadow); }
+  .fatlog-card-m .fc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .fatlog-card-m .fc-date { font-weight: 800; color: var(--primary-deep); font-size: 14px; }
+  .fatlog-card-m .fc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+  .fatlog-card-m .fc-grid > div { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+  .fatlog-card-m .fc-grid .k { color: var(--text-soft); }
+  .fatlog-card-m .fc-grid .v { color: var(--text); font-weight: 600; }
 
   /* 图表 */
   .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 6px; }
@@ -970,6 +992,13 @@
     sync();
     if (mq.addEventListener) mq.addEventListener("change", sync); else if (mq.addListener) mq.addListener(sync);
   })();
+  // 屏幕宽度跨越 820px（旋转/分屏）时，若正在看减脂记录则重新渲染为对应布局
+  (function () {
+    const mq = window.matchMedia("(max-width: 820px)");
+    let last = mq.matches;
+    const onCh = () => { if (mq.matches !== last) { last = mq.matches; const v = document.getElementById("view-fatlog"); if (v && v.classList.contains("active")) renderFatlog(); } };
+    if (mq.addEventListener) mq.addEventListener("change", onCh); else if (mq.addListener) mq.addListener(onCh);
+  })();
 
   async function addCategory() {
     const name = await promptBox("新建分类", "输入分类名称：", "新分类", "🌟");
@@ -1688,9 +1717,22 @@
     renderSummary("sumWeek", recs.slice(-7), data.goal.height);
     renderSummary("sumMonth", recs.slice(-30), data.goal.height);
     const list = document.getElementById("historyList");
+    const mob = window.matchMedia("(max-width: 820px)").matches;
     list.innerHTML = recs.slice().reverse().map(r => {
       const net = (r.intake || 0) - (r.burn || 0);
       const netCls = net < 0 ? "net-good" : "net-bad";
+      if (mob) {
+        return `<div class="fatlog-card-m">
+          <div class="fc-top"><span class="fc-date">${r.date.slice(5)}</span><button class="del-btn" onclick="delFatRec('${r.date}')">删除</button></div>
+          <div class="fc-grid">
+            <div><span class="k">体重</span><span class="v">${r.weight} kg</span></div>
+            <div><span class="k">体脂率</span><span class="v">${r.bodyfat != null ? r.bodyfat + "%" : "—"}</span></div>
+            <div><span class="k">摄入</span><span class="v">${r.intake != null ? r.intake : "—"}</span></div>
+            <div><span class="k">运动</span><span class="v">${r.burn != null ? r.burn : "—"}</span></div>
+            <div><span class="k">净热量</span><span class="v" style="color:${net<0?'#2f8a5b':'#c8742f'}">${net}</span></div>
+            <div><span class="k">其他</span><span class="v">${extraText(r) || "—"}</span></div>
+          </div></div>`;
+      }
       return `<div class="hist-row" style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.8fr 0.8fr 0.9fr 1.2fr 0.6fr;gap:8px;align-items:center;font-size:13px;padding:11px 6px;border-bottom:1px solid var(--line);">
         <span>${r.date.slice(5)}</span><span>${r.weight} kg</span><span>${r.bodyfat != null ? r.bodyfat + "%" : "—"}</span><span>${r.intake != null ? r.intake : "—"}</span><span>${r.burn != null ? r.burn : "—"}</span><span class="${netCls}" style="font-weight:700;color:${net<0?'#2f8a5b':'#c8742f'}">${net}</span><span>${extraText(r)}</span><span><button class="del-btn" onclick="delFatRec('${r.date}')">删除</button></span></div>`;
     }).join("");
