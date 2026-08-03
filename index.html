@@ -35,7 +35,7 @@
   }
 
   /* 侧边栏 */
-  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 280px; max-width: 84vw; background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(255,255,255,0.90)); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-right: 1px solid rgba(169,140,201,0.30); border-top: 3px solid var(--gold); padding: 92px 14px 14px; display: flex; flex-direction: column; gap: 10px; height: 100vh; overflow-y: auto; box-shadow: 6px 0 28px rgba(70,58,82,0.10); transform: translateX(-100%); transition: transform .28s ease; z-index: 80; }
+  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 140px; max-width: 50vw; background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(255,255,255,0.90)); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-right: 1px solid rgba(169,140,201,0.30); border-top: 3px solid var(--gold); padding: 92px 10px 12px; display: flex; flex-direction: column; gap: 8px; height: 100vh; overflow-y: auto; box-shadow: 6px 0 28px rgba(70,58,82,0.10); transform: translateX(-100%); transition: transform .28s ease; z-index: 80; }
   body.nav-open .sidebar { transform: translateX(0); }
   .nav-backdrop { position: fixed; inset: 0; background: rgba(70,58,82,0.30); opacity: 0; visibility: hidden; transition: opacity .25s ease; z-index: 70; }
   @media (max-width: 820px) { body.nav-open .nav-backdrop { opacity: 1; visibility: visible; } }
@@ -48,7 +48,7 @@
   .avatar { width: 84px; height: 84px; border-radius: 24px; object-fit: cover; border: 2px solid var(--gold); box-shadow: 0 8px 24px rgba(169,140,201,0.30); flex-shrink: 0; cursor: pointer; background: var(--primary-soft); }
   .brand-text .name { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
   .brand-text .sub { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
-  .nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-content: start; }
+  .nav { display: grid; grid-template-columns: 1fr; gap: 8px; align-content: start; }
   .nav-item { border-radius: var(--radius-sm); cursor: pointer; user-select: none; transition: background .2s, color .2s; }
   .nav-head { position: relative; overflow: hidden; border-radius: var(--radius-sm); }
   .sub-item { position: relative; overflow: hidden; border-radius: 10px; }
@@ -79,6 +79,10 @@
     .top-row { grid-template-columns: 1fr; }
     .modules { grid-template-columns: 1fr; }
     .cat-list { gap: 10px; }
+    .cat-grid { gap: 12px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .verdict { min-width: 0; }
+    .main { overflow-x: hidden; }
     .mod-layout { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
     .chart-grid { grid-template-columns: 1fr; }
@@ -380,13 +384,13 @@
   .todo-del { color: var(--text-soft); font-size: 20px; line-height: 1; cursor: pointer; opacity: .45; padding: 0 4px; transition: opacity .15s, color .15s; }
   .todo-del:hover { opacity: 1; color: var(--accent); }
 
-  /* ============ 公主日记风：侧栏/类目方块（图标在上·标题在下） ============ */
-  .nav-foot { grid-column: 1 / -1; padding: 12px 14px 4px; }
-  .nav-tile { border-radius: var(--radius); cursor: pointer; user-select: none; }
-  .nav-tile .nav-head { border-radius: var(--radius); }
-  .nav-tile .swipe-content { flex-direction: column; align-items: center; justify-content: center; gap: 7px; text-align: center; aspect-ratio: 1 / 1; padding: 8px 6px; font-size: 12px; font-weight: 700; color: var(--text); }
-  .nav-tile .ico { font-size: 23px; width: auto; }
-  .nav-tile .label { flex: none; line-height: 1.3; }
+  /* ============ 公主日记风：侧栏总类目（竖排·一行一个·图标+标题横排） ============ */
+  .nav-foot { grid-column: 1 / -1; padding: 12px 10px 4px; }
+  .nav-tile { border-radius: var(--radius-sm); cursor: pointer; user-select: none; }
+  .nav-tile .nav-head { border-radius: var(--radius-sm); }
+  .nav-tile .swipe-content { flex-direction: row; align-items: center; justify-content: flex-start; gap: 10px; text-align: left; aspect-ratio: auto; padding: 10px 12px; font-size: 13px; font-weight: 700; color: var(--text); }
+  .nav-tile .ico { font-size: 18px; width: 22px; text-align: center; flex: 0 0 22px; }
+  .nav-tile .label { flex: 1; min-width: 0; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .nav-tile.active > .nav-head .swipe-content { background: var(--primary-soft); color: var(--primary-deep); }
   .nav-tile:hover > .nav-head .swipe-content { background: var(--bg-soft); }
 
@@ -439,7 +443,6 @@
           <div class="m-progress"><div class="bar"><span id="htBar" style="width:0%"></span></div><div class="m-pct" id="htPct">0%</div></div>
         </div>
       </section>
-      <section class="modules" id="modules"></section>
       <div class="footer-note">🏠 去建你的房子，🛠️ 重建你的人生，👣 每一步都算数 ✨</div>
     </div>
 
@@ -447,7 +450,7 @@
     <div class="view" id="view-cat">
       <div class="page-head">
         <div>
-          <button class="back-btn" onclick="showView('home')">← 返回首页</button>
+          <button class="back-btn" onclick="goBack()">← 返回</button>
           <h1 id="catTitle" style="margin-top:12px;">类目</h1>
           <div class="greet" id="catGreet"></div>
         </div>
@@ -462,7 +465,7 @@
     <div class="view" id="view-fatlog">
       <div class="page-head">
         <div>
-          <button class="back-btn" onclick="backToCat('image')">← 返回形象提升</button>
+          <button class="back-btn" onclick="goBack()">← 返回</button>
           <h1 style="margin-top:12px;">💃 减脂塑形 · 每日记录</h1>
           <div class="greet">对标减肥 App：每日记录体重 / 体脂率 / 摄入大卡，追踪趋势、BMI 与目标体脂率</div>
         </div>
@@ -535,7 +538,7 @@
     <div class="view" id="view-rbin">
       <div class="page-head">
         <div>
-          <button class="back-btn" onclick="showView('home')">← 返回首页</button>
+          <button class="back-btn" onclick="goBack()">← 返回</button>
           <h1 style="margin-top:12px;">🗑️ 回收站</h1>
           <div class="greet">已删除的类目 / 子项会在这里保留 <b>7 天</b>，到期自动永久删除；也可随时「恢复」或「永久删除」。</div>
           <button class="tool-btn" id="emptyRbinBtn" onclick="emptyRecycle()" style="margin-top:10px;">🧹 清空回收站</button>
@@ -1023,15 +1026,31 @@
       head.appendChild(headContent); wrap.appendChild(head);
       const delHead = async () => { if (await confirmBox("移入回收站", "将「" + labelOf(cat.id, cat.label) + "」及其全部子类目移入回收站？\n7 天内可恢复，到期自动永久删除。", "移入回收站", false, "🗑️")) deleteCat(cat.id); };
       attachSwipe(head, headContent, delHead);
-      makeEditable(headContent, cat.id, cat.label);
+      // 提示可改名（连续三击总类目方框）
+      headContent.title = "连续点击三下改名";
+      const labelEl = headContent.querySelector(".label");
+      if (labelEl) labelEl.style.cursor = "text";
       const go = () => {
         document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
         wrap.classList.add("active");
         if (cat.leaf) showView("home"); else openCat(cat.id);
         closeNav();
       };
-      headContent.addEventListener("click", (e) => { e.stopPropagation(); if (headContent._t) clearTimeout(headContent._t); headContent._t = setTimeout(go, 240); });
-      headContent.addEventListener("dblclick", () => { if (headContent._t) { clearTimeout(headContent._t); headContent._t = null; } });
+      // 单击延时进入；连续三击触发改名（不再走双击）
+      let _clicks = 0, _ct = null;
+      headContent.addEventListener("click", (e) => {
+        e.stopPropagation();
+        _clicks++;
+        if (_clicks === 1) {
+          _ct = setTimeout(() => { _clicks = 0; go(); }, 350);
+        } else if (_clicks === 2) {
+          clearTimeout(_ct);
+          _ct = setTimeout(() => { _clicks = 0; go(); }, 350);
+        } else if (_clicks === 3) {
+          clearTimeout(_ct); _clicks = 0;
+          beginRename(headContent, cat.id, cat.label);
+        }
+      });
       navEl.appendChild(wrap);
     });
     const footer = document.createElement("div"); footer.className = "nav-foot";
@@ -1103,22 +1122,8 @@
     }));
   }
   function renderHomeModules() {
-    const modEl = document.getElementById("modules");
-    modEl.innerHTML = "";
-    modulesData = buildHomeModulesData();
-    if (!modulesData.length) {
-      modEl.innerHTML = '<div class="empty-hint">还没有类目，点击左上角菜单「＋ 新增类目」开始吧 🌱</div>';
-      return;
-    }
-    modulesData.forEach((m, i) => {
-      const card = document.createElement("div");
-      card.className = "module anim"; card.style.animationDelay = (0.1 + i * 0.07) + "s"; card.dataset.id = m.id;
-      card.innerHTML = `
-        <div class="m-ico">${m.icon}</div>
-        <div class="m-title">${m.name}</div>`;
-      card.addEventListener("click", () => { document.querySelectorAll(".module").forEach(c => c.classList.remove("selected")); card.classList.add("selected"); openCat(m.id); });
-      modEl.appendChild(card);
-    });
+    /* v25：首页「总类目六大板块」已移除，首页仅保留日期横幅与「今日待办」进度卡 */
+    return;
   }
   renderHomeModules();
   renderHomeTodo();
@@ -1129,19 +1134,36 @@
   document.getElementById("dateSmall").textContent = weekMap[now.getDay()] + " · 宜成长，忌拖延";
   /* 倒计时卡片已移除（v23），改由首页「今日待办」进度条取代 */
 
-  /* ============ 视图切换 ============ */
-  function showView(name) {
+  /* ============ 视图切换（含「返回上一步」历史栈） ============ */
+  let viewStack = [];
+  function curViewName() { const v = document.querySelector(".view.active"); return v ? v.id.replace(/^view-/, "") : "home"; }
+  function pushHistory(name) { const cur = curViewName(); if (cur && cur !== name) viewStack.push(cur); }
+  function showView(name, opts) {
+    if (!(opts && opts.noHistory)) pushHistory(name);
     document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
     document.getElementById("view-" + name).classList.add("active");
     window.scrollTo(0, 0);
-    if (name === "home") { renderHomeModules(); refreshHomeProgress(); renderHomeTodo(); updateImageProgressLight(); }
+    if (name === "home") { refreshHomeProgress(); renderHomeTodo(); updateImageProgressLight(); }
   }
-  function backToCat(catId) { showView("home"); openCat(catId); }
+  // 返回上一步：弹栈回到上一个视图（而非固定回首页）
+  function goBack() {
+    const prev = viewStack.pop();
+    if (!prev) { showView("home", { noHistory: true }); return; }
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.getElementById("view-" + prev).classList.add("active");
+    window.scrollTo(0, 0);
+    if (prev === "home") { refreshHomeProgress(); renderHomeTodo(); updateImageProgressLight(); }
+    else if (prev === "cat") { if (window._curCatId) openCat(window._curCatId, { noShow: true }); }
+    else if (prev === "module") { if (currentModule) renderModule(currentModule, currentHorizon); }
+    else if (prev === "fatlog") { renderFatlog(); }
+    else if (prev === "rbin") { renderRecycle(); }
+  }
+  function backToCat(catId) { showView("home", { noHistory: true }); openCat(catId); }
 
-  function openCat(catId) {
+  function openCat(catId, opts) {
     window._curCatId = catId;
     const cat = CATS.find(c => c.id === catId);
-    if (!cat) { toast("该类目已删除"); showView("home"); return; }
+    if (!cat) { toast("该类目已删除"); showView("home", { noHistory: true }); return; }
     const catName = labelOf(cat.id, cat.label);
     document.getElementById("catTitle").textContent = catName;
     document.getElementById("catGreet").textContent = "「" + catName + "」的子类目 · 轻点方块进入，左滑可删除，双击可改名 ✨";
@@ -1175,7 +1197,7 @@
     addTile.innerHTML = '<div class="c-add">＋</div><div class="m-subname">添加子项</div>';
     addTile.addEventListener("click", async () => { await addSubItem(cat.id, cat.horizons ? "horizons" : undefined); if (document.getElementById("view-cat").classList.contains("active")) openCat(catId); });
     grid.appendChild(addTile);
-    showView("cat");
+    if (!opts || !opts.noShow) showView("cat");
   }
 
   /* ============ 模块详情入口 ============ */
@@ -1192,11 +1214,11 @@
   function renderModule(id, horizon) {
     const m = getModule(id);
     const view = document.getElementById("view-module");
-    const backLabel = m.cat === "okr" ? "返回首页" : "返回" + (CATS.find(c => c.id === m.cat) ? CATS.find(c => c.id === m.cat).label : "首页");
+    const backLabel = "返回";
     let html = `
       <div class="page-head">
         <div>
-          <button class="back-btn" onclick="${m.cat==='okr' ? "showView('home')" : "backToCat('"+m.cat+"')"}">← ${backLabel}</button>
+          <button class="back-btn" onclick="goBack()">← ${backLabel}</button>
           <h1 style="margin-top:12px;">${m.app.icon} ${labelOf(id, m.title)}</h1>
           <div class="greet">${m.blurb}</div>
           <div class="app-ref"><span class="a-ico">📱</span>对标 App：${m.app.name}</div>
