@@ -386,11 +386,11 @@
 
   /* ============ 公主日记风：侧栏总类目（竖排·一行一个·图标+标题横排） ============ */
   .nav-foot { grid-column: 1 / -1; padding: 12px 10px 4px; }
-  .nav-tile { border-radius: var(--radius-sm); cursor: pointer; user-select: none; }
-  .nav-tile .nav-head { border-radius: var(--radius-sm); }
-  .nav-tile .swipe-content { flex-direction: row; align-items: center; justify-content: flex-start; gap: 10px; text-align: left; aspect-ratio: auto; padding: 10px 12px; font-size: 13px; font-weight: 700; color: var(--text); }
-  .nav-tile .ico { font-size: 18px; width: 22px; text-align: center; flex: 0 0 22px; }
-  .nav-tile .label { flex: 1; min-width: 0; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nav-tile { border-radius: 20px; cursor: pointer; user-select: none; }
+  .nav-tile .nav-head { border-radius: 20px; }
+  .nav-tile .swipe-content { flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; aspect-ratio: 1 / 1; padding: 8px 6px; font-size: 12px; font-weight: 700; color: var(--text); }
+  .nav-tile .ico { font-size: 26px; width: auto; flex: none; }
+  .nav-tile .label { flex: none; min-width: 0; max-width: 100%; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .nav-tile.active > .nav-head .swipe-content { background: var(--primary-soft); color: var(--primary-deep); }
   .nav-tile:hover > .nav-head .swipe-content { background: var(--bg-soft); }
 
