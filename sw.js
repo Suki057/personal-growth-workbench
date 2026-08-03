@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wb-growth-v29';
+const CACHE_NAME = 'wb-growth-v30';
 const ASSETS = [
   './index.html',
   './manifest.webmanifest',

@@ -35,7 +35,7 @@
   }
 
   /* 侧边栏 */
-  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 140px; max-width: 50vw; background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(255,255,255,0.90)); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-right: 1px solid rgba(169,140,201,0.30); border-top: 3px solid var(--gold); padding: 92px 10px 12px; display: flex; flex-direction: column; gap: 8px; height: 100vh; overflow-y: auto; box-shadow: 6px 0 28px rgba(70,58,82,0.10); transform: translateX(-100%); transition: transform .28s ease; z-index: 80; }
+  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 140px; max-width: 50vw; background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(255,255,255,0.90)); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-right: 1px solid rgba(169,140,201,0.30); border-top: 3px solid var(--gold); padding: 92px 10px 12px; display: flex; flex-direction: column; gap: 8px; height: 100vh; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; box-shadow: 6px 0 28px rgba(70,58,82,0.10); transform: translateX(-100%); transition: transform .28s ease; z-index: 80; }
   body.nav-open .sidebar { transform: translateX(0); }
   .nav-backdrop { position: fixed; inset: 0; background: rgba(70,58,82,0.30); opacity: 0; visibility: hidden; transition: opacity .25s ease; z-index: 70; }
   @media (max-width: 820px) { body.nav-open .nav-backdrop { opacity: 1; visibility: visible; } }
@@ -56,7 +56,7 @@
   .nav-head .ico { font-size: 17px; width: 22px; text-align: center; }
   .nav-head .label { flex: 1; user-select: none; }
   .sub-item .swipe-content { gap: 8px; padding: 9px 12px; font-size: 13px; font-weight: 500; color: var(--text-soft); justify-content: flex-start; text-align: left; }
-  .swipe-del { position: absolute; top: 0; right: 0; bottom: 0; width: 76px; display: flex; align-items: center; justify-content: center; gap: 4px; background: linear-gradient(135deg, #d9779a, #b94f74); color: #fff; font-size: 12.5px; font-weight: 700; z-index: 1; cursor: pointer; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
+  .swipe-del { position: absolute; top: 0; right: 0; bottom: 0; width: 76px; display: none; align-items: center; justify-content: center; gap: 4px; background: linear-gradient(135deg, #d9779a, #b94f74); color: #fff; font-size: 12.5px; font-weight: 700; z-index: 1; cursor: pointer; box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); }
   .swipe-del:active { filter: brightness(.94); }
   .nav-head .arrow { width: 20px; height: 20px; flex: 0 0 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--mint-2); color: var(--primary-deep); transition: transform .25s ease, background .2s; }
   .nav-head .arrow svg { display: block; }
@@ -165,8 +165,12 @@
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
   .form-grid.one { grid-template-columns: 1fr; }
   .form-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--text-soft); font-weight: 600; }
-  .form-grid input, .form-grid select { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; font-size: 14px; color: var(--text); background: var(--bg-soft); outline: none; transition: border-color .2s; }
+  .form-grid input, .form-grid select { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; font-size: 14px; color: var(--text); background: var(--bg-soft); outline: none; transition: border-color .2s; box-sizing: border-box; }
   .form-grid input:focus, .form-grid select:focus { border-color: var(--primary); background: #fff; }
+  /* OKR 新建目标：方框宽度缩短，边框限制在内不溢出 */
+  .form-grid.okr-new { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-grid.okr-new label { width: 100%; max-width: 240px; }
+  .form-grid.okr-new input, .form-grid.okr-new select { width: 100%; max-width: 240px; }
   .btn-primary { border: none; border-radius: 12px; padding: 11px 18px; font-size: 14px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #c9b8e6, #8e6fb3); cursor: pointer; width: 100%; box-shadow: 0 6px 16px rgba(70,58,82,0.28); transition: transform .15s; }
   .btn-primary:hover { transform: translateY(-2px); }
   .btn-ghost { border: 1px solid var(--primary); color: var(--primary-deep); background: #fff; border-radius: 12px; padding: 10px 18px; font-size: 13.5px; font-weight: 700; cursor: pointer; width: 100%; transition: background .2s; }
@@ -392,7 +396,7 @@
   .todo-del:hover { opacity: 1; color: var(--accent); }
 
   /* ============ 公主日记风：侧栏总类目（竖排·一行一个·图标+标题横排） ============ */
-  .nav-foot { grid-column: 1 / -1; padding: 12px 10px 4px; }
+  .nav-foot { grid-column: 1 / -1; padding: 12px 10px 16px; flex: 0 0 auto; }
   .nav-tile { border-radius: 14px; cursor: pointer; user-select: none; margin: 6px 12px 4px; }
   .nav-tile .nav-head { border-radius: 14px; }
   .nav-tile .swipe-content { flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; padding: 10px 12px; font-size: 12px; font-weight: 700; color: var(--text); background: rgba(169,140,201,0.08); }
@@ -976,7 +980,9 @@
   function resetOpenSwipe() {
     if (openSwipe) {
       const c = openSwipe.querySelector(".swipe-content");
+      const d = openSwipe.querySelector(".swipe-del");
       if (c) { c.style.transition = ""; c.style.transform = ""; }
+      if (d) d.style.display = "none";
       openSwipe = null;
     }
   }
@@ -985,8 +991,8 @@
     del.innerHTML = '🗑️<span>删除</span>';
     container.insertBefore(del, content);
     let sx = 0, sy = 0, dragging = false, decided = false, dx = 0;
-    const closeMe = () => { content.style.transition = ""; content.style.transform = ""; if (openSwipe === container) openSwipe = null; };
-    const closeOthers = () => { if (openSwipe && openSwipe !== container) { const c = openSwipe.querySelector(".swipe-content"); if (c) { c.style.transition = ""; c.style.transform = ""; } openSwipe = null; } };
+    const closeMe = () => { content.style.transition = ""; content.style.transform = ""; del.style.display = "none"; if (openSwipe === container) openSwipe = null; };
+    const closeOthers = () => { if (openSwipe && openSwipe !== container) { const c = openSwipe.querySelector(".swipe-content"); const d = openSwipe.querySelector(".swipe-del"); if (c) { c.style.transition = ""; c.style.transform = ""; } if (d) d.style.display = "none"; openSwipe = null; } };
     content.addEventListener("pointerdown", (e) => { if (e.pointerType === "mouse" && e.button !== 0) return; sx = e.clientX; sy = e.clientY; dragging = true; decided = false; dx = 0; content._moved = false; content.style.transition = "none"; closeOthers(); });
     content.addEventListener("pointermove", (e) => {
       if (!dragging) return;
@@ -1007,12 +1013,12 @@
       dragging = false; content.style.transition = "";
       if (decided) {
         // 需拖过约 60% 才吸附常开，轻触/小幅拖动自动回弹收起
-        if (dx < -DEL_W * 0.6) { content.style.transform = "translateX(" + (-DEL_W) + "px)"; openSwipe = container; }
+        if (dx < -DEL_W * 0.6) { content.style.transform = "translateX(" + (-DEL_W) + "px)"; del.style.display = "flex"; openSwipe = container; }
         else closeMe();
       }
     };
     content.addEventListener("pointerup", endDrag);
-    content.addEventListener("pointercancel", () => { dragging = false; content.style.transition = ""; content.style.transform = ""; });
+    content.addEventListener("pointercancel", () => { dragging = false; content.style.transition = ""; content.style.transform = ""; del.style.display = "none"; });
     // 捕获阶段拦截：左滑刚结束 或 已展开删除时，吞掉随后的 click，避免误触发“打开”
     content.addEventListener("click", (e) => {
       if (content._moved || openSwipe === container) { e.stopImmediatePropagation(); e.preventDefault(); content._moved = false; return; }
@@ -1062,6 +1068,7 @@
     });
     const footer = document.createElement("div"); footer.className = "nav-foot";
     footer.innerHTML = `
+      <button class="nav-add-cat" onclick="addCategory()">＋ 新建分类</button>
       <div class="nav-rbin" onclick="openRecycle()" id="navRbin">
         <span class="rbin-ico">🗑️</span>
         <span class="rbin-label">回收站</span>
@@ -1070,8 +1077,7 @@
       <div class="nav-io">
         <div class="nav-io-item" onclick="importData()"><span class="io-ico">📥</span><span class="io-label">导入数据</span></div>
         <div class="nav-io-item" onclick="exportData()"><span class="io-ico">📤</span><span class="io-label">导出数据</span></div>
-      </div>
-      <button class="nav-add-cat" onclick="addCategory()">＋ 新建分类</button>`;
+      </div>`;
     navEl.appendChild(footer);
     updateRbinBadge();
   }
@@ -1285,8 +1291,8 @@
         <div>
           <button class="back-btn" onclick="goBack()">← ${backLabel}</button>
           <h1 style="margin-top:12px;">${m.app.icon} ${labelOf(id, m.title)}</h1>
-          <div class="greet">${m.blurb}</div>
-          <div class="app-ref"><span class="a-ico">📱</span>对标 App：${m.app.name}</div>
+          ${id === "okr" ? "" : `<div class="greet">${m.blurb}</div>`}
+          ${id === "okr" ? "" : `<div class="app-ref"><span class="a-ico">📱</span>对标 App：${m.app.name}</div>`}
         </div>
       </div>`;
     if (id === "okr") html += renderOKR(horizon);
@@ -1809,7 +1815,7 @@
       ${horizon ? `<div class="tip" style="margin-bottom:14px;">正在查看：<b>${labelOf(horizon, horizon)}</b> · <a href="#" onclick="openModule('okr');return false;" style="color:var(--primary-deep);">查看全部</a></div>` : ""}
       <section class="card" style="margin-bottom:18px;">
         <div class="section-title" style="margin-bottom:12px;">🎯 新建目标 (Objective)</div>
-        <div class="form-grid">
+        <div class="form-grid okr-new">
           <label>目标名称<input id="okr_title" type="text" placeholder="如 今年减脂塑形达标" /></label>
           <label>周期<select id="okr_horizon">${horOpts.map(h=>`<option ${h===horizon?"selected":""}>${labelOf(h, h)}</option>`).join("")}</select></label>
         </div>
