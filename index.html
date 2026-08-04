@@ -35,6 +35,8 @@
     --font-head: "PingFang SC", "Microsoft YaHei", sans-serif;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* 防 iOS Safari：任何输入框聚焦时自动放大整页 → 所有表单元素字号≥16px */
+  input, select, textarea { font-size: 16px; font-family: inherit; max-zoom: 100%; }
   html, body { height: 100%; }
   body {
     font-family: var(--font);
@@ -176,7 +178,7 @@
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
   .form-grid.one { grid-template-columns: 1fr; }
   .form-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--text-soft); font-weight: 600; }
-  .form-grid input, .form-grid select { border: none; border-radius: 12px; padding: 10px 12px; font-size: 14px; color: var(--text); background: var(--paper-soft); outline: none; transition: box-shadow .2s; box-sizing: border-box; box-shadow: var(--neu-inset-sm); }
+  .form-grid input, .form-grid select { border: none; border-radius: 12px; padding: 10px 12px; font-size: 16px; color: var(--text); background: var(--paper-soft); outline: none; transition: box-shadow .2s; box-sizing: border-box; box-shadow: var(--neu-inset-sm); }
   .form-grid input:focus, .form-grid select:focus { box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); background: #fff; }
   /* OKR 新建目标：方框宽度缩短，边框限制在内不溢出 */
   .form-grid.okr-new { grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -271,7 +273,7 @@
   .okr-card .oc-title { font-size: 15px; font-weight: 700; }
   .okr-card .oc-horizon { font-size: 11.5px; color: var(--primary-deep); background: var(--primary-soft); padding: 3px 10px; border-radius: 14px; }
   .okr-kr { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-  .okr-kr input[type=text] { flex: 1; border: none; border-radius: 10px; padding: 8px 11px; font-size: 13px; background: var(--paper-soft); box-shadow: var(--neu-inset-sm); }
+  .okr-kr input[type=text] { flex: 1; border: none; border-radius: 10px; padding: 8px 11px; font-size: 16px; background: var(--paper-soft); box-shadow: var(--neu-inset-sm); }
   .okr-kr input[type=text]:focus { outline: none; box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); }
   .okr-kr input[type=range] { flex: 1.2; }
   .okr-kr .kr-pct { font-size: 12px; font-weight: 700; color: var(--primary-deep); width: 38px; text-align: right; }
@@ -327,7 +329,7 @@
   .sub-add { font-size:12.5px; color:var(--text); padding:9px 12px; margin-top:4px; border-radius:10px; background:var(--bg-soft); cursor:pointer; font-weight:600; text-align:center; transition:.18s; box-shadow:var(--neu-raised-sm); }
   .sub-add:hover { background:rgba(255,255,255,0.62); }
   .sub-add:active { box-shadow:var(--neu-inset-sm); }
-  .rename-input { font-size:13px; padding:6px 10px; border:none; border-radius:10px; width:140px; outline:none; font-family:inherit; color:var(--text); background:var(--paper-soft); box-shadow:var(--neu-inset-sm); }
+  .rename-input { font-size:16px; padding:6px 10px; border:none; border-radius:10px; width:140px; outline:none; font-family:inherit; color:var(--text); background:var(--paper-soft); box-shadow:var(--neu-inset-sm); }
   /* 命名 / 删除交互：双击重命名 + 左滑删除（悬停编辑/删除图标已移除，见 .swipe 样式） */
   /* 回收站入口（图标在上，标题在下） */
   .nav-rbin {
@@ -380,7 +382,7 @@
   .modal-title { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
   .modal-msg { font-size: 14px; line-height: 1.7; color: var(--text-soft); white-space: pre-line; }
   .modal-input-wrap { margin-top: 16px; }
-  .modal-input { width: 100%; font-size: 14px; padding: 11px 13px; border-radius: 12px; border: none; background: var(--paper-soft); color: var(--text); outline: none; font-family: inherit; box-shadow: var(--neu-inset-sm); }
+  .modal-input { width: 100%; font-size: 16px; padding: 11px 13px; border-radius: 12px; border: none; background: var(--paper-soft); color: var(--text); outline: none; font-family: inherit; box-shadow: var(--neu-inset-sm); }
   .modal-input:focus { box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); }
   .modal-acts { margin-top: 22px; display: flex; gap: 12px; justify-content: flex-end; }
   .modal-btn { border: none; border-radius: 13px; padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer; transition: transform .15s, box-shadow .2s, background .2s; }
@@ -407,10 +409,10 @@
   /* —— 待办事项清单（三字段 + 四象限状态 + 日期分组） —— */
   .todo-card { padding: 20px 18px; }
   .todo-form { display: flex; gap: 7px; margin-bottom: 16px; flex-wrap: nowrap; align-items: center; }
-  .todo-date { width: 130px; border: none; border-radius: 12px; padding: 10px 10px; font-size: 13px; background: var(--paper-soft); color: var(--text); flex-shrink: 0; box-shadow: var(--neu-inset-sm); }
-  .todo-input { flex: 1; min-width: 0; border: none; border-radius: 12px; padding: 10px 12px; font-size: 13px; background: var(--paper-soft); color: var(--text); box-shadow: var(--neu-inset-sm); }
+  .todo-date { width: 140px; border: none; border-radius: 12px; padding: 10px 10px; font-size: 16px; background: var(--paper-soft); color: var(--text); flex-shrink: 0; box-shadow: var(--neu-inset-sm); }
+  .todo-input { flex: 1; min-width: 0; border: none; border-radius: 12px; padding: 10px 12px; font-size: 16px; background: var(--paper-soft); color: var(--text); box-shadow: var(--neu-inset-sm); }
   .todo-input:focus { outline: none; box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); }
-  .todo-status { width: 120px; border: none; border-radius: 12px; padding: 10px 8px; font-size: 13px; background: var(--paper-soft); color: var(--text); flex-shrink: 0; cursor: pointer; box-shadow: var(--neu-inset-sm); }
+  .todo-status { width: 130px; border: none; border-radius: 12px; padding: 10px 8px; font-size: 16px; background: var(--paper-soft); color: var(--text); flex-shrink: 0; cursor: pointer; box-shadow: var(--neu-inset-sm); }
   .todo-groups { display: flex; flex-direction: column; gap: 14px; }
   .todo-group { }
   .tg-head { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; padding-left: 4px; font-family: var(--font-head); letter-spacing: .3px; }
