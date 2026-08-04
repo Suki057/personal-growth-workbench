@@ -1432,20 +1432,24 @@
   function bindTodo(id) {
     const dateInp = document.getElementById("todoDate");
     const inp = document.getElementById("todoInput");
-    const stSel = document.getElementById("todoStatus");
+    const stEl = document.getElementById("todoStatus");
     const addBtn = document.getElementById("todoAddBtn");
     if (inp) inp.addEventListener("keydown", e => { if (e.key === "Enter") addTodoItem(id); });
     if (addBtn) addBtn.addEventListener("click", () => addTodoItem(id));
-    // 状态选择"其他"时弹出自定义输入
-    if (stSel) stSel.addEventListener("change", () => {
-      if (stSel.value === "其他") {
-        // 先重置为占位，等弹窗确认后再设值
-        stSel.value = "";
-        showCustomStatusModal(stSel);
-      } else {
-        _customTodoStatus = ""; // 选了预设选项则清空自定义
-      }
-    });
+    // 状态选择"其他"时：将下拉框替换为输入框（同样式），可直接打字
+    if (stEl && stEl.tagName === "SELECT") {
+      stEl.addEventListener("change", () => {
+        if (stEl.value === "其他") {
+          replaceStatusSelectWithInput(stEl);
+        } else {
+          _customTodoStatus = "";
+        }
+      });
+    }
+    // 如果是输入框模式，回车也能添加
+    if (stEl && stEl.tagName === "INPUT") {
+      stEl.addEventListener("keydown", e => { if (e.key === "Enter") addTodoItem(id); });
+    }
     const listEl = document.getElementById("todoGroups");
     if (listEl) {
       listEl.querySelectorAll(".todo-item").forEach(row => {
@@ -1456,51 +1460,39 @@
       });
     }
   }
-  function showCustomStatusModal(selectEl) {
-    const overlay = document.createElement("div"); overlay.className = "modal-overlay"; overlay.id="customStatusOverlay";
-    overlay.innerHTML = `
-      <div class="modal" style="max-width:360px;">
-        <div style="font-size:16px;font-weight:600;margin-bottom:12px;color:var(--text);">✏️ 自定义状态</div>
-        <input type="text" id="customStatusInput" placeholder="输入新的状态名称…" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;background:var(--paper);color:var(--text);box-sizing:border-box;margin-bottom:14px;" />
-        <div style="display:flex;gap:8px;justify-content:flex-end;">
-          <button class="btn-cancel" onclick="cancelCustomStatus()">取消</button>
-          <button class="btn-primary" id="customStatusOk" style="padding:9px 20px;">确定</button>
-        </div>
-      </div>`;
-    document.body.appendChild(overlay);
-    setTimeout(() => { const ci = document.getElementById("customStatusInput"); if (ci) ci.focus(); }, 100);
-    document.getElementById("customStatusOk").addEventListener("click", () => {
-      const val = (document.getElementById("customStatusInput").value || "").trim();
-      if (!val) { toast("请输入状态名称"); return; }
-      _customTodoStatus = val;
-      // 将选择器的"其他"选项替换为自定义值，并选中它
-      for (let i = 0; i < selectEl.options.length; i++) {
-        if (selectEl.options[i].value === "其他") { selectEl.options[i].value = val; selectEl.options[i].text = val; break; }
-      }
-      selectEl.value = val;
-      overlay.remove();
-    });
-  }
-  function cancelCustomStatus() {
-    const overlay = document.getElementById("customStatusOverlay");
-    if (overlay) overlay.remove();
-    _customTodoStatus = "";
+  /* 将状态选择器(select)原地替换为输入框(input)，样式一致 */
+  function replaceStatusSelectWithInput(selectEl) {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.id = "todoStatus";
+    input.className = "todo-status";
+    input.placeholder = "输入自定义状态…";
+    input.style.cssText = window.getComputedStyle(selectEl).cssText;
+    // 聚焦新输入框
+    selectEl.parentNode.replaceChild(input, selectEl);
+    input.focus();
+    // 回车可触发添加
+    input.addEventListener("keydown", e => { if (e.key === "Enter") addTodoItem("todo_today"); });
   }
   function addTodoItem(id) {
     const inp = document.getElementById("todoInput");
     const dateInp = document.getElementById("todoDate");
-    const stSel = document.getElementById("todoStatus");
+    const stEl = document.getElementById("todoStatus");
     const v = inp ? inp.value.trim() : "";
     if (!v) { toast("请输入待办内容"); return; }
     const d = dateInp ? dateInp.value : todayStr();
-    // 优先使用自定义状态，其次取选择器当前值
-    let status = _customTodoStatus || (stSel ? stSel.value : "");
+    // 兼容 select 和 input 两种形态
+    let status = "";
+    if (stEl) {
+      status = stEl.value.trim();
+      if (!status && stEl.tagName === "INPUT") status = stEl.placeholder.trim();
+    }
     if (!status) status = "其他";
     const list = getTodos(id);
     list.push({ t: v, d: d, status: status, done: false });
     setTodos(id, list);
-    _customTodoStatus = ""; // 添加后清空自定义状态
-    renderModule(id);
+    _customTodoStatus = ""; // 添加后清空
+    renderModule(id);       // ← 这里会重新渲染整个区域，自动恢复为 select 下拉框
     refreshHomeProgress();
   }
   function toggleTodo(id, i) {
