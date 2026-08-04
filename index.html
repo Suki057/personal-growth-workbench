@@ -1070,7 +1070,7 @@
     navEl.innerHTML = "";
     CATS.forEach(cat => {
       const wrap = document.createElement("div");
-      wrap.className = "nav-item nav-tile" + (cat.leaf ? " active" : "");
+      wrap.className = "nav-item nav-tile";
       wrap.dataset.id = cat.id;
       const head = document.createElement("div"); head.className = "nav-head";
       const headContent = document.createElement("div"); headContent.className = "swipe-content";
@@ -1224,6 +1224,19 @@
   }
 
   buildNav();
+  /* 根据当前视图同步侧栏激活态 */
+  (function syncActiveNav() {
+    const vn = curViewName(); /* home / cat / todo / fatlog ... */
+    document.querySelectorAll(".nav-item").forEach(n => {
+      const id = n.dataset.id;
+      let on = false;
+      if (vn === "home" && id === "home") on = true;
+      else if (vn === "todo" && id === "todo") on = true;
+      else if (vn === "fatlog" && id === "fatlog") on = true;
+      else if (vn === "cat" && window._curCatId && id === window._curCatId) on = true;
+      n.classList.toggle("active", on);
+    });
+  })();
 
   /* ============ 首页模块卡片 ============ */
   function buildHomeModulesData() {
@@ -1253,6 +1266,12 @@
     document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
     document.getElementById("view-" + name).classList.add("active");
     window.scrollTo(0, 0);
+    /* 同步侧栏激活态 */
+    document.querySelectorAll(".nav-item").forEach(n => {
+      const id = n.dataset.id;
+      let on = (name === "home" && id === "home") || (name === "todo" && id === "todo") || (name === "fatlog" && id === "fatlog") || (name === "cat" && window._curCatId && id === window._curCatId);
+      n.classList.toggle("active", on);
+    });
     if (name === "home") { refreshHomeProgress(); renderHomeTodo(); updateImageProgressLight(); }
   }
   // 返回上一步：弹栈回到上一个视图（而非固定回首页）
