@@ -1355,6 +1355,7 @@
     { v: "不紧急也不重要", c: "#95a5a6" },
     { v: "其他", c: "#7f8c8d" }
   ];
+  let _customTodoStatus = ""; // 用户通过"其他"输入的自定义状态值
   function todayStr() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
   function getDateGroup(d) {
     if (!d) return "更早";
@@ -1438,7 +1439,11 @@
     // 状态选择"其他"时弹出自定义输入
     if (stSel) stSel.addEventListener("change", () => {
       if (stSel.value === "其他") {
+        // 先重置为占位，等弹窗确认后再设值
+        stSel.value = "";
         showCustomStatusModal(stSel);
+      } else {
+        _customTodoStatus = ""; // 选了预设选项则清空自定义
       }
     });
     const listEl = document.getElementById("todoGroups");
@@ -1455,10 +1460,10 @@
     const overlay = document.createElement("div"); overlay.className = "modal-overlay"; overlay.id="customStatusOverlay";
     overlay.innerHTML = `
       <div class="modal" style="max-width:360px;">
-        <div style="font-size:16px;font-weight:600;margin-bottom:12px;color:var(--text);">自定义状态</div>
-        <input type="text" id="customStatusInput" placeholder="输入自定义状态名称…" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;background:var(--paper);color:var(--text);box-sizing:border-box;margin-bottom:14px;" />
+        <div style="font-size:16px;font-weight:600;margin-bottom:12px;color:var(--text);">✏️ 自定义状态</div>
+        <input type="text" id="customStatusInput" placeholder="输入新的状态名称…" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;background:var(--paper);color:var(--text);box-sizing:border-box;margin-bottom:14px;" />
         <div style="display:flex;gap:8px;justify-content:flex-end;">
-          <button class="btn-cancel" onclick="document.getElementById('customStatusOverlay').remove();document.getElementById('todoStatus').value='';">取消</button>
+          <button class="btn-cancel" onclick="cancelCustomStatus()">取消</button>
           <button class="btn-primary" id="customStatusOk" style="padding:9px 20px;">确定</button>
         </div>
       </div>`;
@@ -1467,13 +1472,19 @@
     document.getElementById("customStatusOk").addEventListener("click", () => {
       const val = (document.getElementById("customStatusInput").value || "").trim();
       if (!val) { toast("请输入状态名称"); return; }
-      // 将"其他"选项替换为自定义值
+      _customTodoStatus = val;
+      // 将选择器的"其他"选项替换为自定义值，并选中它
       for (let i = 0; i < selectEl.options.length; i++) {
         if (selectEl.options[i].value === "其他") { selectEl.options[i].value = val; selectEl.options[i].text = val; break; }
       }
       selectEl.value = val;
       overlay.remove();
     });
+  }
+  function cancelCustomStatus() {
+    const overlay = document.getElementById("customStatusOverlay");
+    if (overlay) overlay.remove();
+    _customTodoStatus = "";
   }
   function addTodoItem(id) {
     const inp = document.getElementById("todoInput");
@@ -1482,11 +1493,13 @@
     const v = inp ? inp.value.trim() : "";
     if (!v) { toast("请输入待办内容"); return; }
     const d = dateInp ? dateInp.value : todayStr();
-    let status = stSel ? stSel.value : "";
+    // 优先使用自定义状态，其次取选择器当前值
+    let status = _customTodoStatus || (stSel ? stSel.value : "");
     if (!status) status = "其他";
     const list = getTodos(id);
     list.push({ t: v, d: d, status: status, done: false });
     setTodos(id, list);
+    _customTodoStatus = ""; // 添加后清空自定义状态
     renderModule(id);
     refreshHomeProgress();
   }
