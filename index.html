@@ -387,11 +387,11 @@
 
   /* —— 待办事项清单（三字段 + 四象限状态 + 日期分组） —— */
   .todo-card { padding: 20px 18px; }
-  .todo-form { display: flex; gap: 7px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .todo-form { display: flex; gap: 7px; margin-bottom: 16px; flex-wrap: nowrap; align-items: center; }
   .todo-date { width: 130px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font-size: 13px; background: var(--paper); color: var(--text); flex-shrink: 0; }
-  .todo-input { flex: 1; min-width: 140px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font-size: 13px; background: var(--paper); color: var(--text); }
+  .todo-input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font-size: 13px; background: var(--paper); color: var(--text); }
   .todo-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(62,139,214,0.15); }
-  .todo-status { width: 130px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font-size: 13px; background: var(--paper); color: var(--text); flex-shrink: 0; cursor: pointer; }
+  .todo-status { width: 120px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 8px; font-size: 13px; background: var(--paper); color: var(--text); flex-shrink: 0; cursor: pointer; }
   .todo-groups { display: flex; flex-direction: column; gap: 14px; }
   .todo-group { }
   .tg-head { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; padding-left: 4px; font-family: var(--font-head); letter-spacing: .3px; }
@@ -1397,7 +1397,7 @@
           + '<option value="">选择状态</option>'
           + TODO_STATUSES.map(s => '<option value="' + s.v + '">' + s.v + '</option>').join("")
         + '</select>'
-        + '<button id="todoAddBtn" class="btn-primary" style="width:auto;padding:10px 18px;white-space:nowrap;">添加</button>'
+        + '<button id="todoAddBtn" class="btn-primary" style="width:auto;padding:10px 18px;white-space:nowrap;flex-shrink:0;">添加</button>'
       + '</div>';
     /* ---- 分组列表 ---- */
     html += '<div class="todo-groups" id="todoGroups">';
