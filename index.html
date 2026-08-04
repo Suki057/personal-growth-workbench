@@ -379,24 +379,33 @@
   .section-title::before { width: 4px; height: 18px; border-radius: 2px; background: linear-gradient(180deg, var(--gold), var(--gold-deep)); }
 
   /* —— 首页「今日待办」进度卡 —— */
-  .home-todo-card { cursor: default; background: linear-gradient(135deg, rgba(91,155,213,0.15), rgba(61,122,184,0.10)); }
+  .home-todo-card { cursor: pointer; background: linear-gradient(135deg, rgba(91,155,213,0.15), rgba(61,122,184,0.10)); }
   .ht-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
   .ht-emoji { font-size: 20px; }
   .ht-title { font-size: 16px; font-weight: 800; color: var(--text); font-family: var(--font-head); letter-spacing: .4px; }
   .ht-count { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--text); background: rgba(91,155,213,0.22); padding: 3px 10px; border-radius: 20px; }
 
-  /* —— 待办事项清单 —— */
-  .todo-add { display: flex; gap: 8px; margin-bottom: 14px; }
-  .todo-input { flex: 1; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 12px; font-size: 14px; background: rgba(255,255,255,0.08); color: var(--text); }
-  .todo-input:focus { outline: none; border-color: rgba(91,155,213,0.50); }
+  /* —— 待办事项清单（三字段 + 四象限状态 + 日期分组） —— */
+  .todo-card { padding: 20px 18px; }
+  .todo-form { display: flex; gap: 7px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .todo-date { width: 130px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font-size: 13px; background: var(--paper); color: var(--text); flex-shrink: 0; }
+  .todo-input.tf-content { flex: 1; min-width: 140px; }
+  .todo-status { width: 130px; border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font-size: 13px; background: var(--paper); color: var(--text); flex-shrink: 0; cursor: pointer; }
+  .todo-groups { display: flex; flex-direction: column; gap: 14px; }
+  .todo-group { }
+  .tg-head { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 8px; padding-left: 4px; font-family: var(--font-head); letter-spacing: .3px; }
   .todo-list { display: flex; flex-direction: column; gap: 8px; }
-  .todo-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: rgba(255,255,255,0.06); border-radius: 12px; transition: background .15s; }
-  .todo-item:hover { background: rgba(91,155,213,0.14); }
-  .todo-box { width: 22px; height: 22px; border-radius: 7px; border: 2px solid rgba(91,155,213,0.50); flex: 0 0 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: #fff; cursor: pointer; background: transparent; transition: background .15s, border-color .15s; user-select: none; }
+  .todo-item { display: flex; align-items: center; gap: 12px; padding: 11px 13px; background: rgba(255,255,255,0.55); border-radius: 12px; transition: background .15s, box-shadow .15s; border: 1px solid transparent; }
+  .todo-item:hover { background: rgba(255,255,255,0.75); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .todo-box { width: 22px; height: 22px; border-radius: 7px; border: 2px solid var(--primary); flex: 0 0 22px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: #fff; cursor: pointer; background: transparent; transition: background .15s, border-color .15s; user-select: none; }
   .todo-item.done .todo-box { background: var(--accent); border-color: var(--accent); }
-  .todo-text { flex: 1; text-align: left; font-size: 14px; color: var(--text); cursor: pointer; word-break: break-word; }
+  .todo-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .todo-text { text-align: left; font-size: 14px; color: var(--text); cursor: pointer; word-break: break-word; line-height: 1.35; }
   .todo-item.done .todo-text { text-decoration: line-through; color: var(--text-soft); }
-  .todo-del { color: var(--text-soft); font-size: 20px; line-height: 1; cursor: pointer; opacity: .45; padding: 0 4px; transition: opacity .15s, color .15s; }
+  .todo-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .todo-dtag { font-size: 11.5px; color: var(--text-soft); opacity: .75; }
+  .todo-stag { font-size: 11px; padding: 1px 8px; border-radius: 20px; border: 1px solid; white-space: nowrap; font-weight: 600; }
+  .todo-del { color: var(--text-soft); font-size: 20px; line-height: 1; cursor: pointer; opacity: .40; padding: 0 4px; transition: opacity .15s, color .15s; flex-shrink: 0; }
   .todo-del:hover { opacity: 1; color: var(--accent); }
 
   /* ============ 公主日记风：侧栏总类目（竖排·一行一个·图标+标题横排） ============ */
@@ -1321,16 +1330,14 @@
   /* ============ 待办事项直达视图（leaf） ============ */
   function openTodoView() {
     resetOpenSwipe();
-    const m = getModule("todo_today");
     const view = document.getElementById("view-module");
     currentModule = "todo_today"; currentHorizon = null;
     let html = `
       <div class="page-head">
         <div>
           <button class="back-btn" onclick="goBack()">← 返回</button>
-          <h1 style="margin-top:12px;">${m.app.icon} ${labelOf("todo_today", m.title)}</h1>
-          <div class="greet">${m.blurb}</div>
-          <div class="app-ref"><span class="a-ico">📱</span>对标 App：${m.app.name}</div>
+          <h1 style="margin-top:12px;">📌 待办事项</h1>
+          <div class="greet">今日待办：勾选完成的事项，进度自动汇总到首页与类目概览。</div>
         </div>
       </div>`;
     html += renderTodo("todo_today");
@@ -1339,37 +1346,103 @@
     showView("module");
   }
 
-  /* ============ 待办事项（todo） ============ */
+  /* ============ 待办事项（todo）— 三字段 + 四象限状态 + 日期分组 ============ */
+  const TODO_STATUSES = [
+    { v: "重要且紧急", c: "#e74c3c" },
+    { v: "重要不紧急", c: "#e67e22" },
+    { v: "紧急不重要", c: "#f39c12" },
+    { v: "不紧急也不重要", c: "#95a5a6" },
+    { v: "其他", c: "#7f8c8d" }
+  ];
+  function todayStr() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+  function getDateGroup(d) {
+    if (!d) return "更早";
+    const now = new Date(), t = new Date(d + "T00:00:00");
+    const diffMs = t.getTime() - now.getTime();
+    const diffDays = Math.round(diffMs / 86400000);
+    if (diffDays === 0) return "今日";
+    if (diffDays >= 1 && diffDays <= 7) return "本周";
+    if (diffDays >= 8 && diffDays <= 30) return "本月";
+    if (diffDays >= 31 && diffDays <= 365) return "今年";
+    if (diffDays < 0 && diffDays >= -365) return "逾期";
+    return "更早";
+  }
   function renderTodo(id) {
     const list = getTodos(id);
+    // 迁移旧数据：没有 status/d 字段的补上
+    let migrated = false;
+    list.forEach(t => { if (t.status === undefined) { t.status = "其他"; migrated = true; } if (!t.d) { t.d = todayStr(); migrated = true; } });
+    if (migrated) setTodos(id, list);
     const total = list.length, done = list.filter(t => t.done).length;
     const pct = total ? Math.round(done / total * 100) : 0;
+    // 按日期分组
+    const groups = {};
+    list.forEach((t, i) => {
+      const g = getDateGroup(t.d);
+      if (!groups[g]) groups[g] = [];
+      groups[g].push({ ...t, _i: i });
+    });
+    // 分组排序
+    const groupOrder = ["今日","本周","本月","今年","逾期","更早"];
     let html = '<div class="card todo-card">'
       + '<div class="section-title" style="margin-bottom:12px;">✅ 待办清单（' + done + '/' + total + ' 已完成）</div>'
       + '<div class="m-progress" style="margin-bottom:14px;"><div class="bar"><span style="width:' + pct + '%"></span></div><div class="m-pct">' + pct + '%</div></div>'
-      + '<div class="todo-add"><input id="todoInput" class="todo-input" type="text" placeholder="添加一项待办，回车保存…" /><button id="todoAddBtn" class="btn-primary" style="width:auto;padding:11px 16px;">添加</button></div>'
-      + '<div class="todo-list" id="todoList">';
-    if (!list.length) html += '<div class="empty-hint" style="padding:14px 4px;">还没有待办事项，添加第一项吧 ✍️</div>';
-    else {
-      list.forEach((t, i) => {
-        html += '<div class="todo-item' + (t.done ? ' done' : '') + '" data-i="' + i + '">'
-          + '<div class="todo-box">' + (t.done ? '✓' : '') + '</div>'
-          + '<div class="todo-text">' + escapeHtml(t.t) + '</div>'
-          + '<div class="todo-del">×</div>'
-          + '</div>';
+      /* ---- 三输入框 ---- */
+      + '<div class="todo-form" id="todoForm">'
+        + '<input id="todoDate" class="todo-date" type="date" value="' + todayStr() + '" />'
+        + '<input id="todoInput" class="todo-input tf-content" type="text" placeholder="输入待办事项…" />'
+        + '<select id="todoStatus" class="todo-status">'
+          + '<option value="">选择状态</option>'
+          + TODO_STATUSES.map(s => '<option value="' + s.v + '">' + s.v + '</option>').join("")
+        + '</select>'
+        + '<button id="todoAddBtn" class="btn-primary" style="width:auto;padding:10px 18px;white-space:nowrap;">添加</button>'
+      + '</div>';
+    /* ---- 分组列表 ---- */
+    html += '<div class="todo-groups" id="todoGroups">';
+    if (!list.length) {
+      html += '<div class="empty-hint" style="padding:16px 4px;">还没有待办事项，添加第一项吧 ✍️</div>';
+    } else {
+      groupOrder.forEach(gName => {
+        const items = groups[gName];
+        if (!items || !items.length) return;
+        html += '<div class="todo-group"><div class="tg-head">' + gName + '（' + items.length + '项）</div>';
+        items.forEach(t => {
+          const sc = TODO_STATUSES.find(s => s.v === t.status);
+          const scColor = sc ? sc.c : "#7f8c8d";
+          html += '<div class="todo-item' + (t.done ? ' done' : '') + '" data-i="' + t._i + '">'
+            + '<div class="todo-box">' + (t.done ? '✓' : '') + '</div>'
+            + '<div class="todo-body">'
+              + '<div class="todo-text">' + escapeHtml(t.t) + '</div>'
+              + '<div class="todo-meta">'
+                + '<span class="todo-dtag">📅 ' + (t.d || "未设日期") + '</span>'
+                + '<span class="todo-stag" style="color:' + scColor + ';border-color:' + scColor + ';">' + escapeHtml(t.status || "其他") + '</span>'
+              + '</div>'
+            + '</div>'
+            + '<div class="todo-del">×</div>'
+            + '</div>';
+        });
+        html += '</div>';
       });
     }
     html += '</div></div>';
     return html;
   }
   function bindTodo(id) {
+    const dateInp = document.getElementById("todoDate");
     const inp = document.getElementById("todoInput");
-    if (inp) inp.addEventListener("keydown", e => { if (e.key === "Enter") addTodoItem(id); });
+    const stSel = document.getElementById("todoStatus");
     const addBtn = document.getElementById("todoAddBtn");
+    if (inp) inp.addEventListener("keydown", e => { if (e.key === "Enter") addTodoItem(id); });
     if (addBtn) addBtn.addEventListener("click", () => addTodoItem(id));
-    const list = document.getElementById("todoList");
-    if (list) {
-      list.querySelectorAll(".todo-item").forEach(row => {
+    // 状态选择"其他"时弹出自定义输入
+    if (stSel) stSel.addEventListener("change", () => {
+      if (stSel.value === "其他") {
+        showCustomStatusModal(stSel);
+      }
+    });
+    const listEl = document.getElementById("todoGroups");
+    if (listEl) {
+      listEl.querySelectorAll(".todo-item").forEach(row => {
         const i = +row.dataset.i;
         row.querySelector(".todo-box").addEventListener("click", () => toggleTodo(id, i));
         row.querySelector(".todo-text").addEventListener("click", () => toggleTodo(id, i));
@@ -1377,12 +1450,41 @@
       });
     }
   }
+  function showCustomStatusModal(selectEl) {
+    const overlay = document.createElement("div"); overlay.className = "modal-overlay"; overlay.id="customStatusOverlay";
+    overlay.innerHTML = `
+      <div class="modal" style="max-width:360px;">
+        <div style="font-size:16px;font-weight:600;margin-bottom:12px;color:var(--text);">自定义状态</div>
+        <input type="text" id="customStatusInput" placeholder="输入自定义状态名称…" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;background:var(--paper);color:var(--text);box-sizing:border-box;margin-bottom:14px;" />
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn-cancel" onclick="document.getElementById('customStatusOverlay').remove();document.getElementById('todoStatus').value='';">取消</button>
+          <button class="btn-primary" id="customStatusOk" style="padding:9px 20px;">确定</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    setTimeout(() => { const ci = document.getElementById("customStatusInput"); if (ci) ci.focus(); }, 100);
+    document.getElementById("customStatusOk").addEventListener("click", () => {
+      const val = (document.getElementById("customStatusInput").value || "").trim();
+      if (!val) { toast("请输入状态名称"); return; }
+      // 将"其他"选项替换为自定义值
+      for (let i = 0; i < selectEl.options.length; i++) {
+        if (selectEl.options[i].value === "其他") { selectEl.options[i].value = val; selectEl.options[i].text = val; break; }
+      }
+      selectEl.value = val;
+      overlay.remove();
+    });
+  }
   function addTodoItem(id) {
     const inp = document.getElementById("todoInput");
+    const dateInp = document.getElementById("todoDate");
+    const stSel = document.getElementById("todoStatus");
     const v = inp ? inp.value.trim() : "";
-    if (!v) return;
+    if (!v) { toast("请输入待办内容"); return; }
+    const d = dateInp ? dateInp.value : todayStr();
+    let status = stSel ? stSel.value : "";
+    if (!status) status = "其他";
     const list = getTodos(id);
-    list.push({ t: v, done: false });
+    list.push({ t: v, d: d, status: status, done: false });
     setTodos(id, list);
     renderModule(id);
     refreshHomeProgress();
