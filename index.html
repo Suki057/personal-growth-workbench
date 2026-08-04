@@ -585,7 +585,7 @@
   const CATS_DEFAULT = [
     { id: "home",   icon: "🏠", label: "首页",       leaf: true },
     { id: "okr",    icon: "🎯", label: "目标OKR", open: true, horizons: ["今年","近三年","近五年","近十年"] },
-    { id: "todo",   icon: "✅", label: "待办事项", subs: ["todo_today","todo_week","todo_month"] },
+    { id: "todo",   icon: "✅", label: "待办事项", leaf: true },
     { id: "image",  icon: "💃", label: "形象提升",  subs: ["dance","fatloss"] },
     { id: "ability",icon: "📚", label: "能力提升",  subs: ["photo","bazi","english","video","media"] },
     { id: "money",  icon: "💰", label: "赚钱方式",  subs: ["fulltime","side"] },
@@ -607,7 +607,7 @@
   (function () {
     if (!CATS.find(c => c.id === "todo")) {
       const idx = CATS.findIndex(c => c.id === "okr");
-      const todoCat = { id: "todo", icon: "✅", label: "待办事项", subs: ["todo_today","todo_week","todo_month"] };
+      const todoCat = { id: "todo", icon: "✅", label: "待办事项", leaf: true };
       if (idx >= 0) CATS.splice(idx + 1, 0, todoCat); else CATS.push(todoCat);
       storeSet("wb_cats", CATS);
     }
@@ -1054,7 +1054,7 @@
       const go = () => {
         document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
         wrap.classList.add("active");
-        if (cat.leaf) showView("home"); else openCat(cat.id);
+        if (cat.leaf) { if (cat.id === "todo") openTodoView(); else showView("home"); } else openCat(cat.id);
         closeNav();
       };
       // 单击延时进入；连续三击触发改名（不再走双击）
@@ -1318,6 +1318,27 @@
     else bindTracker(id, m);
   }
 
+  /* ============ 待办事项直达视图（leaf） ============ */
+  function openTodoView() {
+    resetOpenSwipe();
+    const m = getModule("todo_today");
+    const view = document.getElementById("view-module");
+    currentModule = "todo_today"; currentHorizon = null;
+    let html = `
+      <div class="page-head">
+        <div>
+          <button class="back-btn" onclick="goBack()">← 返回</button>
+          <h1 style="margin-top:12px;">${m.app.icon} ${labelOf("todo_today", m.title)}</h1>
+          <div class="greet">${m.blurb}</div>
+          <div class="app-ref"><span class="a-ico">📱</span>对标 App：${m.app.name}</div>
+        </div>
+      </div>`;
+    html += renderTodo("todo_today");
+    view.innerHTML = html;
+    bindTodo("todo_today");
+    showView("module");
+  }
+
   /* ============ 待办事项（todo） ============ */
   function renderTodo(id) {
     const list = getTodos(id);
@@ -1391,6 +1412,7 @@
     const cnt = document.getElementById("htCount"); if (cnt) cnt.textContent = done + "/" + total;
     const bar = document.getElementById("htBar"); if (bar) bar.style.width = pct + "%";
     const pctEl = document.getElementById("htPct"); if (pctEl) pctEl.textContent = pct + "%";
+    el.onclick = () => openTodoView();
   }
   /* ============ 通用 Tracker ============ */
   function renderTracker(id, m) {
