@@ -286,6 +286,15 @@
   .okr-prog .bar > span { display: block; height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .15s ease; position: relative; }
   /* 拖动手柄圆点 */
   .okr-prog .bar > span::after { content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.18), var(--neu-raised-sm); }
+  /* 数据明细 */
+  .okr-log { margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(120,105,80,0.18); }
+  .okr-log-title { font-size: 13px; font-weight: 700; color: var(--primary-deep); margin-bottom: 10px; }
+  .okr-log-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .okr-log-row .ol-date { font-size: 12.5px; color: var(--text-soft); min-width: 84px; flex: 0 0 auto; }
+  .okr-log-row .ol-bar { flex: 1; height: 9px; border-radius: 20px; background: rgba(120,105,80,0.12); overflow: hidden; box-shadow: var(--neu-inset-sm); }
+  .okr-log-row .ol-bar > span { display: block; height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .3s ease; }
+  .okr-log-row .ol-pct { font-size: 13px; font-weight: 700; color: var(--primary-deep); min-width: 40px; text-align: right; flex: 0 0 auto; }
+  .okr-log-empty { font-size: 12.5px; color: var(--text-soft); padding: 4px 0; }
 
   .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--glass-bg); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--text); padding: 12px 24px; border-radius: 24px; font-size: 13.5px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 99; border: var(--glass-border); box-shadow: var(--glass-shadow); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -2043,7 +2052,9 @@
         <div id="krlist_${o.id}">${o.krs.map((k, i) => krRow(o.id, i, k)).join("")}</div>
         <div class="okr-prog" style="margin-top:12px;cursor:pointer;" data-oid="${o.id}" onmousedown="startDragOkrProg(event,'${o.id}')" ontouchstart="startDragOkrProg(event,'${o.id}')"><div class="bar"><span style="width:${avg}%"></span></div><div class="m-pct">${avg}%</div></div>
         <button class="btn-sm" style="margin-top:10px;width:100%;" onclick="addKR('${o.id}')">＋ 添加关键结果</button>
+        <button class="btn-primary" style="margin-top:10px;width:100%;" onclick="saveOkrLog('${o.id}')">💾 保存进度</button>
         <button class="btn-ghost" style="margin-top:10px;width:100%;color:#E8946A;border-color:rgba(232,148,106,0.30);background:rgba(232,148,106,0.08);" onclick="delOKR('${o.id}')">🚮 删除目标</button>
+        ${okrLogHTML(o)}
       </div>`;
     }).join("") : `<div style="padding:14px;color:var(--text-soft);font-size:13px;">还没有目标，先定一个吧 🎯</div>`;
     return `
@@ -2080,6 +2091,34 @@
   function addKR(oid) {
     const data = loadOKR(); const o = data.find(x => x.id === oid); if (!o) return;
     o.krs.push({ t: "", p: 0 }); storeSet("wb_okr", data); renderModule("okr", currentHorizon); refreshHomeProgress();
+  }
+  /* 渲染数据明细 */
+  function okrLogHTML(o) {
+    const logs = o.logs || [];
+    const rows = logs.length ? logs.slice().reverse().map(l => `
+      <div class="okr-log-row">
+        <span class="ol-date">${l.date}</span>
+        <div class="ol-bar"><span style="width:${l.pct}%"></span></div>
+        <span class="ol-pct">${l.pct}%</span>
+      </div>`).join("")
+      : `<div class="okr-log-empty">暂无保存的进度记录，填写关键结果后点「保存进度」即可打卡</div>`;
+    return `<div class="okr-log">
+      <div class="okr-log-title">📊 进度明细（${logs.length}）</div>
+      ${rows}
+    </div>`;
+  }
+  /* 保存进度：记录达成进度+日期，然后重置表单 */
+  function saveOkrLog(oid) {
+    const data = loadOKR(); const o = data.find(x => x.id === oid); if (!o) return;
+    const pct = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + (k.p||0), 0) / o.krs.length) : (o._manualPct || 0);
+    if (!o.logs) o.logs = [];
+    o.logs.push({ date: todayStr(), pct });
+    /* 恢复默认状态：清空关键结果与临时进度 */
+    o.krs = [];
+    o._manualPct = 0;
+    storeSet("wb_okr", data);
+    renderModule("okr", currentHorizon); refreshHomeProgress();
+    toast("已保存进度：" + pct + "%");
   }
   function updKR(oid, i, key, val) {
     const data = loadOKR(); const o = data.find(x => x.id === oid); if (!o) return;
