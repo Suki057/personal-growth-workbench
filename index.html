@@ -273,13 +273,15 @@
   .okr-card .oc-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .okr-card .oc-title { font-size: 15px; font-weight: 700; }
   .okr-card .oc-horizon { font-size: 11.5px; color: var(--primary-deep); background: var(--primary-soft); padding: 3px 10px; border-radius: 14px; }
-  .okr-kr { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-  .okr-kr input[type=text] { flex: 1; border: none; border-radius: 10px; padding: 8px 11px; font-size: 16px; background: var(--paper-soft); box-shadow: var(--neu-inset-sm); }
+  .okr-kr { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+  .okr-kr .kr-row { display: flex; align-items: center; gap: 8px; }
+  .okr-kr .kr-row label { font-size: 13px; font-weight: 600; color: var(--text-soft); white-space: nowrap; min-width: 32px; }
+  .okr-kr input[type=text] { flex: 1; border: none; border-radius: 10px; padding: 9px 11px; font-size: 16px; background: var(--paper-soft); box-shadow: var(--neu-inset-sm); }
   .okr-kr input[type=text]:focus { outline: none; box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); }
-  .okr-kr input[type=range] { flex: 1.2; }
-  .okr-kr .kr-pct { font-size: 12px; font-weight: 700; color: var(--primary-deep); width: 38px; text-align: right; }
-  .okr-kr .kr-del { border: none; background: rgba(232,112,80,0.15); color: #E8946A; border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
+  .okr-kr input[type=date] { width: 0; flex: 1; min-width: 120px; border: none; border-radius: 10px; padding: 9px 11px; font-size: 16px; background: var(--paper-soft); color: var(--text); box-shadow: var(--neu-inset-sm); box-sizing: border-box; }
+  .okr-kr .kr-del { align-self: flex-end; border: none; background: rgba(232,112,80,0.15); color: #E8946A; border-radius: 8px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
   .okr-prog { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
+  .okr-prog .bar { flex: 1; }
 
   .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--glass-bg); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--text); padding: 12px 24px; border-radius: 24px; font-size: 13.5px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 99; border: var(--glass-border); box-shadow: var(--glass-shadow); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -829,10 +831,15 @@
       const list = cat[entry.listKind] || (cat[entry.listKind] = []);
       list.splice(Math.min(entry.index, list.length), 0, entry.id);
       if (entry.customData) { CUSTOM[entry.id] = entry.customData; storeSet("wb_custom_modules", CUSTOM); }
+    } else if (entry.kind === "okr") {
+      const data = loadOKR();
+      data.push(entry.okrData);
+      storeSet("wb_okr", data);
     }
     storeSet("wb_cats", CATS);
     RV.splice(i, 1); saveRV();
     buildNav(); renderHomeModules(); refreshHomeProgress();
+    if (entry.kind === "okr") renderModule("okr", currentHorizon);
     toast("已恢复：" + entry.name);
   }
 
@@ -1991,9 +1998,9 @@
       return `<div class="okr-card" data-oid="${o.id}">
         <div class="oc-top"><div class="oc-title">${o.title}</div><span class="oc-horizon">${o.horizon}</span></div>
         <div id="krlist_${o.id}">${o.krs.map((k, i) => krRow(o.id, i, k)).join("")}</div>
-        <button class="btn-sm" style="margin-top:12px;" onclick="addKR('${o.id}')">＋ 添加关键结果</button>
-        <div class="okr-prog"><div class="bar"><span style="width:${avg}%"></span></div><div class="m-pct">${avg}%</div></div>
-        <button class="okr-kr kr-del" style="margin-top:12px;border:none;background:rgba(232,112,80,0.15);color:#E8946A;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;" onclick="delOKR('${o.id}')">删除目标</button>
+        <button class="btn-sm" style="margin-top:10px;width:100%;" onclick="addKR('${o.id}')">＋ 添加关键结果</button>
+        <div class="okr-prog" style="margin-top:12px;"><div class="bar"><span style="width:${avg}%"></span></div><div class="m-pct">${avg}%</div></div>
+        <button class="btn-ghost" style="margin-top:10px;width:100%;color:#E8946A;border-color:rgba(232,148,106,0.30);background:rgba(232,148,106,0.08);" onclick="delOKR('${o.id}')">🗑 删除目标</button>
       </div>`;
     }).join("") : `<div style="padding:14px;color:var(--text-soft);font-size:13px;">还没有目标，先定一个吧 🎯</div>`;
     return `
@@ -2011,10 +2018,9 @@
   }
   function krRow(oid, i, k) {
     return `<div class="okr-kr" data-i="${i}">
-      <input type="text" value="${k.t||""}" oninput="updKR('${oid}',${i},'t',this.value)" placeholder="关键结果描述" />
-      <input type="range" min="0" max="100" value="${k.p||0}" oninput="updKR('${oid}',${i},'p',+this.value)" />
-      <span class="kr-pct">${k.p||0}%</span>
-      <button class="kr-del" onclick="delKR('${oid}',${i})">✕</button>
+      <div class="kr-row"><label>📅 日期</label><input type="date" value="${k.d||todayStr()}" onchange="updKR('${oid}',${i},'d',this.value)" /></div>
+      <div class="kr-row"><label>📝 描述</label><input type="text" value="${k.t||""}" oninput="updKR('${oid}',${i},'t',this.value)" placeholder="输入完成情况…" /></div>
+      <button class="kr-del" onclick="delKR('${oid}',${i})">✕ 删除此条</button>
     </div>`;
   }
   function bindOKR(horizon) {}
@@ -2042,8 +2048,16 @@
     const data = loadOKR(); const o = data.find(x => x.id === oid); if (!o) return;
     o.krs.splice(i, 1); storeSet("wb_okr", data); renderModule("okr", currentHorizon); refreshHomeProgress();
   }
-  function delOKR(oid) {
-    storeSet("wb_okr", loadOKR().filter(x => x.id !== oid)); renderModule("okr", currentHorizon); refreshHomeProgress(); toast("已删除目标");
+  async function delOKR(oid) {
+    if (!(await confirmBox("移入回收站", "将此目标及其所有关键结果移入回收站？\n7 天内可恢复，到期自动永久删除。", "移入回收站", false, "🚮"))) return;
+    const data = loadOKR();
+    const idx = data.findIndex(x => x.id === oid);
+    if (idx < 0) return;
+    const o = data[idx];
+    addToRecycle({ id: oid, kind: "okr", name: o.title, deletedAt: Date.now(), okrData: o });
+    data.splice(idx, 1);
+    storeSet("wb_okr", data);
+    renderModule("okr", currentHorizon); refreshHomeProgress(); toast("已移入回收站：" + o.title);
   }
 
   /* ============ 首页进度联动 ============ */
