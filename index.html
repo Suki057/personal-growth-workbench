@@ -590,7 +590,7 @@
         <div>
           <button class="back-btn" onclick="goBack()">← 返回</button>
           <h1 style="margin-top:12px;">🚮 回收站</h1>
-          <div class="greet">已删除的类目 / 子项会在这里保留 <b>7 天</b>，到期自动永久删除；也可随时「恢复」或「永久删除」。</div>
+          <div class="greet">已删除的类目、子项、目标、待办、记录等都会在这里暂存 <b>7 天</b>，到期自动永久删除；也可随时「恢复」或「永久删除」。</div>
           <button class="tool-btn" id="emptyRbinBtn" onclick="emptyRecycle()" style="margin-top:10px;">🧹 清空回收站</button>
         </div>
       </div>
@@ -835,6 +835,30 @@
       const data = loadOKR();
       data.push(entry.okrData);
       storeSet("wb_okr", data);
+    } else if (entry.kind === "todo") {
+      const list = getTodos(entry.id);
+      list.splice(Math.min(entry.index, list.length), 0, entry.item);
+      setTodos(entry.id, list);
+      renderModule(entry.id);
+    } else if (entry.kind === "rec") {
+      const data = storeGet("wb_" + entry.id, []);
+      const ex = data.findIndex(r => r.date === entry.date);
+      if (ex >= 0) data[ex] = entry.record || data[ex]; else data.push(entry.record);
+      storeSet("wb_" + entry.id, data);
+      renderModule(entry.id);
+    } else if (entry.kind === "kr") {
+      const data = loadOKR();
+      const o = data.find(x => x.id === entry.oid);
+      if (!o) { toast("原目标已不存在，无法恢复"); return; }
+      o.krs.splice(Math.min(entry.index, o.krs.length), 0, entry.kr);
+      storeSet("wb_okr", data);
+      renderModule("okr", currentHorizon);
+    } else if (entry.kind === "fat") {
+      const data = loadFat();
+      const ex = data.records.findIndex(r => r.date === entry.date);
+      if (ex >= 0) data.records[ex] = entry.record || data.records[ex]; else data.records.push(entry.record);
+      saveFat(data);
+      renderFatlog();
     }
     storeSet("wb_cats", CATS);
     RV.splice(i, 1); saveRV();
@@ -868,6 +892,16 @@
     renderRecycle(); showView("rbin");
   }
 
+  const RBIN_META = {
+    cat: { label: "类目", ico: "📂" },
+    sub: { label: "子项", ico: "📄" },
+    okr: { label: "目标", ico: "🎯" },
+    todo:{ label: "待办", ico: "✅" },
+    rec: { label: "记录", ico: "📈" },
+    kr:  { label: "关键结果", ico: "🔑" },
+    fat: { label: "减脂记录", ico: "⚖️" }
+  };
+
   function renderRecycle() {
     const wrap = document.getElementById("rbinList");
     if (!wrap) return;
@@ -875,20 +909,19 @@
     if (btn) btn.disabled = RV.length === 0;
     updateRbinBadge();
     if (RV.length === 0) {
-      wrap.innerHTML = `<div class="rbin-empty"><div class="big">🚮</div>回收站是空的<br/><span style="font-size:13px;">删除的类目 / 子项会出现在这里，7 天内可恢复</span></div>`;
+      wrap.innerHTML = `<div class="rbin-empty"><div class="big">🚮</div>回收站是空的<br/><span style="font-size:13px;">删除的内容会出现在这里，7 天内可恢复</span></div>`;
       return;
     }
     wrap.innerHTML = RV.map((e, i) => {
       const days = rbinRemain(e);
-      const typeLabel = e.kind === "cat" ? "类目" : "子项";
+      const meta = RBIN_META[e.kind] || { label: e.kind || "项目", ico: "📦" };
       const warn = days <= 1 ? `剩 <span class="warn">${days === 0 ? "今天到期" : "1 天"}</span>` : `剩 ${days} 天`;
       const dateStr = new Date(e.deletedAt).toLocaleString("zh-CN", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
-      const ico = e.kind === "cat" ? "📂" : "📄";
       return `<div class="rbin-row">
-        <div class="rbin-ico">${ico}</div>
+        <div class="rbin-ico">${meta.ico}</div>
         <div class="rbin-info">
           <div class="rbin-name">${e.name}</div>
-          <div class="rbin-meta">类型：${typeLabel} · 删除于 ${dateStr} · ${warn}</div>
+          <div class="rbin-meta">类型：${meta.label} · 删除于 ${dateStr} · ${warn}</div>
         </div>
         <div class="rbin-acts">
           <button class="btn-ghost" style="padding:6px 14px;" onclick="restoreItem(${i})">♻️ 恢复</button>
@@ -1558,11 +1591,15 @@
   }
   function delTodoItem(id, i) {
     const list = getTodos(id);
-    if (!list[i]) return;
+    const item = list[i];
+    if (!item) return;
+    const name = (item.t || "待办") + (item.d ? "（" + item.d + "）" : "");
+    addToRecycle({ id, kind: "todo", name, deletedAt: Date.now(), index: i, item });
     list.splice(i, 1);
     setTodos(id, list);
     renderModule(id);
     refreshHomeProgress();
+    toast("已移入回收站：" + name);
   }
   function renderHomeTodo() {
     const el = document.getElementById("homeTodoCard");
@@ -1678,8 +1715,10 @@
 
   function delRec(id, date) {
     const data = storeGet("wb_" + id, []);
+    const rec = data.find(r => r.date === date);
+    addToRecycle({ id, kind: "rec", name: date + " 的记录", deletedAt: Date.now(), date, record: rec || null });
     storeSet("wb_" + id, data.filter(r => r.date !== date));
-    renderModule(id); refreshHomeProgress(); toast("已删除 " + date + " 的记录");
+    renderModule(id); refreshHomeProgress(); toast("已移入回收站：" + date + " 的记录");
   }
 
   /* ============ 英语单词本 ============ */
@@ -2000,7 +2039,7 @@
         <div id="krlist_${o.id}">${o.krs.map((k, i) => krRow(o.id, i, k)).join("")}</div>
         <button class="btn-sm" style="margin-top:10px;width:100%;" onclick="addKR('${o.id}')">＋ 添加关键结果</button>
         <div class="okr-prog" style="margin-top:12px;"><div class="bar"><span style="width:${avg}%"></span></div><div class="m-pct">${avg}%</div></div>
-        <button class="btn-ghost" style="margin-top:10px;width:100%;color:#E8946A;border-color:rgba(232,148,106,0.30);background:rgba(232,148,106,0.08);" onclick="delOKR('${o.id}')">🗑 删除目标</button>
+        <button class="btn-ghost" style="margin-top:10px;width:100%;color:#E8946A;border-color:rgba(232,148,106,0.30);background:rgba(232,148,106,0.08);" onclick="delOKR('${o.id}')">🚮 删除目标</button>
       </div>`;
     }).join("") : `<div style="padding:14px;color:var(--text-soft);font-size:13px;">还没有目标，先定一个吧 🎯</div>`;
     return `
@@ -2046,7 +2085,11 @@
   }
   function delKR(oid, i) {
     const data = loadOKR(); const o = data.find(x => x.id === oid); if (!o) return;
-    o.krs.splice(i, 1); storeSet("wb_okr", data); renderModule("okr", currentHorizon); refreshHomeProgress();
+    const kr = o.krs[i];
+    if (!kr) return;
+    const name = (kr.t || "关键结果") + (kr.d ? "（" + kr.d + "）" : "");
+    addToRecycle({ id: oid, kind: "kr", name, deletedAt: Date.now(), oid, index: i, kr });
+    o.krs.splice(i, 1); storeSet("wb_okr", data); renderModule("okr", currentHorizon); refreshHomeProgress(); toast("已移入回收站：" + name);
   }
   async function delOKR(oid) {
     if (!(await confirmBox("移入回收站", "将此目标及其所有关键结果移入回收站？\n7 天内可恢复，到期自动永久删除。", "移入回收站", false, "🚮"))) return;
@@ -2213,8 +2256,19 @@
     const data = loadFat(); data.goal.height = h; data.goal.targetWeight = t; data.goal.targetBodyfat = bf;
     saveFat(data); renderFatlog(); toast("目标已更新 🎯");
   }
-  function delFatRec(date) { const data = loadFat(); data.records = data.records.filter(r => r.date !== date); saveFat(data); renderFatlog(); refreshHomeProgress(); toast("已删除 " + date + " 的记录"); }
-  async function clearAll() { if (!(await confirmBox("清空记录", "确定清空全部减脂记录吗？\n此操作不可恢复。", "清空", true, "🚮"))) return; localStorage.removeItem(FAT_KEY); renderFatlog(); refreshHomeProgress(); toast("已清空全部记录"); }
+  function delFatRec(date) {
+    const data = loadFat();
+    const rec = data.records.find(r => r.date === date);
+    addToRecycle({ id: "fatlog", kind: "fat", name: date + " 的减脂记录", deletedAt: Date.now(), date, record: rec || null });
+    data.records = data.records.filter(r => r.date !== date);
+    saveFat(data); renderFatlog(); refreshHomeProgress(); toast("已移入回收站：" + date + " 的记录");
+  }
+  async function clearAll() {
+    if (!(await confirmBox("清空记录", "确定清空全部减脂记录吗？\n所有记录会先进入回收站，7 天内可恢复。", "清空并移入回收站", true, "🚮"))) return;
+    const data = loadFat();
+    (data.records || []).forEach(r => addToRecycle({ id: "fatlog", kind: "fat", name: r.date + " 的减脂记录", deletedAt: Date.now(), date: r.date, record: r }));
+    localStorage.removeItem(FAT_KEY); renderFatlog(); refreshHomeProgress(); toast("已清空并移入回收站");
+  }
 
   /* ---- 小结聚合 ---- */
   function summarize(recs, height) {
