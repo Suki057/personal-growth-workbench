@@ -409,11 +409,12 @@
 
   /* —— 待办事项清单（三字段 + 四象限状态 + 日期分组） —— */
   .todo-card { padding: 20px 18px; }
-  .todo-form { display: flex; gap: 7px; margin-bottom: 16px; flex-wrap: nowrap; align-items: center; }
-  .todo-date { width: 140px; border: none; border-radius: 12px; padding: 10px 10px; font-size: 16px; background: var(--paper-soft); color: var(--text); flex-shrink: 0; box-shadow: var(--neu-inset-sm); }
-  .todo-input { flex: 1; min-width: 0; border: none; border-radius: 12px; padding: 10px 12px; font-size: 16px; background: var(--paper-soft); color: var(--text); box-shadow: var(--neu-inset-sm); }
+  .todo-form { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .todo-row { display: flex; gap: 8px; align-items: center; }
+  .todo-date { width: 0; flex: 1; min-width: 100px; border: none; border-radius: 12px; padding: 10px 10px; font-size: 16px; background: var(--paper-soft); color: var(--text); box-shadow: var(--neu-inset-sm); box-sizing: border-box; }
+  .todo-input { width: 0; flex: 1; min-width: 0; border: none; border-radius: 12px; padding: 10px 12px; font-size: 16px; background: var(--paper-soft); color: var(--text); box-shadow: var(--neu-inset-sm); }
   .todo-input:focus { outline: none; box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); }
-  .todo-status { width: 130px; border: none; border-radius: 12px; padding: 10px 8px; font-size: 16px; background: var(--paper-soft); color: var(--text); flex-shrink: 0; cursor: pointer; box-shadow: var(--neu-inset-sm); }
+  .todo-status { width: 0; flex: 1; min-width: 100px; border: none; border-radius: 12px; padding: 10px 8px; font-size: 16px; background: var(--paper-soft); color: var(--text); cursor: pointer; box-shadow: var(--neu-inset-sm); }
   .todo-groups { display: flex; flex-direction: column; gap: 14px; }
   .todo-group { }
   .tg-head { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; padding-left: 4px; font-family: var(--font-head); letter-spacing: .3px; }
@@ -1432,13 +1433,17 @@
       + '<div class="m-progress" style="margin-bottom:14px;"><div class="bar"><span style="width:' + pct + '%"></span></div><div class="m-pct">' + pct + '%</div></div>'
       /* ---- 三输入框 ---- */
       + '<div class="todo-form" id="todoForm">'
-        + '<input id="todoDate" class="todo-date" type="date" value="' + todayStr() + '" />'
-        + '<input id="todoInput" class="todo-input" type="text" placeholder="输入待办事项…" />'
-        + '<select id="todoStatus" class="todo-status">'
-          + '<option value="">选择状态</option>'
-          + TODO_STATUSES.map(s => '<option value="' + s.v + '">' + s.v + '</option>').join("")
-        + '</select>'
-        + '<button id="todoAddBtn" class="btn-primary" style="width:auto;padding:10px 18px;white-space:nowrap;flex-shrink:0;">添加</button>'
+        + '<div class="todo-row">'
+          + '<input id="todoDate" class="todo-date" type="date" value="' + todayStr() + '" />'
+          + '<select id="todoStatus" class="todo-status">'
+            + '<option value="">选择状态</option>'
+            + TODO_STATUSES.map(s => '<option value="' + s.v + '">' + s.v + '</option>').join("")
+          + '</select>'
+        + '</div>'
+        + '<div class="todo-row">'
+          + '<input id="todoInput" class="todo-input" type="text" placeholder="输入待办事项…" />'
+          + '<button id="todoAddBtn" class="btn-primary" style="width:auto;padding:10px 18px;white-space:nowrap;flex-shrink:0;">添加</button>'
+        + '</div>'
       + '</div>';
     /* ---- 分组列表 ---- */
     html += '<div class="todo-groups" id="todoGroups">';
