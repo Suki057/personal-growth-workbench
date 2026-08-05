@@ -289,11 +289,11 @@
   /* 数据明细 */
   .okr-log { margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(120,105,80,0.18); }
   .okr-log-title { font-size: 13px; font-weight: 700; color: var(--primary-deep); margin-bottom: 10px; }
-  .okr-log-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .okr-log-row .ol-date { font-size: 12.5px; color: var(--text-soft); min-width: 84px; flex: 0 0 auto; }
-  .okr-log-row .ol-bar { flex: 1; height: 9px; border-radius: 20px; background: rgba(120,105,80,0.12); overflow: hidden; box-shadow: var(--neu-inset-sm); }
-  .okr-log-row .ol-bar > span { display: block; height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .3s ease; }
-  .okr-log-row .ol-pct { font-size: 13px; font-weight: 700; color: var(--primary-deep); min-width: 40px; text-align: right; flex: 0 0 auto; }
+  .okr-log-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; padding: 8px 10px; background: var(--paper-soft); border-radius: 10px; box-shadow: var(--neu-inset-sm); }
+  .okr-log-row .ol-date { font-size: 12.5px; color: var(--text-soft); min-width: 80px; flex: 0 0 auto; padding-top: 2px; }
+  .okr-log-row .ol-desc { flex: 1; min-width: 0; font-size: 13px; line-height: 1.5; color: var(--text); word-break: break-word; }
+  .okr-log-row .ol-pct { font-size: 20px; font-weight: 800; color: var(--primary-deep); min-width: 56px; text-align: right; flex: 0 0 auto; line-height: 1.1; }
+  .okr-log-row .ol-pct small { font-size: 12px; font-weight: 700; margin-left: 1px; }
   .okr-log-empty { font-size: 12.5px; color: var(--text-soft); padding: 4px 0; }
 
   .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--glass-bg); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--text); padding: 12px 24px; border-radius: 24px; font-size: 13.5px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 99; border: var(--glass-border); box-shadow: var(--glass-shadow); }
@@ -2098,8 +2098,8 @@
     const rows = logs.length ? logs.slice().reverse().map(l => `
       <div class="okr-log-row">
         <span class="ol-date">${l.date}</span>
-        <div class="ol-bar"><span style="width:${l.pct}%"></span></div>
-        <span class="ol-pct">${l.pct}%</span>
+        <span class="ol-desc">${l.desc ? escapeHtml(l.desc) : "—"}</span>
+        <span class="ol-pct">${l.pct}<small>%</small></span>
       </div>`).join("")
       : `<div class="okr-log-empty">暂无保存的进度记录，填写关键结果后点「保存进度」即可打卡</div>`;
     return `<div class="okr-log">
@@ -2107,12 +2107,15 @@
       ${rows}
     </div>`;
   }
-  /* 保存进度：记录达成进度+日期，然后重置表单 */
+  /* 保存进度：记录达成进度+日期+描述，然后重置表单 */
   function saveOkrLog(oid) {
     const data = loadOKR(); const o = data.find(x => x.id === oid); if (!o) return;
     const pct = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + (k.p||0), 0) / o.krs.length) : (o._manualPct || 0);
+    /* 抓取关键结果描述（清空前） */
+    const descs = o.krs.map(k => (k.t || "").trim()).filter(Boolean);
+    const desc = descs.length ? descs.join("；") : "";
     if (!o.logs) o.logs = [];
-    o.logs.push({ date: todayStr(), pct });
+    o.logs.push({ date: todayStr(), pct, desc });
     /* 恢复默认状态：清空关键结果与临时进度 */
     o.krs = [];
     o._manualPct = 0;
