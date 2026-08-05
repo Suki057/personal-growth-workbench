@@ -586,7 +586,7 @@
       <div class="page-head">
         <div>
           <button class="back-btn" onclick="goBack()">← 返回</button>
-          <h1 style="margin-top:12px;">🗑️ 回收站</h1>
+          <h1 style="margin-top:12px;">🚮 回收站</h1>
           <div class="greet">已删除的类目 / 子项会在这里保留 <b>7 天</b>，到期自动永久删除；也可随时「恢复」或「永久删除」。</div>
           <button class="tool-btn" id="emptyRbinBtn" onclick="emptyRecycle()" style="margin-top:10px;">🧹 清空回收站</button>
         </div>
@@ -837,7 +837,7 @@
 
   async function purgeItem(i) {
     const entry = RV[i]; if (!entry) return;
-    if (!(await confirmBox("永久删除", "永久删除「" + entry.name + "」？\n此操作不可恢复。", "永久删除", true, "🗑️"))) return;
+    if (!(await confirmBox("永久删除", "永久删除「" + entry.name + "」？\n此操作不可恢复。", "永久删除", true, "🚮"))) return;
     RV.splice(i, 1); saveRV();
     renderRecycle(); updateRbinBadge();
   }
@@ -867,7 +867,7 @@
     if (btn) btn.disabled = RV.length === 0;
     updateRbinBadge();
     if (RV.length === 0) {
-      wrap.innerHTML = `<div class="rbin-empty"><div class="big">🗑️</div>回收站是空的<br/><span style="font-size:13px;">删除的类目 / 子项会出现在这里，7 天内可恢复</span></div>`;
+      wrap.innerHTML = `<div class="rbin-empty"><div class="big">🚮</div>回收站是空的<br/><span style="font-size:13px;">删除的类目 / 子项会出现在这里，7 天内可恢复</span></div>`;
       return;
     }
     wrap.innerHTML = RV.map((e, i) => {
@@ -884,7 +884,7 @@
         </div>
         <div class="rbin-acts">
           <button class="btn-ghost" style="padding:6px 14px;" onclick="restoreItem(${i})">♻️ 恢复</button>
-          <button class="btn-ghost" style="padding:6px 14px;color:#E8946A;" onclick="purgeItem(${i})">🗑️ 永久删除</button>
+          <button class="btn-ghost" style="padding:6px 14px;color:#E8946A;" onclick="purgeItem(${i})">🚮 永久删除</button>
         </div>
       </div>`;
     }).join("");
@@ -1028,7 +1028,7 @@
   }
   function attachSwipe(container, content, onDelete) {
     const del = document.createElement("div"); del.className = "swipe-del";
-    del.innerHTML = '<span style="font-size:16px;">🗑️</span><span>删除</span>';
+    del.innerHTML = '<span style="font-size:16px;">🚮</span><span>删除</span>';
     container.insertBefore(del, content);
     let sx = 0, sy = 0, dragging = false, decided = false, dx = 0;
     const closeMe = () => { content.style.transition = ""; content.style.transform = ""; del.classList.remove("show"); if (openSwipe === container) openSwipe = null; };
@@ -1077,7 +1077,7 @@
       const headContent = document.createElement("div"); headContent.className = "swipe-content";
       headContent.innerHTML = `<span class="ico">${cat.icon}</span><span class="label">${labelOf(cat.id, cat.label)}</span>`;
       head.appendChild(headContent); wrap.appendChild(head);
-      const delHead = async () => { if (await confirmBox("移入回收站", "将「" + labelOf(cat.id, cat.label) + "」及其全部子类目移入回收站？\n7 天内可恢复，到期自动永久删除。", "移入回收站", false, "🗑️")) deleteCat(cat.id); };
+      const delHead = async () => { if (await confirmBox("移入回收站", "将「" + labelOf(cat.id, cat.label) + "」及其全部子类目移入回收站？\n7 天内可恢复，到期自动永久删除。", "移入回收站", false, "🚮")) deleteCat(cat.id); };
       attachSwipe(head, headContent, delHead);
       // 提示可改名（连续三击总类目方框）
       headContent.title = "连续点击三下改名";
@@ -1110,7 +1110,7 @@
     footer.innerHTML = `
       <button class="nav-add-cat" onclick="addCategory()">＋ 新建分类</button>
       <div class="nav-rbin" onclick="openRecycle()" id="navRbin">
-        <span class="rbin-ico">🗑️</span>
+        <span class="rbin-ico">🚮</span>
         <span class="rbin-label">回收站</span>
         <span class="badge" id="rbinBadge"></span>
       </div>
@@ -1317,7 +1317,7 @@
         const openIt = () => { if (r.horizon) openModule("okr", r.horizon); else openModule(r.id); };
         content.addEventListener("click", (e) => { e.stopPropagation(); if (content._t) clearTimeout(content._t); content._t = setTimeout(openIt, 240); });
         content.addEventListener("dblclick", () => { if (content._t) { clearTimeout(content._t); content._t = null; } });
-        const delFn = async () => { if (await confirmBox("移入回收站", "将「" + r.title + "」移入回收站？\n7 天内可恢复，到期自动永久删除。", "移入回收站", false, "🗑️")) { deleteSub(cat.id, r.id, r.horizon ? "horizons" : "subs"); openCat(catId); } };
+        const delFn = async () => { if (await confirmBox("移入回收站", "将「" + r.title + "」移入回收站？\n7 天内可恢复，到期自动永久删除。", "移入回收站", false, "🚮")) { deleteSub(cat.id, r.id, r.horizon ? "horizons" : "subs"); openCat(catId); } };
         attachSwipe(tile, content, delFn);
         makeEditable(content, r.id, r.title);
         grid.appendChild(tile);
@@ -2195,7 +2195,7 @@
     saveFat(data); renderFatlog(); toast("目标已更新 🎯");
   }
   function delFatRec(date) { const data = loadFat(); data.records = data.records.filter(r => r.date !== date); saveFat(data); renderFatlog(); refreshHomeProgress(); toast("已删除 " + date + " 的记录"); }
-  async function clearAll() { if (!(await confirmBox("清空记录", "确定清空全部减脂记录吗？\n此操作不可恢复。", "清空", true, "🗑️"))) return; localStorage.removeItem(FAT_KEY); renderFatlog(); refreshHomeProgress(); toast("已清空全部记录"); }
+  async function clearAll() { if (!(await confirmBox("清空记录", "确定清空全部减脂记录吗？\n此操作不可恢复。", "清空", true, "🚮"))) return; localStorage.removeItem(FAT_KEY); renderFatlog(); refreshHomeProgress(); toast("已清空全部记录"); }
 
   /* ---- 小结聚合 ---- */
   function summarize(recs, height) {
