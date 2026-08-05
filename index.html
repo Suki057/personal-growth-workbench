@@ -68,7 +68,8 @@
   .nav-head .ico { font-size: 17px; width: 22px; text-align: center; }
   .nav-head .label { flex: 1; user-select: none; }
   .sub-item .swipe-content { gap: 8px; padding: 9px 12px; font-size: 13px; font-weight: 500; color: var(--text-soft); justify-content: flex-start; text-align: left; }
-  .swipe-del { position: absolute; top: 50%; right: 6px; transform: translateY(-50%); width: 54px; height: 54px; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 14px; background: linear-gradient(135deg, #e87050, #c94a30); color: #fff; font-size: 10.5px; font-weight: 700; z-index: 1; cursor: pointer; box-shadow: 0 4px 16px rgba(200,72,48,0.40); }
+  .swipe-del { position: absolute; top: 50%; right: 6px; transform: translateY(-50%); width: 54px; height: 54px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 14px; background: linear-gradient(135deg, #e87050, #c94a30); color: #fff; font-size: 10.5px; font-weight: 700; z-index: 1; cursor: pointer; box-shadow: 0 4px 16px rgba(200,72,48,0.40); opacity: 0; pointer-events: none; transition: opacity .18s ease; }
+  .swipe-del.show { opacity: 1; pointer-events: auto; }
   .swipe-del:active { filter: brightness(.94); }
   .nav-head .arrow { width: 20px; height: 20px; flex: 0 0 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.10); color: var(--text); transition: transform .25s ease, background .2s; }
   .nav-head .arrow svg { display: block; }
@@ -1021,7 +1022,7 @@
       const c = openSwipe.querySelector(".swipe-content");
       const d = openSwipe.querySelector(".swipe-del");
       if (c) { c.style.transition = ""; c.style.transform = ""; }
-      if (d) d.style.display = "none";
+      if (d) d.classList.remove("show");
       openSwipe = null;
     }
   }
@@ -1030,8 +1031,8 @@
     del.innerHTML = '<span style="font-size:16px;">🗑️</span><span>删除</span>';
     container.insertBefore(del, content);
     let sx = 0, sy = 0, dragging = false, decided = false, dx = 0;
-    const closeMe = () => { content.style.transition = ""; content.style.transform = ""; del.style.display = "none"; if (openSwipe === container) openSwipe = null; };
-    const closeOthers = () => { if (openSwipe && openSwipe !== container) { const c = openSwipe.querySelector(".swipe-content"); const d = openSwipe.querySelector(".swipe-del"); if (c) { c.style.transition = ""; c.style.transform = ""; } if (d) d.style.display = "none"; openSwipe = null; } };
+    const closeMe = () => { content.style.transition = ""; content.style.transform = ""; del.classList.remove("show"); if (openSwipe === container) openSwipe = null; };
+    const closeOthers = () => { if (openSwipe && openSwipe !== container) { const c = openSwipe.querySelector(".swipe-content"); const d = openSwipe.querySelector(".swipe-del"); if (c) { c.style.transition = ""; c.style.transform = ""; } if (d) d.classList.remove("show"); openSwipe = null; } };
     content.addEventListener("pointerdown", (e) => { if (e.pointerType === "mouse" && e.button !== 0) return; sx = e.clientX; sy = e.clientY; dragging = true; decided = false; dx = 0; content._moved = false; content.style.transition = "none"; closeOthers(); });
     content.addEventListener("pointermove", (e) => {
       if (!dragging) return;
@@ -1052,12 +1053,12 @@
       dragging = false; content.style.transition = "";
       if (decided) {
         // 拖过约 35% 即吸附常开（降低门槛，更容易展开）
-        if (dx < -DEL_W * 0.35) { content.style.transform = "translateX(" + (-DEL_W) + "px)"; del.style.display = "flex"; openSwipe = container; content._moved = false; }
+        if (dx < -DEL_W * 0.35) { content.style.transform = "translateX(" + (-DEL_W) + "px)"; del.classList.add("show"); openSwipe = container; content._moved = false; }
         else closeMe();
       }
     };
     content.addEventListener("pointerup", endDrag);
-    content.addEventListener("pointercancel", () => { dragging = false; content.style.transition = ""; content.style.transform = ""; del.style.display = "none"; });
+    content.addEventListener("pointercancel", () => { dragging = false; content.style.transition = ""; content.style.transform = ""; del.classList.remove("show"); });
     // 捕获阶段拦截：左滑刚结束 或 已展开删除时，吞掉随后的 click，避免误触发“打开”
     content.addEventListener("click", (e) => {
       if (content._moved || openSwipe === container) { e.stopImmediatePropagation(); e.preventDefault(); content._moved = false; return; }
