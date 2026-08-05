@@ -306,7 +306,10 @@
   .okr-log-row .ol-edit .ol-fld.wide { grid-column: 1 / -1; }
   .okr-log-row .ol-edit .ol-fld input, .okr-log-row .ol-edit .ol-fld textarea { border: none; border-radius: 10px; padding: 8px 11px; font-size: 16px; background: var(--paper-soft); color: var(--text); box-shadow: var(--neu-inset-sm); font-family: inherit; resize: vertical; }
   .okr-log-row .ol-edit .ol-fld input:focus, .okr-log-row .ol-edit .ol-fld textarea:focus { outline: none; box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); }
-  .okr-log-row .ol-edit-acts { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; margin-top: 2px; }
+  .okr-log-row .ol-edit-acts { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 6px; }
+  .okr-log-row .ol-save-btn { flex: 1; border: none; border-radius: 10px; padding: 10px 0; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; white-space: nowrap; box-shadow: var(--neu-raised-sm); transition: box-shadow .15s, background .15s; background: var(--primary); color: #fff; }
+  .okr-log-row .ol-save-btn:active { box-shadow: var(--neu-inset-sm); }
+  .okr-log-row .ol-cancel-btn { background: var(--bg-soft); color: var(--text); }
   .okr-log-empty { font-size: 12.5px; color: var(--text-soft); padding: 10px 12px; line-height: 1.7; background: var(--paper-soft); border-radius: 12px; box-shadow: var(--neu-inset-sm); }
 
   .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--glass-bg); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--text); padding: 12px 24px; border-radius: 24px; font-size: 13.5px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 99; border: var(--glass-border); box-shadow: var(--glass-shadow); }
@@ -2070,7 +2073,7 @@
     const okrCat = CATS.find(c => c.id === "okr");
     const horOpts = (okrCat && Array.isArray(okrCat.horizons) && okrCat.horizons.length) ? okrCat.horizons : ["今年", "近三年", "近五年", "近十年"];
     const cards = list.length ? list.map(o => {
-      const avg = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + (k.p||0), 0) / o.krs.length) : (o._manualPct || 0);
+      const avg = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + (k.p||0), 0) / o.krs.length) : (o._manualPct || (o.logs && o.logs.length ? o.logs[o.logs.length - 1].pct : 0));
       return `<div class="okr-card" data-oid="${o.id}">
         <div class="oc-top"><div class="oc-title">${o.title}</div><span class="oc-horizon">${o.horizon}</span></div>
         <div id="krlist_${o.id}">${o.krs.map((k, i) => krRow(o.id, i, k)).join("")}</div>
@@ -2134,8 +2137,8 @@
             <label class="ol-fld">进度(%)<input type="number" min="0" max="100" value="${b.pct}" oninput="editLogField('${o.id}','${l.lid}','pct',this.value)"></label>
             <label class="ol-fld wide">描述<textarea rows="2" oninput="editLogField('${o.id}','${l.lid}','desc',this.value)">${escapeHtml(b.desc || "")}</textarea></label>
             <div class="ol-edit-acts">
-              <button class="btn-sm" onclick="saveEditLog('${o.id}','${l.lid}')">💾 保存</button>
-              <button class="btn-ghost" onclick="cancelEditLog()">取消</button>
+              <button class="ol-save-btn" onclick="saveEditLog('${o.id}','${l.lid}')">💾 保存</button>
+              <button class="ol-save-btn ol-cancel-btn" onclick="cancelEditLog()">取消</button>
             </div>
           </div>
         </div>`;
@@ -2159,7 +2162,13 @@
     </div>`;
   }
   /* 编辑进度明细 */
-  function startEditLog(oid, lid) { _editingLid = lid; _editBuf = null; renderModule("okr", currentHorizon); }
+  function startEditLog(oid, lid) {
+    const o = loadOKR().find(x => x.id === oid);
+    const l = o && (o.logs || []).find(x => x.lid === lid);
+    _editingLid = lid;
+    _editBuf = l ? { lid: l.lid, date: l.date, pct: l.pct, desc: l.desc || "" } : null;
+    renderModule("okr", currentHorizon);
+  }
   function editLogField(oid, lid, key, val) {
     if (!_editBuf || _editBuf.lid !== lid) {
       const o = loadOKR().find(x => x.id === oid);
@@ -2171,11 +2180,25 @@
   function saveEditLog(oid, lid) {
     const data = loadOKR(); const o = data.find(x => x.id === oid); if (!o) return;
     const l = (o.logs || []).find(x => x.lid === lid); if (!l) return;
-    l.date = _editBuf.date; l.pct = Number(_editBuf.pct) || 0; l.desc = _editBuf.desc;
+    /* 优先用编辑缓冲区；若为空则从 DOM 回退读取 */
+    if (_editBuf && _editBuf.lid === lid) {
+      l.date = _editBuf.date; l.pct = Number(_editBuf.pct) || 0; l.desc = _editBuf.desc;
+    } else {
+      /* DOM 回退：在编辑行内查找 input 值 */
+      const row = document.querySelector(`.okr-log-row.editing`);
+      if (row) {
+        const dateInput = row.querySelector('input[type="date"]');
+        const pctInput = row.querySelector('input[type="number"]');
+        const descArea = row.querySelector('textarea');
+        if (dateInput) l.date = dateInput.value;
+        if (pctInput) l.pct = Number(pctInput.value) || 0;
+        if (descArea) l.desc = descArea.value.trim();
+      }
+    }
     storeSet("wb_okr", data);
     _editingLid = null; _editBuf = null;
     renderModule("okr", currentHorizon); refreshHomeProgress();
-    toast("已更新进度明细");
+    toast("已更新进度明细 ✅");
   }
   function cancelEditLog() { _editingLid = null; _editBuf = null; renderModule("okr", currentHorizon); }
   /* 删除进度明细（进回收站） */
@@ -2201,9 +2224,9 @@
     const desc = descs.length ? descs.join("；") : "";
     if (!o.logs) o.logs = [];
     o.logs.push({ lid: "l" + Date.now() + Math.random().toString(36).slice(2,6), date: todayStr(), pct, desc });
-    /* 恢复默认状态：清空关键结果与临时进度 */
+    /* 恢复默认状态：清空关键结果，但保留上次进度作为下次默认值 */
     o.krs = [];
-    o._manualPct = 0;
+    o._manualPct = pct;
     storeSet("wb_okr", data);
     renderModule("okr", currentHorizon); refreshHomeProgress();
     toast("已保存进度：" + pct + "%");
