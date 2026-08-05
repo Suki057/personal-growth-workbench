@@ -289,13 +289,14 @@
   /* 数据明细 */
   .okr-log { margin-top: 14px; padding-top: 12px; border-top: 1px dashed rgba(120,105,80,0.18); }
   .okr-log-title { font-size: 13px; font-weight: 700; color: var(--primary-deep); margin-bottom: 10px; }
-  .okr-log-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; padding: 8px 10px; background: var(--paper-soft); border-radius: 10px; box-shadow: var(--neu-inset-sm); }
-  .okr-log-row .ol-date { font-size: 12.5px; color: var(--text-soft); min-width: 80px; flex: 0 0 auto; padding-top: 2px; }
-  .okr-log-row .ol-desc { flex: 1; min-width: 0; font-size: 13px; line-height: 1.5; color: var(--text); word-break: break-word; }
-  .okr-log-row .ol-pct { font-size: 20px; font-weight: 800; color: var(--primary-deep); min-width: 56px; text-align: right; flex: 0 0 auto; line-height: 1.1; }
+  .okr-log-row { display: block; margin-bottom: 10px; padding: 10px 12px; background: var(--paper-soft); border-radius: 12px; box-shadow: var(--neu-inset-sm); }
+  .okr-log-row .ol-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .okr-log-row .ol-date { font-size: 12.5px; color: var(--text-soft); }
+  .okr-log-row .ol-desc { font-size: 13px; line-height: 1.5; color: var(--text); word-break: break-word; margin-top: 4px; }
+  .okr-log-row .ol-pct { font-size: 22px; font-weight: 800; color: var(--primary-deep); line-height: 1.1; }
   .okr-log-row .ol-pct small { font-size: 12px; font-weight: 700; margin-left: 1px; }
-  .okr-log-row .ol-acts { display: flex; flex-direction: column; gap: 4px; flex: 0 0 auto; align-items: flex-end; }
-  .okr-log-row .ol-btn { border: none; background: var(--bg-soft); color: var(--text); border-radius: 8px; padding: 4px 9px; font-size: 12px; cursor: pointer; box-shadow: var(--neu-raised-sm); white-space: nowrap; }
+  .okr-log-row .ol-acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(120,105,80,0.16); }
+  .okr-log-row .ol-btn { border: none; background: var(--bg-soft); color: var(--text); border-radius: 9px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: var(--neu-raised-sm); white-space: nowrap; }
   .okr-log-row .ol-btn:active { box-shadow: var(--neu-inset-sm); }
   .okr-log-row .ol-btn.del { background: rgba(232,112,80,0.15); color: #E8946A; }
   /* 编辑态 */
@@ -306,7 +307,7 @@
   .okr-log-row .ol-edit .ol-fld input, .okr-log-row .ol-edit .ol-fld textarea { border: none; border-radius: 10px; padding: 8px 11px; font-size: 16px; background: var(--paper-soft); color: var(--text); box-shadow: var(--neu-inset-sm); font-family: inherit; resize: vertical; }
   .okr-log-row .ol-edit .ol-fld input:focus, .okr-log-row .ol-edit .ol-fld textarea:focus { outline: none; box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); }
   .okr-log-row .ol-edit-acts { grid-column: 1 / -1; display: flex; gap: 8px; justify-content: flex-end; margin-top: 2px; }
-  .okr-log-empty { font-size: 12.5px; color: var(--text-soft); padding: 4px 0; }
+  .okr-log-empty { font-size: 12.5px; color: var(--text-soft); padding: 10px 12px; line-height: 1.7; background: var(--paper-soft); border-radius: 12px; box-shadow: var(--neu-inset-sm); }
 
   .toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px); background: var(--glass-bg); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: var(--text); padding: 12px 24px; border-radius: 24px; font-size: 13.5px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; z-index: 99; border: var(--glass-border); box-shadow: var(--glass-shadow); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -2120,6 +2121,10 @@
   let _editBuf = null;
   function okrLogHTML(o) {
     const logs = o.logs || [];
+    /* 兼容旧数据：为没有 lid 的历史记录补一个稳定标识 */
+    let _needFix = false;
+    logs.forEach(l => { if (!l.lid) { l.lid = "l" + (Date.parse(l.date) || Date.now()) + Math.random().toString(36).slice(2, 6); _needFix = true; } });
+    if (_needFix) { const all = loadOKR(); const t = all.find(x => x.id === o.id); if (t) { t.logs = logs; storeSet("wb_okr", all); } }
     const rows = logs.length ? logs.slice().reverse().map(l => {
       if (_editingLid === l.lid) {
         const b = (_editBuf && _editBuf.lid === l.lid) ? _editBuf : l;
@@ -2136,16 +2141,18 @@
         </div>`;
       }
       return `<div class="okr-log-row">
-        <span class="ol-date">${l.date}</span>
-        <span class="ol-desc">${l.desc ? escapeHtml(l.desc) : "—"}</span>
-        <span class="ol-pct">${l.pct}<small>%</small></span>
-        <span class="ol-acts">
+        <div class="ol-head">
+          <span class="ol-date">📅 ${l.date}</span>
+          <span class="ol-pct">${l.pct}<small>%</small></span>
+        </div>
+        <div class="ol-desc">${l.desc ? escapeHtml(l.desc) : "—"}</div>
+        <div class="ol-acts">
           <button class="ol-btn" onclick="startEditLog('${o.id}','${l.lid}')">✏️ 编辑</button>
-          <button class="ol-btn del" onclick="delOkrLog('${o.id}','${l.lid}')">🚮</button>
-        </span>
+          <button class="ol-btn del" onclick="delOkrLog('${o.id}','${l.lid}')">🚮 删除</button>
+        </div>
       </div>`;
     }).join("")
-      : `<div class="okr-log-empty">暂无保存的进度记录，填写关键结果后点「保存进度」即可打卡</div>`;
+      : `<div class="okr-log-empty">暂无保存的进度记录。<br/>填写上面的「关键结果」并拖动进度条后，点 <b>💾 保存进度</b>，这里就会生成一条带「✏️ 编辑 / 🚮 删除」按钮的明细。</div>`;
     return `<div class="okr-log">
       <div class="okr-log-title">📊 进度明细（${logs.length}）</div>
       ${rows}
