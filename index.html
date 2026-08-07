@@ -144,21 +144,28 @@
   .stat .s-ico { width: 46px; height: 46px; border-radius: 13px; background: var(--primary-soft); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
   .stat .s-val { font-size: 24px; font-weight: 800; color: var(--text); }
   .stat .s-label { font-size: 12.5px; color: var(--text-soft); margin-top: 3px; }
-  /* 目标时长卡片（在 stats-row 中） */
+  /* 目标时长卡片 */
   .stat-goal { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .stat-goal-wide { margin-bottom: 18px; }
   .stat-goal .sg-head { font-size: 13px; font-weight: 700; color: var(--primary-deep); }
   .stat-goal .sg-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .stat-goal .sg-select, .stat-goal .sg-input { border: none; border-radius: 10px; padding: 8px 10px; font-size: 15px; color: var(--text); background: var(--paper-soft); box-shadow: var(--neu-inset-sm); outline: none; }
+  .stat-goal .sg-row-period .sg-select { min-width: 100px; }
+  .stat-goal .sg-row-target { display: flex; align-items: center; gap: 8px; }
+  .stat-goal .sg-row-target .sg-input { flex: 1; min-width: 0; text-align: left; }
+  .stat-goal .sg-row-target .sg-unit { flex: 0 0 auto; }
+  .stat-goal .sg-row-target .sg-btn { flex: 0 0 auto; }
+  .stat-goal .sg-select, .stat-goal .sg-input { border: none; border-radius: 10px; padding: 10px 12px; font-size: 15px; color: var(--text); background: var(--paper-soft); box-shadow: var(--neu-inset-sm); outline: none; }
   .stat-goal .sg-select { min-width: 80px; }
-  .stat-goal .sg-input { width: 70px; text-align: center; }
+  .stat-goal .sg-input { text-align: center; }
   .stat-goal .sg-input[type="number"] { -moz-appearance: textfield; }
   .stat-goal .sg-input[type="number"]::-webkit-outer-spin-button, .stat-goal .sg-input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .stat-goal .sg-unit { font-size: 12.5px; color: var(--text-soft); }
-  .stat-goal .sg-btn { border: none; border-radius: 10px; padding: 8px 14px; font-size: 14px; font-weight: 700; color: #fff; background: var(--primary); cursor: pointer; box-shadow: var(--neu-raised-sm); }
+  .stat-goal .sg-btn { border: 1px solid rgba(107,140,191,0.45); border-radius: 10px; padding: 9px 18px; font-size: 14px; font-weight: 700; color: var(--primary); background: var(--paper-soft); cursor: pointer; box-shadow: var(--neu-raised-sm); }
   .stat-goal .sg-btn:active { box-shadow: var(--neu-inset-sm); }
-  .stat-goal .sg-bar { flex: 1; height: 10px; border-radius: 20px; background: rgba(120,105,80,0.12); overflow: hidden; box-shadow: var(--neu-inset-sm); }
+  .stat-goal .sg-bar { width: 100%; height: 10px; border-radius: 20px; background: rgba(120,105,80,0.12); overflow: hidden; box-shadow: var(--neu-inset-sm); }
   .stat-goal .sg-bar > span { display: block; height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .3s ease; }
   .stat-goal .sg-meta { font-size: 12px; color: var(--text-soft); }
+  .stats-row-pair { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-bottom: 26px; }
 
   .section-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
   .section-title::before { content: ""; width: 5px; height: 16px; border-radius: 3px; background: var(--primary); display: inline-block; }
@@ -1706,15 +1713,17 @@
     const periodOptions = Object.entries(GOAL_PERIODS).map(([k, v]) => `<option value="${k}" ${g.period===k?"selected":""}>${v.label}</option>`).join("");
     const showCustom = g.period === "custom";
     return `
-      <div class="stat-goal">
+      <div class="stat-goal stat-goal-wide">
         <div class="sg-head">🎯 ${g.label}</div>
-        <div class="sg-row">
+        <div class="sg-row sg-row-period">
           <select id="goalPeriod_${id}" class="sg-select" onchange="toggleGoalCustom('${id}')">${periodOptions}</select>
-          <input id="goalTarget_${id}" class="sg-input" type="number" step="0.1" value="${g.target}" placeholder="目标值" />
+        </div>
+        ${showCustom ? `<div class="sg-row sg-custom-row"><span class="sg-unit">天数</span><input id="goalCustom_${id}" class="sg-input" type="number" step="1" value="${g.customDays || 7}" /></div>` : ""}
+        <div class="sg-row sg-row-target">
+          <input id="goalTarget_${id}" class="sg-input" type="number" step="0.1" value="${g.target}" placeholder="输入目标时长" />
           <span class="sg-unit">${g.unit}</span>
           <button class="sg-btn" onclick="saveGoalConfig('${id}')">确定</button>
         </div>
-        ${showCustom ? `<div class="sg-row sg-custom-row"><span class="sg-unit">天数</span><input id="goalCustom_${id}" class="sg-input" type="number" step="1" value="${g.customDays || 7}" /></div>` : ""}
         <div class="sg-bar"><span style="width:${pct}%"></span></div>
         <div class="sg-meta">${GOAL_PERIODS[g.period]?.label || "周期内"}已完成 <b>${sum}</b> / ${g.target} ${g.unit} · ${pct}%</div>
       </div>`;
@@ -1778,10 +1787,10 @@
     }).join("") : `<div style="padding:14px 4px;color:var(--text-soft);font-size:13px;">还没有记录，今天就开始第一笔吧 🌿</div>`;
 
     return `
-      <section class="stats-row">
+      ${goalHtml}
+      <section class="stats-row stats-row-pair">
         <div class="stat"><div class="s-ico">📌</div><div><div class="s-val">${latest ? (+latest[m.metric.k]||0)+m.metric.unit : "—"}</div><div class="s-label">最新${m.metric.label}</div></div></div>
         <div class="stat"><div class="s-ico">📊</div><div><div class="s-val">${sumMetric}${m.metric.unit}</div><div class="s-label">累计${m.metric.label}</div></div></div>
-        ${goalHtml}
       </section>
       <section class="mod-stack">
         <div class="card">
