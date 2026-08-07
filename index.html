@@ -125,7 +125,7 @@
   .top-row { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 18px; margin-bottom: 22px; }
   .top-row.top-single { display: block; }
   .top-row.top-single .countdown-card { width: 100%; }
-  .card { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 20px 22px; border: var(--glass-border); }
+  .card { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 20px 22px; border: var(--glass-border); overflow: hidden; }
   .date-banner { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 20px 24px; background: linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.30)); }
   .date-banner .d-big { font-size: 28px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 10px; }
   .date-banner .d-emoji { font-size: 26px; }
@@ -148,24 +148,41 @@
   .stat-goal { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
   .stat-goal-wide { margin-bottom: 18px; }
   .stat-goal .sg-head { font-size: 13px; font-weight: 700; color: var(--primary-deep); }
-  .stat-goal .sg-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .stat-goal .sg-row-period .sg-select { min-width: 100px; }
+  .stat-goal .sg-row { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+  .stat-goal .sg-row-period { justify-content: space-between; }
+  .stat-goal .sg-row-period .sg-date { flex: 1 1 0; min-width: 0; }
+  .stat-goal .sg-tilde { flex: 0 0 auto; color: var(--text-soft); font-size: 14px; padding: 0 2px; }
   .stat-goal .sg-row-target { display: flex; align-items: center; gap: 8px; }
   .stat-goal .sg-row-target .sg-input { flex: 1; min-width: 0; text-align: left; }
   .stat-goal .sg-row-target .sg-unit { flex: 0 0 auto; }
   .stat-goal .sg-row-target .sg-btn { flex: 0 0 auto; }
   .stat-goal .sg-select, .stat-goal .sg-input { border: none; border-radius: 10px; padding: 10px 12px; font-size: 15px; color: var(--text); background: var(--paper-soft); box-shadow: var(--neu-inset-sm); outline: none; }
   .stat-goal .sg-select { min-width: 80px; }
+  .stat-goal .sg-input[type="date"] { min-width: 0; font-size: 14px; }
   .stat-goal .sg-input { text-align: center; }
   .stat-goal .sg-input[type="number"] { -moz-appearance: textfield; }
   .stat-goal .sg-input[type="number"]::-webkit-outer-spin-button, .stat-goal .sg-input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .stat-goal .sg-unit { font-size: 12.5px; color: var(--text-soft); }
   .stat-goal .sg-btn { border: 1px solid rgba(107,140,191,0.45); border-radius: 10px; padding: 9px 18px; font-size: 14px; font-weight: 700; color: var(--primary); background: var(--paper-soft); cursor: pointer; box-shadow: var(--neu-raised-sm); }
   .stat-goal .sg-btn:active { box-shadow: var(--neu-inset-sm); }
+  .stat-goal .sg-btn-del { color: #c85a3a; border-color: rgba(200,90,58,0.45); }
   .stat-goal .sg-bar { width: 100%; height: 10px; border-radius: 20px; background: rgba(120,105,80,0.12); overflow: hidden; box-shadow: var(--neu-inset-sm); }
+  .stat-goal .sg-bar.sg-bar-empty { background: rgba(120,105,80,0.06); }
   .stat-goal .sg-bar > span { display: block; height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .3s ease; }
   .stat-goal .sg-meta { font-size: 12px; color: var(--text-soft); }
+  .stat-goal .sg-new-goal { padding: 12px; border-radius: 14px; background: rgba(255,255,255,0.28); border: 1px dashed rgba(107,140,191,0.25); display: flex; flex-direction: column; gap: 10px; }
+  .stat-goal .sg-goal-item { padding: 12px; border-radius: 14px; background: rgba(255,255,255,0.38); border: 1px solid rgba(255,255,255,0.45); display: flex; flex-direction: column; gap: 10px; }
+  .stat-goal .sg-goal-item + .sg-goal-item { margin-top: 10px; }
+  .stat-goal .sg-empty { font-size: 12.5px; color: var(--text-soft); padding: 8px 4px; }
   .stats-row-pair { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-bottom: 26px; }
+  @media (max-width: 820px) {
+    .stat-goal { padding: 14px; }
+    .stat-goal .sg-row { gap: 6px; }
+    .stat-goal .sg-btn { padding: 9px 14px; font-size: 13px; }
+    .stat-goal .sg-input { font-size: 14px; padding: 9px 10px; }
+    .stat-goal .sg-input[type="date"] { font-size: 13px; }
+    .stat-goal .sg-tilde { font-size: 12px; }
+  }
 
   .section-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
   .section-title::before { content: ""; width: 5px; height: 16px; border-radius: 3px; background: var(--primary); display: inline-block; }
@@ -200,15 +217,15 @@
   .app-ref .a-ico { font-size: 15px; }
   .mod-layout { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-bottom: 22px; align-items: start; }
   .mod-stack { display: flex; flex-direction: column; gap: 18px; margin-bottom: 22px; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; width: 100%; min-width: 0; }
   .form-grid.one { grid-template-columns: 1fr; }
-  .form-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--text-soft); font-weight: 600; }
-  .form-grid input, .form-grid select { border: none; border-radius: 12px; padding: 10px 12px; font-size: 16px; color: var(--text); background: var(--paper-soft); outline: none; transition: box-shadow .2s; box-sizing: border-box; box-shadow: var(--neu-inset-sm); }
+  .form-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--text-soft); font-weight: 600; min-width: 0; }
+  .form-grid input, .form-grid select { border: none; border-radius: 12px; padding: 10px 12px; font-size: 16px; color: var(--text); background: var(--paper-soft); outline: none; transition: box-shadow .2s; box-sizing: border-box; box-shadow: var(--neu-inset-sm); width: 100%; max-width: 100%; min-width: 0; }
   .form-grid input:focus, .form-grid select:focus { box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); background: #fff; }
   /* OKR 新建目标：方框宽度缩短，边框限制在内不溢出 */
   .form-grid.okr-new { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .form-grid.okr-new label { width: 100%; max-width: 240px; }
-  .form-grid.okr-new input, .form-grid.okr-new select { width: 100%; max-width: 240px; }
+  .form-grid.okr-new label { width: 100%; max-width: 100%; }
+  .form-grid.okr-new input, .form-grid.okr-new select { width: 100%; max-width: 100%; }
   .btn-primary { border: none; border-radius: 14px; padding: 12px 18px; font-size: 14px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7B9CCC, #5C7FA8); cursor: pointer; width: 100%; box-shadow: 5px 5px 14px rgba(91,110,150,0.40), -5px -5px 14px rgba(255,255,255,0.55), inset 0 1px 0 rgba(255,255,255,0.30); transition: transform .15s, box-shadow .2s; }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 7px 7px 18px rgba(91,110,150,0.45), -6px -6px 16px rgba(255,255,255,0.55), inset 0 1px 0 rgba(255,255,255,0.30); }
   .btn-primary:active { box-shadow: inset 4px 4px 10px rgba(74,90,128,0.55), inset -3px -3px 8px rgba(255,255,255,0.25); transform: translateY(0); }
@@ -249,6 +266,12 @@
   .chart-card.chart-wide { grid-column: 1 / -1; }
   .chart-title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
   .chart-card svg { display: block; width: 100%; }
+
+  /* 本月小结 */
+  .month-summary-card { margin-bottom: 6px; }
+  .month-note-label { display: block; font-size: 12.5px; color: var(--text-soft); font-weight: 600; margin: 16px 0 8px; }
+  .month-note { width: 100%; box-sizing: border-box; border: none; border-radius: 12px; padding: 12px 14px; font-size: 15px; color: var(--text); background: var(--paper-soft); outline: none; resize: vertical; min-height: 72px; box-shadow: var(--neu-inset-sm); font-family: inherit; line-height: 1.6; }
+  .month-note:focus { box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); background: #fff; }
 
   /* AI 趋势分析 */
   .ai-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -570,34 +593,14 @@
         <div>
           <button class="back-btn" onclick="goBack()">← 返回</button>
           <h1 style="margin-top:12px;">💃 减脂塑形 · 每日记录</h1>
-          <div class="greet">对标减肥 App：每日记录体重 / 体脂率 / 摄入大卡，追踪趋势、BMI 与目标体脂率</div>
+          <div class="greet">对标减肥 App：每日记录体重 / 体脂率，追踪趋势与目标体脂率</div>
         </div>
       </div>
       <section class="stats-row">
-        <div class="stat"><div class="s-ico">📅</div><div><div class="s-val" id="fDays">0</div><div class="s-label">累计记录天数</div></div></div>
         <div class="stat"><div class="s-ico">⚖️</div><div><div class="s-val" id="fCur">—</div><div class="s-label">当前体重</div></div></div>
-        <div class="stat"><div class="s-ico">🧮</div><div><div class="s-val" id="fBMI">—</div><div class="s-label" id="fBMIcls">当前 BMI</div></div></div>
         <div class="stat"><div class="s-ico">🎯</div><div><div class="s-val" id="fToGo">—</div><div class="s-label">距目标体重</div></div></div>
       </section>
       <section class="mod-layout">
-        <div class="card">
-          <div class="section-title" style="margin-bottom:14px;">📝 今日打卡</div>
-          <div class="form-grid">
-            <label>体重 (kg)<input id="inWeight" type="number" step="0.1" placeholder="如 60.5" /></label>
-            <label>体脂率 (%)<input id="inFat" type="number" step="0.1" placeholder="如 26.5" /></label>
-            <label>摄入热量 (大卡)<input id="inCal" type="number" step="1" placeholder="如 1380" /></label>
-            <label>运动消耗 (大卡)<input id="inBurn" type="number" step="1" placeholder="如 220，可选" /></label>
-          </div>
-          <div class="more-title" style="font-size:12.5px;font-weight:700;color:var(--primary-deep);margin:8px 0 10px;">➕ 更多指标（可选）</div>
-          <div class="form-grid">
-            <label>围度 (cm)<input id="ex_girth" type="number" step="0.1" placeholder="如 90" /></label>
-            <label>腰围 (cm)<input id="ex_waist" type="number" step="0.1" placeholder="如 72" /></label>
-            <label>饮水 (ml)<input id="ex_water" type="number" step="50" placeholder="如 1500" /></label>
-            <label>睡眠 (h)<input id="ex_sleep" type="number" step="0.1" placeholder="如 7.5" /></label>
-          </div>
-          <button class="btn-primary" onclick="saveToday()">保存今日记录</button>
-          <div id="todayStatus" class="today-status"></div>
-        </div>
         <div class="card">
           <div class="section-title" style="margin-bottom:14px;">🎯 我的目标</div>
           <div class="form-grid">
@@ -606,15 +609,23 @@
             <label>目标体脂率 (%)<input id="goalBodyfat" type="number" step="0.1" /></label>
           </div>
           <button class="btn-ghost" onclick="saveGoal()">更新目标</button>
-          <div class="tip">💡 BMI = 体重(kg) ÷ 身高(m)²：＜18.5 偏瘦，18.5–24 正常，24–28 超重，≥28 肥胖（中国标准）。<br/>目标体脂率参考：女性健康约 21–28%，男性约 14–20%。</div>
+          <div class="tip">💡 目标体脂率参考：女性健康约 21–28%，男性约 14–20%。</div>
           <span class="clear-link" onclick="clearAll()" style="display:inline-block;margin-top:12px;font-size:12px;color:var(--text-soft);cursor:pointer;text-decoration:underline;">清空全部记录</span>
+        </div>
+        <div class="card">
+          <div class="section-title" style="margin-bottom:14px;">📝 今日打卡</div>
+          <div class="form-grid">
+            <label>体重 (kg)<input id="inWeight" type="number" step="0.1" placeholder="如 60.5" /></label>
+            <label>体脂率 (%)<input id="inFat" type="number" step="0.1" placeholder="如 26.5" /></label>
+          </div>
+          <button class="btn-primary" onclick="saveToday()">保存今日记录</button>
+          <div id="todayStatus" class="today-status"></div>
         </div>
       </section>
       <div class="section-title">📈 趋势分析</div>
       <section class="chart-grid">
         <div class="card chart-card"><div class="chart-title">体重趋势 (kg) · 虚线为目标</div><div id="chartWeight"></div></div>
         <div class="card chart-card"><div class="chart-title">体脂率趋势 (%) · 虚线为目标</div><div id="chartFat"></div></div>
-        <div class="card chart-card chart-wide"><div class="chart-title">每日摄入热量 (大卡) 趋势</div><div id="chartCal"></div></div>
       </section>
       <div class="section-title" style="margin-top:26px;">🤖 AI 趋势分析</div>
       <section class="card" style="margin-bottom:6px;">
@@ -625,14 +636,16 @@
         <div id="aiInsights" class="ai-insights"></div>
         <div class="ai-stamp" id="aiStamp"></div>
       </section>
-      <div class="section-title" style="margin-top:26px;">📊 周期小结</div>
-      <section class="summary-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
-        <div class="card"><div class="sum-h" style="font-size:14px;font-weight:700;color:var(--primary-deep);margin-bottom:12px;">本周小结（最近 7 天）</div><div id="sumWeek"></div></div>
-        <div class="card"><div class="sum-h" style="font-size:14px;font-weight:700;color:var(--primary-deep);margin-bottom:12px;">本月小结（最近 30 天）</div><div id="sumMonth"></div></div>
+      <div class="section-title" style="margin-top:26px;">📊 本月小结</div>
+      <section class="card month-summary-card">
+        <div class="sum-h" style="font-size:14px;font-weight:700;color:var(--primary-deep);margin-bottom:12px;">近 30 天体重趋势</div>
+        <div id="sumMonthChart"></div>
+        <label class="month-note-label">本月小结（可输入）</label>
+        <textarea id="monthNote" class="month-note" rows="3" placeholder="记录下本月的感受、调整或计划…" oninput="saveMonthNote()"></textarea>
       </section>
       <div class="section-title" style="margin-top:26px;">📜 历史记录</div>
       <div class="card">
-        <div class="table-head" style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.8fr 0.8fr 0.9fr 1.2fr 0.6fr;align-items:center;gap:8px;font-size:12px;color:var(--text-soft);font-weight:700;padding:4px 6px 12px;border-bottom:1px solid var(--line);"><span>日期</span><span>体重</span><span>体脂率</span><span>摄入</span><span>运动</span><span>净热量</span><span>其他指标</span><span></span></div>
+        <div class="table-head" style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.6fr;align-items:center;gap:8px;font-size:12px;color:var(--text-soft);font-weight:700;padding:4px 6px 12px;border-bottom:1px solid var(--line);"><span>日期</span><span>体重</span><span>体脂率</span><span></span></div>
         <div id="historyList"></div>
       </div>
     </div>
@@ -717,7 +730,7 @@
     },
     fatloss: {
       cat: "image", title: "减脂塑形", app: { name: "薄荷健康 / Keep / 减肥App", icon: "🥗" },
-      mode: "fatlog", blurb: "对标「薄荷健康」「Keep」：记录体重/体脂率/摄入大卡，追踪趋势、BMI 与目标体脂率，AI 自动分析。"
+      mode: "fatlog", blurb: "对标「薄荷健康」「Keep」：记录体重/体脂率，追踪趋势与目标体脂率，AI 自动分析。"
     },
     photo: {
       cat: "ability", title: "摄影", app: { name: "泼辣修图 / 图虫 / Lightroom", icon: "📷" },
@@ -825,6 +838,14 @@
     const custom = CUSTOM[id] || {};
     const merged = { ...base, ...custom };
     if (base.goal || custom.goal) merged.goal = { ...base.goal, ...custom.goal };
+    // 旧版单目标 → 新版多时间段目标（自定义日期范围）
+    if (!custom.goals && (base.goal || custom.goal)) {
+      const g = merged.goal;
+      const end = new Date(); end.setHours(23, 59, 59, 999);
+      const start = new Date(); start.setDate(end.getDate() - (g.customDays || 7) + 1); start.setHours(0, 0, 0, 0);
+      merged.goals = [{ gid: Date.now() + "" + Math.floor(Math.random() * 9999), label: g.label, start: fmt(start), end: fmt(end), target: g.target || 0, unit: g.unit || "" }];
+    }
+    if (custom.goals) merged.goals = custom.goals;
     return merged;
   }
   let LABELS = storeGet("wb_labels", {});
@@ -928,6 +949,12 @@
       o.logs.push(restored);
       storeSet("wb_okr", data);
       renderModule("okr", currentHorizon);
+    } else if (entry.kind === "goalperiod") {
+      if (!CUSTOM[entry.id]) CUSTOM[entry.id] = {};
+      if (!CUSTOM[entry.id].goals) CUSTOM[entry.id].goals = [];
+      CUSTOM[entry.id].goals.push(entry.goalData);
+      storeSet("wb_custom_modules", CUSTOM);
+      renderModule(entry.id);
     }
     storeSet("wb_cats", CATS);
     RV.splice(i, 1); saveRV();
@@ -969,7 +996,8 @@
     rec: { label: "记录", ico: "📈" },
     kr:  { label: "关键结果", ico: "🔑" },
     fat: { label: "减脂记录", ico: "⚖️" },
-    okrlog:{ label: "进度明细", ico: "📊" }
+    okrlog:{ label: "进度明细", ico: "📊" },
+    goalperiod:{ label: "目标时段", ico: "🎯" }
   };
 
   function renderRecycle() {
@@ -1682,83 +1710,109 @@
     const pctEl = document.getElementById("htPct"); if (pctEl) pctEl.textContent = pct + "%";
     el.onclick = () => openTodoView();
   }
-  /* ============ 通用 Tracker ============ */
-  const GOAL_PERIODS = {
-    week: { days: 7, label: "本周" },
-    month: { days: 30, label: "本月" },
-    quarter: { days: 90, label: "本季度" },
-    year: { days: 365, label: "本年" },
-    custom: { days: 0, label: "自定义" }
-  };
-  function getGoalRange(period, customDays) {
-    const days = period === "custom" ? (parseInt(customDays) || 7) : (GOAL_PERIODS[period]?.days || 7);
-    const end = new Date(); end.setHours(23, 59, 59, 999);
-    const start = new Date(); start.setDate(end.getDate() - days + 1); start.setHours(0, 0, 0, 0);
-    return { days, start, end };
-  }
-  function getGoalProgress(id, m) {
+  /* ============ 通用 Tracker 目标（自定义日期范围，可多段） ============ */
+  function calcGoalProgress(id, goal) {
     const data = storeGet("wb_" + id, []);
     const recs = data.slice().sort((a, b) => a.date < b.date ? -1 : 1);
-    const g = m.goal;
-    const range = getGoalRange(g.period, g.customDays);
+    const start = new Date(goal.start + "T00:00:00");
+    const end = new Date(goal.end + "T23:59:59");
+    const metricK = goal.metricK || "min";
     const sum = recs.reduce((s, r) => {
       const d = new Date(r.date + "T00:00:00");
-      return (d >= range.start && d <= range.end) ? s + (+r[m.metric.k] || 0) : s;
+      return (d >= start && d <= end) ? s + (+r[metricK] || 0) : s;
     }, 0);
-    const pct = g.target ? Math.min(100, Math.round(sum / g.target * 100)) : 0;
-    return { sum, pct, range, g };
+    const pct = goal.target ? Math.min(100, Math.round(sum / goal.target * 100)) : 0;
+    return { sum, pct };
   }
   function renderGoalCard(id, m) {
-    const { sum, pct, g } = getGoalProgress(id, m);
-    const periodOptions = Object.entries(GOAL_PERIODS).map(([k, v]) => `<option value="${k}" ${g.period===k?"selected":""}>${v.label}</option>`).join("");
-    const showCustom = g.period === "custom";
-    return `
-      <div class="stat-goal stat-goal-wide">
-        <div class="sg-head">🎯 ${g.label}</div>
+    const goals = m.goals || [];
+    const baseGoal = m.goal || {};
+    const unit = baseGoal.unit || m.metric?.unit || "";
+    const label = baseGoal.label || "目标";
+    const today = fmt(new Date());
+    const weekAgo = fmt(new Date(Date.now() - 6 * 86400000));
+    let html = `<div class="stat-goal stat-goal-wide">
+      <div class="sg-head">🎯 ${label}</div>
+      <div class="sg-new-goal">
         <div class="sg-row sg-row-period">
-          <select id="goalPeriod_${id}" class="sg-select" onchange="toggleGoalCustom('${id}')">${periodOptions}</select>
+          <input type="date" id="goalStart_${id}" class="sg-input sg-date" value="${weekAgo}" />
+          <span class="sg-tilde">~</span>
+          <input type="date" id="goalEnd_${id}" class="sg-input sg-date" value="${today}" />
         </div>
-        ${showCustom ? `<div class="sg-row sg-custom-row"><span class="sg-unit">天数</span><input id="goalCustom_${id}" class="sg-input" type="number" step="1" value="${g.customDays || 7}" /></div>` : ""}
         <div class="sg-row sg-row-target">
-          <input id="goalTarget_${id}" class="sg-input" type="number" step="0.1" value="${g.target}" placeholder="输入目标时长" />
-          <span class="sg-unit">${g.unit}</span>
-          <button class="sg-btn" onclick="saveGoalConfig('${id}')">确定</button>
+          <input id="goalTarget_${id}" class="sg-input" type="number" step="0.1" value="0" placeholder="输入目标" />
+          <span class="sg-unit">${unit}</span>
+          <button class="sg-btn" onclick="addGoalPeriod('${id}')">确定</button>
         </div>
-        <div class="sg-bar"><span style="width:${pct}%"></span></div>
-        <div class="sg-meta">${GOAL_PERIODS[g.period]?.label || "周期内"}已完成 <b>${sum}</b> / ${g.target} ${g.unit} · ${pct}%</div>
+        <div class="sg-bar sg-bar-empty"><span style="width:0%"></span></div>
       </div>`;
-  }
-  function toggleGoalCustom(id) {
-    const el = document.getElementById("goalPeriod_" + id);
-    const wrap = el?.closest(".stat-goal");
-    if (!wrap) return;
-    let customRow = wrap.querySelector(".sg-custom-row");
-    if (el.value === "custom") {
-      if (!customRow) {
-        customRow = document.createElement("div"); customRow.className = "sg-row sg-custom-row";
-        customRow.innerHTML = `<span class="sg-unit">天数</span><input id="goalCustom_${id}" class="sg-input" type="number" step="1" value="7" />`;
-        el.closest(".sg-row").after(customRow);
-      }
-    } else if (customRow) {
-      customRow.remove();
+    if (!goals.length) {
+      html += `<div class="sg-empty">还没有时间段目标，填写上方日期和时长后点击「确定」添加。</div>`;
+    } else {
+      goals.forEach(g => {
+        const { sum, pct } = calcGoalProgress(id, g);
+        html += `<div class="sg-goal-item">
+          <div class="sg-row sg-row-period">
+            <input type="date" class="sg-input sg-date" value="${g.start}" onchange="updateGoalPeriod('${id}','${g.gid}','start',this.value)" />
+            <span class="sg-tilde">~</span>
+            <input type="date" class="sg-input sg-date" value="${g.end}" onchange="updateGoalPeriod('${id}','${g.gid}','end',this.value)" />
+          </div>
+          <div class="sg-row sg-row-target">
+            <input class="sg-input" type="number" step="0.1" value="${g.target}" onchange="updateGoalPeriod('${id}','${g.gid}','target',this.value)" />
+            <span class="sg-unit">${g.unit || unit}</span>
+            <button class="sg-btn sg-btn-del" onclick="deleteGoalPeriod('${id}','${g.gid}')">删除</button>
+          </div>
+          <div class="sg-bar"><span style="width:${pct}%"></span></div>
+          <div class="sg-meta">${g.start} ~ ${g.end} 已完成 <b>${sum}</b> / ${g.target} ${g.unit || unit} · ${pct}%</div>
+        </div>`;
+      });
     }
+    html += `</div>`;
+    return html;
   }
-  function saveGoalConfig(id) {
+  function addGoalPeriod(id) {
     const m = getModule(id);
-    if (!m.goal) return;
+    const startEl = document.getElementById("goalStart_" + id);
+    const endEl = document.getElementById("goalEnd_" + id);
     const targetEl = document.getElementById("goalTarget_" + id);
-    const periodEl = document.getElementById("goalPeriod_" + id);
-    const customEl = document.getElementById("goalCustom_" + id);
+    const start = startEl?.value;
+    const end = endEl?.value;
     const target = parseFloat(targetEl?.value);
-    const period = periodEl?.value || "week";
-    const customDays = period === "custom" ? (parseInt(customEl?.value) || 7) : (m.goal.customDays || 7);
-    if (!target || target <= 0) { toast("请输入有效的目标值"); return; }
-    const newGoal = { ...m.goal, target, period, customDays };
+    if (!start || !end) { toast("请选择开始和结束日期"); return; }
+    if (start > end) { toast("开始日期不能晚于结束日期"); return; }
+    if (target == null || isNaN(target) || target < 0) { toast("请输入有效的目标值"); return; }
+    const baseGoal = m.goal || {};
+    const g = { gid: Date.now() + "" + Math.floor(Math.random() * 9999), label: baseGoal.label || "目标", start, end, target, unit: baseGoal.unit || m.metric?.unit || "", metricK: m.metric?.k || "min" };
     if (!CUSTOM[id]) CUSTOM[id] = {};
-    CUSTOM[id].goal = newGoal;
+    if (!CUSTOM[id].goals) CUSTOM[id].goals = [];
+    CUSTOM[id].goals.push(g);
     storeSet("wb_custom_modules", CUSTOM);
     renderModule(id); refreshHomeProgress();
-    toast("目标已更新");
+    toast("已添加目标时间段");
+  }
+  function updateGoalPeriod(id, gid, field, value) {
+    const goals = (CUSTOM[id]?.goals) || getModule(id).goals || [];
+    const idx = goals.findIndex(x => x.gid === gid);
+    if (idx < 0) return;
+    if (field === "target") value = parseFloat(value) || 0;
+    goals[idx][field] = value;
+    if (!CUSTOM[id]) CUSTOM[id] = {};
+    CUSTOM[id].goals = goals;
+    storeSet("wb_custom_modules", CUSTOM);
+    renderModule(id); refreshHomeProgress();
+  }
+  function deleteGoalPeriod(id, gid) {
+    const goals = (CUSTOM[id]?.goals) || getModule(id).goals || [];
+    const idx = goals.findIndex(x => x.gid === gid);
+    if (idx < 0) return;
+    const g = goals[idx];
+    addToRecycle({ id, kind: "goalperiod", name: (g.label || "目标") + " " + g.start + "~" + g.end, deletedAt: Date.now(), goalData: g });
+    goals.splice(idx, 1);
+    if (!CUSTOM[id]) CUSTOM[id] = {};
+    CUSTOM[id].goals = goals;
+    storeSet("wb_custom_modules", CUSTOM);
+    renderModule(id); refreshHomeProgress();
+    toast("已移入回收站");
   }
 
   function renderTracker(id, m) {
@@ -2454,10 +2508,15 @@
     localStorage.setItem("wb_fatlog_cleared_v9", "1");
   }
   function seedFat() {
-    return { goal: { startWeight: 62.8, targetWeight: 55, targetBodyfat: 22, height: 165 }, records: [] };
+    return { goal: { startWeight: 62.8, targetWeight: 55, targetBodyfat: 22, height: 165, monthNote: "" }, records: [] };
+  }
+  function ensureFatGoal(d) {
+    if (!d.goal) d.goal = {};
+    if (d.goal.monthNote == null) d.goal.monthNote = "";
+    return d;
   }
   function loadFat() {
-    try { const d = JSON.parse(localStorage.getItem(FAT_KEY)); if (d && d.records) return d; } catch (e) {}
+    try { const d = JSON.parse(localStorage.getItem(FAT_KEY)); if (d && d.records) return ensureFatGoal(d); } catch (e) {}
     const seeded = seedFat(); saveFat(seeded); return seeded;
   }
   function saveFat(d) { localStorage.setItem(FAT_KEY, JSON.stringify(d)); }
@@ -2469,81 +2528,56 @@
     const data = loadFat();
     const recs = data.records.slice().sort((a, b) => a.date < b.date ? -1 : 1);
     const cur = recs.length ? recs[recs.length - 1].weight : null;
-    const start = data.goal.startWeight, target = data.goal.targetWeight;
-    const lost = (cur != null) ? (start - cur) : null;
+    const target = data.goal.targetWeight;
     const toGo = (cur != null) ? (cur - target) : null;
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    set("fDays", recs.length);
     set("fCur", cur != null ? cur + " kg" : "—");
     set("fToGo", toGo != null ? (toGo > 0 ? "还差 " + toGo.toFixed(1) + " kg" : (toGo === 0 ? "已达成 🎉" : "已超标 " + Math.abs(toGo).toFixed(1) + " kg")) : "—");
-    const h = data.goal.height ? data.goal.height / 100 : null;
-    const bmi = (cur != null && h) ? (cur / (h * h)) : null;
-    set("fBMI", bmi != null ? bmi.toFixed(1) : "—");
-    set("fBMIcls", "当前 BMI" + (bmi != null ? " · " + bmiCls(bmi) : ""));
     const dates = recs.map(r => r.date);
     drawLine(document.getElementById("chartWeight"), dates, recs.map(r => r.weight), "#6B8CBF", "ag1", data.goal.targetWeight);
     drawLine(document.getElementById("chartFat"), dates, recs.map(r => r.bodyfat), "#E8946A", "ag2", data.goal.targetBodyfat);
-    drawBars(document.getElementById("chartCal"), dates, recs.map(r => r.intake));
     analyzeTrends();
     const today = fmt(new Date());
     const rec = recs.find(r => r.date === today);
     const ts = document.getElementById("todayStatus");
     if (rec) {
-      const net = (rec.intake || 0) - (rec.burn || 0);
-      let html = "今日已记录 ✅";
-      if (rec.intake != null) html += ` ｜ 摄入 ${rec.intake} 大卡`;
-      if (rec.burn) html += `，运动 ${rec.burn} 大卡`;
-      if (rec.intake != null) html += ` ｜ 净热量 <b>${net}</b>（缺口 ${net <= 0 ? Math.abs(net) : 0}）`;
+      let html = `今日已记录 ✅ ｜ 体重 ${rec.weight} kg`;
       if (rec.bodyfat != null) { const tg = data.goal.targetBodyfat, diff = rec.bodyfat - tg; html += ` ｜ 体脂率 ${rec.bodyfat}%，距目标(${tg}%) <b>${diff > 0 ? "还差 " + diff.toFixed(1) + "%" : (diff === 0 ? "已达标 🎉" : "已超额 " + Math.abs(diff).toFixed(1) + "%")}</b>`; }
-      if (rec.extra) html += `<br/>其他指标：${extraText(rec)}`;
       ts.className = "today-status show"; ts.style.display = "block"; ts.style.background = "#e3f6ec"; ts.style.color = "#2f8a5b"; ts.style.padding = "10px 12px"; ts.style.borderRadius = "10px"; ts.style.marginTop = "12px"; ts.style.fontSize = "13px"; ts.style.fontWeight = "600"; ts.style.lineHeight = "1.7"; ts.innerHTML = html;
       document.getElementById("inWeight").value = rec.weight;
       document.getElementById("inFat").value = rec.bodyfat || "";
-      document.getElementById("inCal").value = rec.intake || "";
-      document.getElementById("inBurn").value = rec.burn || "";
-      ["girth", "waist", "water", "sleep"].forEach(k => { const el = document.getElementById("ex_" + k); if (el) el.value = (rec.extra && rec.extra[k] != null) ? rec.extra[k] : ""; });
     } else {
       ts.className = "today-status show"; ts.style.display = "block"; ts.style.background = "var(--bg-soft)"; ts.style.color = "var(--text-soft)"; ts.style.padding = "10px 12px"; ts.style.borderRadius = "10px"; ts.style.marginTop = "12px"; ts.style.fontSize = "13px"; ts.textContent = "今天还没记录哦，填好上方表单点「保存今日记录」吧 🌿";
     }
     document.getElementById("goalHeight").value = data.goal.height;
     document.getElementById("goalTarget").value = data.goal.targetWeight;
     document.getElementById("goalBodyfat").value = data.goal.targetBodyfat;
-    renderSummary("sumWeek", recs.slice(-7), data.goal.height);
-    renderSummary("sumMonth", recs.slice(-30), data.goal.height);
+    document.getElementById("monthNote").value = data.goal.monthNote || "";
+    renderMonthSummary(recs.slice(-30), data.goal);
     const list = document.getElementById("historyList");
     const mob = window.matchMedia("(max-width: 820px)").matches;
     list.innerHTML = recs.slice().reverse().map(r => {
-      const net = (r.intake || 0) - (r.burn || 0);
-      const netCls = net < 0 ? "net-good" : "net-bad";
       if (mob) {
         return `<div class="fatlog-card-m">
           <div class="fc-top"><span class="fc-date">${r.date.slice(5)}</span><button class="del-btn" onclick="delFatRec('${r.date}')">删除</button></div>
           <div class="fc-grid">
             <div><span class="k">体重</span><span class="v">${r.weight} kg</span></div>
             <div><span class="k">体脂率</span><span class="v">${r.bodyfat != null ? r.bodyfat + "%" : "—"}</span></div>
-            <div><span class="k">摄入</span><span class="v">${r.intake != null ? r.intake : "—"}</span></div>
-            <div><span class="k">运动</span><span class="v">${r.burn != null ? r.burn : "—"}</span></div>
-            <div><span class="k">净热量</span><span class="v" style="color:${net<0?'#2f8a5b':'#c8742f'}">${net}</span></div>
-            <div><span class="k">其他</span><span class="v">${extraText(r) || "—"}</span></div>
           </div></div>`;
       }
-      return `<div class="hist-row" style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.8fr 0.8fr 0.9fr 1.2fr 0.6fr;gap:8px;align-items:center;font-size:13px;padding:11px 6px;border-bottom:1px solid var(--line);">
-        <span>${r.date.slice(5)}</span><span>${r.weight} kg</span><span>${r.bodyfat != null ? r.bodyfat + "%" : "—"}</span><span>${r.intake != null ? r.intake : "—"}</span><span>${r.burn != null ? r.burn : "—"}</span><span class="${netCls}" style="font-weight:700;color:${net<0?'#2f8a5b':'#c8742f'}">${net}</span><span>${extraText(r)}</span><span><button class="del-btn" onclick="delFatRec('${r.date}')">删除</button></span></div>`;
+      return `<div class="hist-row" style="display:grid;grid-template-columns:1fr 0.8fr 0.8fr 0.6fr;gap:8px;align-items:center;font-size:13px;padding:11px 6px;border-bottom:1px solid var(--line);">
+        <span>${r.date.slice(5)}</span><span>${r.weight} kg</span><span>${r.bodyfat != null ? r.bodyfat + "%" : "—"}</span><span><button class="del-btn" onclick="delFatRec('${r.date}')">删除</button></span></div>`;
     }).join("");
   }
   function saveToday() {
     const w = parseFloat(document.getElementById("inWeight").value);
     const bf = parseFloat(document.getElementById("inFat").value);
-    const cal = parseFloat(document.getElementById("inCal").value);
-    const burn = parseFloat(document.getElementById("inBurn").value) || 0;
     if (!w || w <= 0) { toast("请填写有效的体重"); return; }
     const data = loadFat(); const today = fmt(new Date());
     let rec = data.records.find(r => r.date === today);
     if (!rec) { rec = { date: today }; data.records.push(rec); }
-    rec.weight = w; if (bf) rec.bodyfat = bf; if (cal) rec.intake = cal; rec.burn = burn;
-    const extras = {};
-    ["girth", "waist", "water", "sleep"].forEach(k => { const v = parseFloat(document.getElementById("ex_" + k).value); if (v) extras[k] = v; });
-    if (Object.keys(extras).length) rec.extra = extras; else delete rec.extra;
+    rec.weight = w; if (bf) rec.bodyfat = bf; else delete rec.bodyfat;
+    delete rec.intake; delete rec.burn; delete rec.extra;
     saveFat(data); renderFatlog(); refreshHomeProgress(); toast("已保存今日记录 ✅");
   }
   function saveGoal() {
@@ -2568,24 +2602,18 @@
     localStorage.removeItem(FAT_KEY); renderFatlog(); refreshHomeProgress(); toast("已清空并移入回收站");
   }
 
-  /* ---- 小结聚合 ---- */
-  function summarize(recs, height) {
-    const n = recs.length;
-    const avg = (k) => recs.reduce((s, r) => s + (r[k] || 0), 0) / n;
-    return { n, start: recs[0].weight, end: recs[recs.length - 1].weight, lost: recs[0].weight - recs[recs.length - 1].weight,
-      avgWeight: avg("weight"), avgBodyfat: avg("bodyfat"), avgIntake: avg("intake"), totalBurn: recs.reduce((s, r) => s + (r.burn || 0), 0) };
-  }
-  function renderSummary(elId, recs, height) {
-    const el = document.getElementById(elId);
+  /* ---- 本月小结：趋势图 + 可输入文本 ---- */
+  function renderMonthSummary(recs, goal) {
+    const el = document.getElementById("sumMonthChart");
+    if (!el) return;
     if (!recs.length) { el.innerHTML = '<div style="padding:14px 0;color:var(--text-soft);font-size:13px;">暂无足够数据</div>'; return; }
-    const s = summarize(recs, height); const h = height / 100; const bmiEnd = s.end / (h * h);
-    const rows = [
-      ["记录天数", s.n + " 天"], ["体重变化", `${s.start} → ${s.end} kg（${s.lost >= 0 ? "-" : "+"}${Math.abs(s.lost).toFixed(1)}）`],
-      ["平均体重", s.avgWeight.toFixed(1) + " kg"], ["平均体脂率", isFinite(s.avgBodyfat) ? s.avgBodyfat.toFixed(1) + " %" : "—"],
-      ["平均每日摄入", isFinite(s.avgIntake) ? Math.round(s.avgIntake) + " 大卡" : "—"], ["累计运动消耗", s.totalBurn + " 大卡"],
-      ["期末 BMI", bmiEnd.toFixed(1) + "（" + bmiCls(bmiEnd) + "）"]
-    ];
-    el.innerHTML = rows.map(r => `<div class="sum-row" style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:7px 0;border-bottom:1px dashed var(--line);"><span style="color:var(--text-soft);">${r[0]}</span><b style="color:var(--text);font-weight:700;">${r[1]}</b></div>`).join("");
+    drawLine(el, recs.map(r => r.date), recs.map(r => r.weight), "#6B8CBF", "agMonth", goal.targetWeight);
+  }
+  function saveMonthNote() {
+    const data = loadFat();
+    const note = document.getElementById("monthNote").value || "";
+    data.goal.monthNote = note;
+    saveFat(data);
   }
 
   /* ---- AI 自助趋势分析引擎 ---- */
