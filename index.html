@@ -138,12 +138,27 @@
   .countdown-card .num { font-size: 46px; font-weight: 900; color: var(--text); line-height: 1; letter-spacing: 0.5px; }
   .countdown-card .c-unit { font-size: 18px; font-weight: 800; color: var(--text-soft); }
 
-  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 26px; }
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 18px; margin-bottom: 26px; }
   .stat { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 18px 20px; display: flex; align-items: center; gap: 14px; transition: transform .2s, box-shadow .2s; }
   .stat:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
   .stat .s-ico { width: 46px; height: 46px; border-radius: 13px; background: var(--primary-soft); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
   .stat .s-val { font-size: 24px; font-weight: 800; color: var(--text); }
   .stat .s-label { font-size: 12.5px; color: var(--text-soft); margin-top: 3px; }
+  /* 目标时长卡片（在 stats-row 中） */
+  .stat-goal { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .stat-goal .sg-head { font-size: 13px; font-weight: 700; color: var(--primary-deep); }
+  .stat-goal .sg-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .stat-goal .sg-select, .stat-goal .sg-input { border: none; border-radius: 10px; padding: 8px 10px; font-size: 15px; color: var(--text); background: var(--paper-soft); box-shadow: var(--neu-inset-sm); outline: none; }
+  .stat-goal .sg-select { min-width: 80px; }
+  .stat-goal .sg-input { width: 70px; text-align: center; }
+  .stat-goal .sg-input[type="number"] { -moz-appearance: textfield; }
+  .stat-goal .sg-input[type="number"]::-webkit-outer-spin-button, .stat-goal .sg-input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .stat-goal .sg-unit { font-size: 12.5px; color: var(--text-soft); }
+  .stat-goal .sg-btn { border: none; border-radius: 10px; padding: 8px 14px; font-size: 14px; font-weight: 700; color: #fff; background: var(--primary); cursor: pointer; box-shadow: var(--neu-raised-sm); }
+  .stat-goal .sg-btn:active { box-shadow: var(--neu-inset-sm); }
+  .stat-goal .sg-bar { flex: 1; height: 10px; border-radius: 20px; background: rgba(120,105,80,0.12); overflow: hidden; box-shadow: var(--neu-inset-sm); }
+  .stat-goal .sg-bar > span { display: block; height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .3s ease; }
+  .stat-goal .sg-meta { font-size: 12px; color: var(--text-soft); }
 
   .section-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
   .section-title::before { content: ""; width: 5px; height: 16px; border-radius: 3px; background: var(--primary); display: inline-block; }
@@ -176,7 +191,8 @@
   /* ============ 模块详情通用 ============ */
   .app-ref { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-soft); color: var(--primary-deep); font-size: 12.5px; font-weight: 600; padding: 6px 13px; border-radius: 20px; margin-top: 10px; }
   .app-ref .a-ico { font-size: 15px; }
-  .mod-layout { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-bottom: 22px; }
+  .mod-layout { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-bottom: 22px; align-items: start; }
+  .mod-stack { display: flex; flex-direction: column; gap: 18px; margin-bottom: 22px; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; }
   .form-grid.one { grid-template-columns: 1fr; }
   .form-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--text-soft); font-weight: 600; }
@@ -689,7 +705,7 @@
         { k: "level", label: "难度", type: "select", opts: ["入门","进阶","高阶"], opt: true }
       ],
       metric: { k: "min", label: "练习时长", unit: "min", color: "#6B8CBF" }, chartType: "line",
-      goal: { label: "本周目标时长", target: 180, unit: "min" },
+      goal: { label: "目标时长", target: 180, unit: "min", period: "week", customDays: 7 },
       tips: "🩰 <b>跟练建议</b>：每次 20–40 分钟，先热身再练核心动作；每周 3–4 次即可见效。可把想学的舞曲加入清单循环练习，用「连续打卡」见证进步。"
     },
     fatloss: {
@@ -706,7 +722,7 @@
         { k: "score", label: "自评(1-5)", type: "num", unit: "分", opt: true }
       ],
       metric: { k: "count", label: "出片数", unit: "张", color: "#E8946A" }, chartType: "line",
-      goal: { label: "本周出片目标", target: 15, unit: "张" },
+      goal: { label: "出片目标", target: 15, unit: "张", period: "week", customDays: 7 },
       tips: "📸 <b>每日一拍挑战</b>：固定一个主题连续拍 7 天，比偶尔大量拍摄更练眼力。后期可用手机 App 调色统一风格，建立自己的视觉签名。"
     },
     bazi: {
@@ -797,7 +813,13 @@
 
   /* ============ 自定义模块 + 标题重命名（持久化） ============ */
   let CUSTOM = storeGet("wb_custom_modules", {});
-  function getModule(id) { return CUSTOM[id] || MODULES[id]; }
+  function getModule(id) {
+    const base = MODULES[id] || {};
+    const custom = CUSTOM[id] || {};
+    const merged = { ...base, ...custom };
+    if (base.goal || custom.goal) merged.goal = { ...base.goal, ...custom.goal };
+    return merged;
+  }
   let LABELS = storeGet("wb_labels", {});
   function labelOf(id, fb) { return LABELS[id] || fb; }
   function setLabel(id, v) { LABELS[id] = v; storeSet("wb_labels", LABELS); }
@@ -1378,7 +1400,8 @@
     if (!cat) { toast("该类目已删除"); showView("home", { noHistory: true }); return; }
     const catName = labelOf(cat.id, cat.label);
     document.getElementById("catTitle").textContent = catName;
-    document.getElementById("catGreet").textContent = "「" + catName + "」的子类目 · 轻点方块进入，左滑可删除，双击可改名 ✨";
+    document.getElementById("catGreet").textContent = "轻点方块进入，左滑可删除，双击可改名 ✨";
+    document.getElementById("catGreet").style.textAlign = "left";
     const grid = document.getElementById("catGrid");
     grid.className = "cat-grid";
     grid.innerHTML = "";
@@ -1433,7 +1456,6 @@
           <button class="back-btn" onclick="goBack()">← ${backLabel}</button>
           <h1 style="margin-top:12px;">${m.app.icon} ${labelOf(id, m.title)}</h1>
           ${id === "okr" ? "" : `<div class="greet">${m.blurb}</div>`}
-          ${id === "okr" ? "" : `<div class="app-ref"><span class="a-ico">📱</span>对标 App：${m.app.name}</div>`}
         </div>
       </div>`;
     if (id === "okr") html += renderOKR(horizon);
@@ -1654,6 +1676,82 @@
     el.onclick = () => openTodoView();
   }
   /* ============ 通用 Tracker ============ */
+  const GOAL_PERIODS = {
+    week: { days: 7, label: "本周" },
+    month: { days: 30, label: "本月" },
+    quarter: { days: 90, label: "本季度" },
+    year: { days: 365, label: "本年" },
+    custom: { days: 0, label: "自定义" }
+  };
+  function getGoalRange(period, customDays) {
+    const days = period === "custom" ? (parseInt(customDays) || 7) : (GOAL_PERIODS[period]?.days || 7);
+    const end = new Date(); end.setHours(23, 59, 59, 999);
+    const start = new Date(); start.setDate(end.getDate() - days + 1); start.setHours(0, 0, 0, 0);
+    return { days, start, end };
+  }
+  function getGoalProgress(id, m) {
+    const data = storeGet("wb_" + id, []);
+    const recs = data.slice().sort((a, b) => a.date < b.date ? -1 : 1);
+    const g = m.goal;
+    const range = getGoalRange(g.period, g.customDays);
+    const sum = recs.reduce((s, r) => {
+      const d = new Date(r.date + "T00:00:00");
+      return (d >= range.start && d <= range.end) ? s + (+r[m.metric.k] || 0) : s;
+    }, 0);
+    const pct = g.target ? Math.min(100, Math.round(sum / g.target * 100)) : 0;
+    return { sum, pct, range, g };
+  }
+  function renderGoalCard(id, m) {
+    const { sum, pct, g } = getGoalProgress(id, m);
+    const periodOptions = Object.entries(GOAL_PERIODS).map(([k, v]) => `<option value="${k}" ${g.period===k?"selected":""}>${v.label}</option>`).join("");
+    const showCustom = g.period === "custom";
+    return `
+      <div class="stat-goal">
+        <div class="sg-head">🎯 ${g.label}</div>
+        <div class="sg-row">
+          <select id="goalPeriod_${id}" class="sg-select" onchange="toggleGoalCustom('${id}')">${periodOptions}</select>
+          <input id="goalTarget_${id}" class="sg-input" type="number" step="0.1" value="${g.target}" placeholder="目标值" />
+          <span class="sg-unit">${g.unit}</span>
+          <button class="sg-btn" onclick="saveGoalConfig('${id}')">确定</button>
+        </div>
+        ${showCustom ? `<div class="sg-row sg-custom-row"><span class="sg-unit">天数</span><input id="goalCustom_${id}" class="sg-input" type="number" step="1" value="${g.customDays || 7}" /></div>` : ""}
+        <div class="sg-bar"><span style="width:${pct}%"></span></div>
+        <div class="sg-meta">${GOAL_PERIODS[g.period]?.label || "周期内"}已完成 <b>${sum}</b> / ${g.target} ${g.unit} · ${pct}%</div>
+      </div>`;
+  }
+  function toggleGoalCustom(id) {
+    const el = document.getElementById("goalPeriod_" + id);
+    const wrap = el?.closest(".stat-goal");
+    if (!wrap) return;
+    let customRow = wrap.querySelector(".sg-custom-row");
+    if (el.value === "custom") {
+      if (!customRow) {
+        customRow = document.createElement("div"); customRow.className = "sg-row sg-custom-row";
+        customRow.innerHTML = `<span class="sg-unit">天数</span><input id="goalCustom_${id}" class="sg-input" type="number" step="1" value="7" />`;
+        el.closest(".sg-row").after(customRow);
+      }
+    } else if (customRow) {
+      customRow.remove();
+    }
+  }
+  function saveGoalConfig(id) {
+    const m = getModule(id);
+    if (!m.goal) return;
+    const targetEl = document.getElementById("goalTarget_" + id);
+    const periodEl = document.getElementById("goalPeriod_" + id);
+    const customEl = document.getElementById("goalCustom_" + id);
+    const target = parseFloat(targetEl?.value);
+    const period = periodEl?.value || "week";
+    const customDays = period === "custom" ? (parseInt(customEl?.value) || 7) : (m.goal.customDays || 7);
+    if (!target || target <= 0) { toast("请输入有效的目标值"); return; }
+    const newGoal = { ...m.goal, target, period, customDays };
+    if (!CUSTOM[id]) CUSTOM[id] = {};
+    CUSTOM[id].goal = newGoal;
+    storeSet("wb_custom_modules", CUSTOM);
+    renderModule(id); refreshHomeProgress();
+    toast("目标已更新");
+  }
+
   function renderTracker(id, m) {
     const data = storeGet("wb_" + id, []);
     const recs = data.slice().sort((a, b) => a.date < b.date ? -1 : 1);
@@ -1664,18 +1762,7 @@
     const sumMetric = metricVals.reduce((s, v) => s + v, 0);
     const today = fmt(new Date());
     const todayRec = recs.find(r => r.date === today);
-    // 周目标
-    let goalHtml = "";
-    if (m.goal) {
-      const wk = recs.filter(r => { const d = new Date(r.date); const diff = (new Date(today) - d) / 86400000; return diff >= 0 && diff < 7; });
-      const wkSum = wk.reduce((s, r) => s + (+r[m.metric.k] || 0), 0);
-      const pct = Math.min(100, Math.round(wkSum / m.goal.target * 100));
-      goalHtml = `<div class="card" style="margin-top:18px;">
-        <div class="section-title" style="margin-bottom:12px;">🎯 ${m.goal.label}（${m.goal.target}${m.goal.unit}）</div>
-        <div class="m-progress"><div class="bar"><span style="width:${pct}%"></span></div><div class="m-pct">${pct}%</div></div>
-        <div style="font-size:12.5px;color:var(--text-soft);margin-top:8px;">本周已完成 <b style="color:var(--primary-deep)">${wkSum}</b> / ${m.goal.target} ${m.goal.unit}</div>
-      </div>`;
-    }
+    const goalHtml = m.goal ? renderGoalCard(id, m) : "";
     // 状态分布
     let statusHtml = "";
     const statusField = m.fields.find(f => f.status);
@@ -1692,12 +1779,11 @@
 
     return `
       <section class="stats-row">
-        <div class="stat"><div class="s-ico">📅</div><div><div class="s-val">${recs.length}</div><div class="s-label">累计记录</div></div></div>
-        <div class="stat"><div class="s-ico">🔥</div><div><div class="s-val">${streak}</div><div class="s-label">连续打卡(天)</div></div></div>
         <div class="stat"><div class="s-ico">📌</div><div><div class="s-val">${latest ? (+latest[m.metric.k]||0)+m.metric.unit : "—"}</div><div class="s-label">最新${m.metric.label}</div></div></div>
         <div class="stat"><div class="s-ico">📊</div><div><div class="s-val">${sumMetric}${m.metric.unit}</div><div class="s-label">累计${m.metric.label}</div></div></div>
+        ${goalHtml}
       </section>
-      <section class="mod-layout">
+      <section class="mod-stack">
         <div class="card">
           <div class="section-title" style="margin-bottom:14px;">📝 今日记录（${today}）</div>
           <div class="form-grid ${m.fields.length % 2 ? "" : ""}">
@@ -1716,7 +1802,6 @@
           ${m.checklist ? `<div class="tip" style="margin-top:10px;"><b>剪辑清单：</b>${m.checklist.map(c=>`<span class="tag" style="margin:3px 3px 0 0;">${c}</span>`).join("")}</div>` : ""}
         </div>
       </section>
-      ${goalHtml}
       <div class="section-title" style="margin-top:22px;">📈 ${m.metric.label}趋势</div>
       <section class="card">
         <div id="trkChart"></div>
