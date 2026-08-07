@@ -97,9 +97,7 @@
     .stats-row { grid-template-columns: repeat(2, 1fr); }
     .verdict { min-width: 0; }
     .main { overflow-x: hidden; }
-    .mod-layout { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
-    .chart-grid { grid-template-columns: 1fr; }
     .pillars { grid-template-columns: repeat(2, 1fr); }
     .summary-grid { grid-template-columns: 1fr !important; }
     .vocab-grid { grid-template-columns: repeat(2, 1fr); }
@@ -215,7 +213,7 @@
   /* ============ 模块详情通用 ============ */
   .app-ref { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-soft); color: var(--primary-deep); font-size: 12.5px; font-weight: 600; padding: 6px 13px; border-radius: 20px; margin-top: 10px; }
   .app-ref .a-ico { font-size: 15px; }
-  .mod-layout { display: grid; grid-template-columns: 1.3fr 1fr; gap: 18px; margin-bottom: 22px; align-items: start; }
+  .mod-layout { display: flex; flex-direction: column; gap: 18px; margin-bottom: 22px; }
   .mod-stack { display: flex; flex-direction: column; gap: 18px; margin-bottom: 22px; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px; width: 100%; min-width: 0; }
   .form-grid.one { grid-template-columns: 1fr; }
@@ -262,16 +260,29 @@
   .fatlog-card-m .fc-grid .v { color: var(--text); font-weight: 600; }
 
   /* 图表 */
-  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 6px; }
+  .chart-grid { display: flex; flex-direction: column; gap: 18px; margin-bottom: 6px; }
+  .chart-stack { display: flex; flex-direction: column; gap: 18px; margin-bottom: 6px; }
   .chart-card.chart-wide { grid-column: 1 / -1; }
   .chart-title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
   .chart-card svg { display: block; width: 100%; }
 
   /* 本月小结 */
   .month-summary-card { margin-bottom: 6px; }
+  .sum-h { font-size: 14px; font-weight: 700; color: var(--primary-deep); margin-bottom: 12px; }
   .month-note-label { display: block; font-size: 12.5px; color: var(--text-soft); font-weight: 600; margin: 16px 0 8px; }
+  .month-note-wrap { display: flex; flex-direction: column; gap: 10px; }
   .month-note { width: 100%; box-sizing: border-box; border: none; border-radius: 12px; padding: 12px 14px; font-size: 15px; color: var(--text); background: var(--paper-soft); outline: none; resize: vertical; min-height: 72px; box-shadow: var(--neu-inset-sm); font-family: inherit; line-height: 1.6; }
   .month-note:focus { box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); background: #fff; }
+  .month-summary-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .month-summary-item { background: var(--bg-soft); border-radius: 12px; padding: 12px 14px; }
+  .month-summary-item .msi-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .month-summary-item .msi-date { font-size: 12.5px; font-weight: 700; color: var(--primary-deep); }
+  .month-summary-item .msi-text { font-size: 13.5px; color: var(--text); line-height: 1.6; white-space: pre-wrap; }
+  .month-summary-item .msi-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .month-summary-item .msi-actions button { border: none; border-radius: 8px; padding: 5px 11px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .month-summary-item .msi-edit { background: rgba(107,140,191,0.15); color: var(--primary); }
+  .month-summary-item .msi-del { background: rgba(232,112,80,0.15); color: #E8946A; }
+  .month-summary-item .msi-edit-area { width: 100%; box-sizing: border-box; border: none; border-radius: 10px; padding: 10px 12px; font-size: 14px; color: var(--text); background: var(--paper-soft); outline: none; resize: vertical; min-height: 60px; box-shadow: var(--neu-inset-sm); font-family: inherit; line-height: 1.6; margin-bottom: 8px; }
 
   /* AI 趋势分析 */
   .ai-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -600,7 +611,7 @@
         <div class="stat"><div class="s-ico">⚖️</div><div><div class="s-val" id="fCur">—</div><div class="s-label">当前体重</div></div></div>
         <div class="stat"><div class="s-ico">🎯</div><div><div class="s-val" id="fToGo">—</div><div class="s-label">距目标体重</div></div></div>
       </section>
-      <section class="mod-layout">
+      <section class="mod-stack">
         <div class="card">
           <div class="section-title" style="margin-bottom:14px;">🎯 我的目标</div>
           <div class="form-grid">
@@ -623,7 +634,7 @@
         </div>
       </section>
       <div class="section-title">📈 趋势分析</div>
-      <section class="chart-grid">
+      <section class="chart-stack">
         <div class="card chart-card"><div class="chart-title">体重趋势 (kg) · 虚线为目标</div><div id="chartWeight"></div></div>
         <div class="card chart-card"><div class="chart-title">体脂率趋势 (%) · 虚线为目标</div><div id="chartFat"></div></div>
       </section>
@@ -638,10 +649,14 @@
       </section>
       <div class="section-title" style="margin-top:26px;">📊 本月小结</div>
       <section class="card month-summary-card">
-        <div class="sum-h" style="font-size:14px;font-weight:700;color:var(--primary-deep);margin-bottom:12px;">近 30 天体重趋势</div>
+        <div class="sum-h">近 30 天体重趋势</div>
         <div id="sumMonthChart"></div>
-        <label class="month-note-label">本月小结（可输入）</label>
-        <textarea id="monthNote" class="month-note" rows="3" placeholder="记录下本月的感受、调整或计划…" oninput="saveMonthNote()"></textarea>
+        <div class="month-note-wrap">
+          <label class="month-note-label">本月小结（可输入）</label>
+          <textarea id="monthNote" class="month-note" rows="3" placeholder="记录下本月的感受、调整或计划…"></textarea>
+          <button class="btn-primary" onclick="saveMonthSummary()">确定</button>
+        </div>
+        <div id="monthSummaryList" class="month-summary-list"></div>
       </section>
       <div class="section-title" style="margin-top:26px;">📜 历史记录</div>
       <div class="card">
@@ -955,6 +970,14 @@
       CUSTOM[entry.id].goals.push(entry.goalData);
       storeSet("wb_custom_modules", CUSTOM);
       renderModule(entry.id);
+    } else if (entry.kind === "fatnote") {
+      const data = loadFat();
+      if (!data.goal.monthSummaries) data.goal.monthSummaries = [];
+      const restored = Object.assign({}, entry.note);
+      if (!restored.id) restored.id = "ms" + Date.now() + Math.random().toString(36).slice(2, 6);
+      data.goal.monthSummaries.unshift(restored);
+      saveFat(data);
+      if (document.getElementById("view-fatlog").classList.contains("active")) renderFatlog();
     }
     storeSet("wb_cats", CATS);
     RV.splice(i, 1); saveRV();
@@ -997,7 +1020,8 @@
     kr:  { label: "关键结果", ico: "🔑" },
     fat: { label: "减脂记录", ico: "⚖️" },
     okrlog:{ label: "进度明细", ico: "📊" },
-    goalperiod:{ label: "目标时段", ico: "🎯" }
+    goalperiod:{ label: "目标时段", ico: "🎯" },
+    fatnote:{ label: "月度小结", ico: "📝" }
   };
 
   function renderRecycle() {
@@ -2508,11 +2532,16 @@
     localStorage.setItem("wb_fatlog_cleared_v9", "1");
   }
   function seedFat() {
-    return { goal: { startWeight: 62.8, targetWeight: 55, targetBodyfat: 22, height: 165, monthNote: "" }, records: [] };
+    return { goal: { startWeight: 62.8, targetWeight: 55, targetBodyfat: 22, height: 165, monthNoteDraft: "", monthSummaries: [] }, records: [] };
   }
   function ensureFatGoal(d) {
     if (!d.goal) d.goal = {};
-    if (d.goal.monthNote == null) d.goal.monthNote = "";
+    if (d.goal.monthNote != null && d.goal.monthSummaries == null) {
+      d.goal.monthNoteDraft = d.goal.monthNote;
+      delete d.goal.monthNote;
+    }
+    if (d.goal.monthNoteDraft == null) d.goal.monthNoteDraft = "";
+    if (!Array.isArray(d.goal.monthSummaries)) d.goal.monthSummaries = [];
     return d;
   }
   function loadFat() {
@@ -2552,8 +2581,9 @@
     document.getElementById("goalHeight").value = data.goal.height;
     document.getElementById("goalTarget").value = data.goal.targetWeight;
     document.getElementById("goalBodyfat").value = data.goal.targetBodyfat;
-    document.getElementById("monthNote").value = data.goal.monthNote || "";
+    document.getElementById("monthNote").value = data.goal.monthNoteDraft || "";
     renderMonthSummary(recs.slice(-30), data.goal);
+    renderMonthSummaryList(data.goal.monthSummaries);
     const list = document.getElementById("historyList");
     const mob = window.matchMedia("(max-width: 820px)").matches;
     list.innerHTML = recs.slice().reverse().map(r => {
@@ -2609,11 +2639,79 @@
     if (!recs.length) { el.innerHTML = '<div style="padding:14px 0;color:var(--text-soft);font-size:13px;">暂无足够数据</div>'; return; }
     drawLine(el, recs.map(r => r.date), recs.map(r => r.weight), "#6B8CBF", "agMonth", goal.targetWeight);
   }
-  function saveMonthNote() {
+  function saveMonthSummary() {
     const data = loadFat();
-    const note = document.getElementById("monthNote").value || "";
-    data.goal.monthNote = note;
+    const el = document.getElementById("monthNote");
+    const text = (el.value || "").trim();
+    if (!text) { toast("请先输入本月小结内容"); return; }
+    const id = "ms" + Date.now() + Math.random().toString(36).slice(2, 6);
+    data.goal.monthSummaries.unshift({ id, date: fmt(new Date()), text });
+    data.goal.monthNoteDraft = "";
     saveFat(data);
+    el.value = "";
+    renderMonthSummaryList(data.goal.monthSummaries);
+    toast("本月小结已添加 ✅");
+  }
+  function renderMonthSummaryList(list) {
+    const wrap = document.getElementById("monthSummaryList");
+    if (!wrap) return;
+    if (!list || !list.length) { wrap.innerHTML = ""; return; }
+    wrap.innerHTML = list.map((it, idx) => `
+      <div class="month-summary-item" data-id="${it.id}">
+        <div class="msi-head"><span class="msi-date">${it.date}</span></div>
+        <div class="msi-text" id="msiText_${it.id}">${escapeHtml(it.text)}</div>
+        <div class="msi-actions" id="msiActs_${it.id}">
+          <button class="msi-edit" onclick="startEditMonthSummary('${it.id}')">编辑</button>
+          <button class="msi-del" onclick="delMonthSummary('${it.id}')">删除</button>
+        </div>
+      </div>
+    `).join("");
+  }
+  function startEditMonthSummary(id) {
+    const data = loadFat();
+    const it = data.goal.monthSummaries.find(x => x.id === id);
+    if (!it) return;
+    const item = document.querySelector(`.month-summary-item[data-id="${id}"]`);
+    const textEl = document.getElementById("msiText_" + id);
+    const actsEl = document.getElementById("msiActs_" + id);
+    if (!textEl || !actsEl) return;
+    textEl.style.display = "none";
+    actsEl.style.display = "none";
+    const area = document.createElement("textarea");
+    area.className = "msi-edit-area"; area.id = "msiEdit_" + id; area.value = it.text;
+    const save = document.createElement("button"); save.className = "msi-edit"; save.textContent = "保存";
+    save.onclick = () => saveEditMonthSummary(id);
+    const cancel = document.createElement("button"); cancel.className = "msi-del"; cancel.textContent = "取消";
+    cancel.onclick = () => cancelEditMonthSummary(id);
+    const row = document.createElement("div"); row.className = "msi-actions"; row.id = "msiEditActs_" + id;
+    row.appendChild(save); row.appendChild(cancel);
+    item.appendChild(area); item.appendChild(row);
+  }
+  function saveEditMonthSummary(id) {
+    const data = loadFat();
+    const it = data.goal.monthSummaries.find(x => x.id === id);
+    if (!it) return;
+    const area = document.getElementById("msiEdit_" + id);
+    const text = (area && area.value || "").trim();
+    if (!text) { toast("小结内容不能为空"); return; }
+    it.text = text;
+    saveFat(data);
+    renderMonthSummaryList(data.goal.monthSummaries);
+    toast("已更新小结 ✅");
+  }
+  function cancelEditMonthSummary(id) {
+    renderMonthSummaryList(loadFat().goal.monthSummaries);
+  }
+  function delMonthSummary(id) {
+    const data = loadFat();
+    const idx = data.goal.monthSummaries.findIndex(x => x.id === id);
+    if (idx < 0) return;
+    const it = data.goal.monthSummaries[idx];
+    addToRecycle({ id: "fatlog", kind: "fatnote", name: it.date + " 的月度小结", deletedAt: Date.now(), noteId: id, note: Object.assign({}, it) });
+    data.goal.monthSummaries.splice(idx, 1);
+    saveFat(data);
+    renderMonthSummaryList(data.goal.monthSummaries);
+    toast("已移入回收站：月度小结");
   }
 
   /* ---- AI 自助趋势分析引擎 ---- */
