@@ -702,8 +702,6 @@
     { id: "home",   icon: "🏠", label: "首页",       leaf: true },
     { id: "okr",    icon: "🎯", label: "目标OKR", open: true, horizons: ["今年","近三年","近五年","近十年"] },
     { id: "todo",   icon: "✅", label: "待办事项", leaf: true },
-    { id: "image",  icon: "💃", label: "形象提升",  subs: ["dance","fatloss"] },
-    { id: "ability",icon: "📚", label: "能力提升",  subs: ["photo","bazi","english","video","media"] },
     { id: "money",  icon: "💰", label: "赚钱方式",  subs: ["fulltime","side"] },
     { id: "account",icon: "📱", label: "账号运营",  subs: ["acc_edit","acc_sell","acc_video"] }
   ];
@@ -726,6 +724,15 @@
       const todoCat = { id: "todo", icon: "✅", label: "待办事项", leaf: true };
       if (idx >= 0) CATS.splice(idx + 1, 0, todoCat); else CATS.push(todoCat);
       storeSet("wb_cats", CATS);
+    }
+  })();
+  // 迁移：按需求移除「形象提升」「能力提升」总分类（含其全部子项）；减脂塑形数据一并清空
+  (function () {
+    const dropIds = ["image", "ability"];
+    if (CATS.some(c => dropIds.includes(c.id))) {
+      CATS = CATS.filter(c => !dropIds.includes(c.id));
+      storeSet("wb_cats", CATS);
+      try { localStorage.removeItem("wb_fatlog_v1"); localStorage.removeItem("wb_fatlog_cleared_v9"); } catch (e) {}
     }
   })();
 
