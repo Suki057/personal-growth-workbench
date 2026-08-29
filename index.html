@@ -221,9 +221,14 @@
   .form-grid input, .form-grid select { border: none; border-radius: 12px; padding: 10px 12px; font-size: 16px; color: var(--text); background: var(--paper-soft); outline: none; transition: box-shadow .2s; box-sizing: border-box; box-shadow: var(--neu-inset-sm); width: 100%; max-width: 100%; min-width: 0; }
   .form-grid input:focus, .form-grid select:focus { box-shadow: var(--neu-inset-sm), 0 0 0 2px var(--primary-soft); background: #fff; }
   /* OKR 新建目标：方框宽度缩短，边框限制在内不溢出 */
-  .form-grid.okr-new { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-grid.okr-new { grid-template-columns: 1fr; gap: 12px; }
   .form-grid.okr-new label { width: 100%; max-width: 100%; }
   .form-grid.okr-new input, .form-grid.okr-new select { width: 100%; max-width: 100%; }
+  .okr-period-label { font-size: 12.5px; font-weight: 700; color: var(--primary-deep); margin-top: 4px; }
+  .horizon-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .horizon-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text); background: var(--paper-soft); border-radius: 14px; padding: 7px 14px; cursor: pointer; box-shadow: var(--neu-inset-sm); user-select: none; transition: box-shadow .15s, background .15s; }
+  .horizon-chip input { width: 15px; height: 15px; accent-color: var(--primary); margin: 0; }
+  .horizon-chip:has(input:checked) { background: var(--primary-soft); color: var(--primary-deep); box-shadow: var(--neu-raised-sm); font-weight: 700; }
   .btn-primary { border: none; border-radius: 14px; padding: 12px 18px; font-size: 14px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #7B9CCC, #5C7FA8); cursor: pointer; width: 100%; box-shadow: 5px 5px 14px rgba(91,110,150,0.40), -5px -5px 14px rgba(255,255,255,0.55), inset 0 1px 0 rgba(255,255,255,0.30); transition: transform .15s, box-shadow .2s; }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 7px 7px 18px rgba(91,110,150,0.45), -6px -6px 16px rgba(255,255,255,0.55), inset 0 1px 0 rgba(255,255,255,0.30); }
   .btn-primary:active { box-shadow: inset 4px 4px 10px rgba(74,90,128,0.55), inset -3px -3px 8px rgba(255,255,255,0.25); transform: translateY(0); }
@@ -330,6 +335,8 @@
   .okr-card { background: var(--glass-bg); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: var(--radius); box-shadow: var(--glass-shadow); padding: 18px 20px; border: var(--glass-border); margin-bottom: 14px; }
   .okr-card .oc-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .okr-card .oc-title { font-size: 15px; font-weight: 700; }
+  .okr-card .oc-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .okr-card .oc-cat { font-size: 11.5px; color: var(--accent); background: rgba(232,148,106,0.14); padding: 3px 10px; border-radius: 14px; font-weight: 700; }
   .okr-card .oc-horizon { font-size: 11.5px; color: var(--primary-deep); background: var(--primary-soft); padding: 3px 10px; border-radius: 14px; }
   .okr-kr { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
   .okr-kr .kr-row { display: flex; align-items: center; gap: 8px; }
@@ -721,6 +728,19 @@
       const todoCat = { id: "todo", icon: "✅", label: "待办事项", leaf: true };
       if (idx >= 0) CATS.splice(idx + 1, 0, todoCat); else CATS.push(todoCat);
       storeSet("wb_cats", CATS);
+    }
+  })();
+  // 迁移：OKR 目标单周期 horizon → 多选 horizons 数组（旧目标归入原所在年份）
+  (function () {
+    const okrData = storeGet("wb_okr", null);
+    if (Array.isArray(okrData) && okrData.length) {
+      let changed = false;
+      okrData.forEach(o => {
+        if (!o) return;
+        if (o.horizon && !Array.isArray(o.horizons)) { o.horizons = [o.horizon]; delete o.horizon; changed = true; }
+        if (!Array.isArray(o.horizons)) { o.horizons = []; changed = true; }
+      });
+      if (changed) storeSet("wb_okr", okrData);
     }
   })();
   // 迁移：按需求移除「形象提升」「能力提升」总分类（含其全部子项）；减脂塑形数据一并清空
@@ -2246,13 +2266,15 @@
   /* ============ OKR ============ */
   function renderOKR(horizon) {
     const data = storeGet("wb_okr", []);
-    const list = horizon ? data.filter(o => o.horizon === horizon) : data;
+    const list = horizon ? data.filter(o => o.horizons && o.horizons.includes(horizon)) : data;
     const okrCat = CATS.find(c => c.id === "okr");
     const horOpts = (okrCat && Array.isArray(okrCat.horizons) && okrCat.horizons.length) ? okrCat.horizons : ["2026年", "2027年", "2028年", "2029年"];
     const cards = list.length ? list.map(o => {
       const avg = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + (k.p||0), 0) / o.krs.length) : (o._manualPct || (o.logs && o.logs.length ? o.logs[o.logs.length - 1].pct : 0));
+      const tags = (o.category ? `<span class="oc-cat">${escapeHtml(o.category)}</span>` : "") + (o.horizons || []).map(h => `<span class="oc-horizon">${escapeHtml(h)}</span>`).join("");
       return `<div class="okr-card" data-oid="${o.id}">
-        <div class="oc-top"><div class="oc-title">${o.title}</div><span class="oc-horizon">${o.horizon}</span></div>
+        <div class="oc-top"><div class="oc-title">${escapeHtml(o.title)}</div></div>
+        ${tags ? `<div class="oc-tags">${tags}</div>` : ""}
         <div id="krlist_${o.id}">${o.krs.map((k, i) => krRow(o.id, i, k)).join("")}</div>
         <div class="okr-prog" style="margin-top:12px;cursor:pointer;" data-oid="${o.id}" onmousedown="startDragOkrProg(event,'${o.id}')" ontouchstart="startDragOkrProg(event,'${o.id}')"><div class="bar"><span style="width:${avg}%"></span></div><div class="m-pct">${avg}%</div></div>
         <button class="btn-sm" style="margin-top:10px;width:100%;" onclick="addKR('${o.id}')">＋ 添加关键结果</button>
@@ -2266,10 +2288,14 @@
       <section class="card" style="margin-bottom:18px;">
         <div class="section-title" style="margin-bottom:12px;">🎯 新建目标 (Objective)</div>
         <div class="form-grid okr-new">
-          <label>目标名称<input id="okr_title" type="text" placeholder="如 今年减脂塑形达标" /></label>
-          <label>周期<select id="okr_horizon">${horOpts.map(h=>`<option ${h===horizon?"selected":""}>${labelOf(h, h)}</option>`).join("")}</select></label>
+          <label>目标分类<input id="okr_category" type="text" placeholder="如 健康 / 学习 / 工作 / 财务" /></label>
+          <label>目标名称<input id="okr_title" type="text" placeholder="如 减脂塑形达标" /></label>
         </div>
-        <button class="btn-primary" onclick="addOKR()">添加目标</button>
+        <div class="okr-period-label">周期（可多选，目标将同时归属所选年份）</div>
+        <div class="horizon-chips" id="okr_horizons">
+          ${horOpts.map(h => `<label class="horizon-chip"><input type="checkbox" value="${labelOf(h, h)}" ${horizon && h === horizon ? "checked" : ""} /><span>${labelOf(h, h)}</span></label>`).join("")}
+        </div>
+        <button class="btn-primary" onclick="addOKR()" style="margin-top:12px;">添加目标</button>
       </section>
       <div class="section-title">📋 我的目标（${list.length}）</div>
       ${cards}`;
@@ -2285,10 +2311,13 @@
   function loadOKR() { return storeGet("wb_okr", []); }
   function addOKR() {
     const title = document.getElementById("okr_title").value.trim();
-    const horizon = document.getElementById("okr_horizon").value;
+    const category = document.getElementById("okr_category").value.trim();
+    const horizonEls = document.querySelectorAll("#okr_horizons input:checked");
+    const horizons = Array.from(horizonEls).map(el => el.value);
     if (!title) { toast("请填写目标名称"); return; }
+    if (!horizons.length) { toast("请至少选择一个周期"); return; }
     const data = loadOKR();
-    data.push({ id: "o" + Date.now(), title, horizon, krs: [] });
+    data.push({ id: "o" + Date.now(), title, category, horizons, krs: [] });
     storeSet("wb_okr", data);
     renderModule("okr", currentHorizon); refreshHomeProgress(); toast("已添加目标 🎯");
   }
@@ -2504,7 +2533,7 @@
   function getSubProgress(catId, subId) {
     if (catId === "okr") {
       const data = storeGet("wb_okr", []);
-      const objs = data.filter(o => o.horizon === subId);
+      const objs = data.filter(o => o.horizons && o.horizons.includes(subId));
       if (!objs.length) return 0;
       const arr = objs.map(o => o.krs.length ? Math.round(o.krs.reduce((s, k) => s + (k.p || 0), 0) / o.krs.length) : 0);
       return Math.round(arr.reduce((s, a) => s + a, 0) / arr.length);
