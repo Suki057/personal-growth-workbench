@@ -4,8 +4,8 @@
   "description": "个人人生中控后台：终极愿景 + 五大成长维度 + 四大时间周期 + 双轨执行体系",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1a2046",
-  "theme_color": "#1c2350",
+  "background_color": "#0a0f28",
+  "theme_color": "#0c1230",
   "orientation": "portrait-primary",
   "scope": ".",
   "icons": [
