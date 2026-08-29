@@ -1,11 +1,11 @@
 {
-  "name": "Suki-私人管理",
-  "short_name": "Suki-私人管理",
-  "description": "个人成长、目标管理、减脂塑形、习惯养成一体化工作台",
+  "name": "个人成长全景工作台",
+  "short_name": "成长全景台",
+  "description": "个人人生中控后台：终极愿景 + 五大成长维度 + 四大时间周期 + 双轨执行体系",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#eef6f0",
-  "theme_color": "#5cb88a",
+  "background_color": "#1a2046",
+  "theme_color": "#1c2350",
   "orientation": "portrait-primary",
   "scope": ".",
   "icons": [
