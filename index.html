@@ -2264,6 +2264,32 @@
   }
 
   /* ============ OKR ============ */
+  /* 目标分类：内置选项 + 用户自定义（存 wb_okr_categories，可累积） */
+  function okrCatDefaults() {
+    return ["身心管理", "资金财务", "主业", "副业", "人生愿景", "今年目标", "年目标", "近三年目标", "近五年目标", "其他"];
+  }
+  function okrCatCustom() { return storeGet("wb_okr_categories", []); }
+  function okrCatAll() {
+    const all = okrCatDefaults();
+    okrCatCustom().forEach(x => { if (x && x !== "其他" && !all.includes(x)) all.push(x); });
+    return all;
+  }
+  function okrCatSelectHTML() {
+    const opts = okrCatAll();
+    return `<select id="okr_category" class="okr-cat-select" onchange="onOkrCatChange()">
+      ${opts.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join("")}
+    </select>`;
+  }
+  function onOkrCatChange() {
+    const wrap = document.getElementById("okr_cat_wrap");
+    const sel = document.getElementById("okr_category");
+    if (!wrap || !sel) return;
+    if (sel.value === "其他") {
+      wrap.innerHTML = '<input id="okr_category" type="text" placeholder="请输入新的目标分类" />';
+      const inp = document.getElementById("okr_category");
+      if (inp && inp.focus) inp.focus();
+    }
+  }
   function renderOKR(horizon) {
     const data = storeGet("wb_okr", []);
     const list = horizon ? data.filter(o => o.horizons && o.horizons.includes(horizon)) : data;
@@ -2288,7 +2314,7 @@
       <section class="card" style="margin-bottom:18px;">
         <div class="section-title" style="margin-bottom:12px;">🎯 新建目标 (Objective)</div>
         <div class="form-grid okr-new">
-          <label>目标分类<input id="okr_category" type="text" placeholder="如 健康 / 学习 / 工作 / 财务" /></label>
+          <label>目标分类<div id="okr_cat_wrap" style="width:100%;">${okrCatSelectHTML()}</div></label>
           <label>目标名称<input id="okr_title" type="text" placeholder="如 减脂塑形达标" /></label>
         </div>
         <div class="okr-period-label">周期（可多选，目标将同时归属所选年份）</div>
@@ -2311,11 +2337,17 @@
   function loadOKR() { return storeGet("wb_okr", []); }
   function addOKR() {
     const title = document.getElementById("okr_title").value.trim();
-    const category = document.getElementById("okr_category").value.trim();
+    const catEl = document.getElementById("okr_category");
+    const category = catEl ? catEl.value.trim() : "";
     const horizonEls = document.querySelectorAll("#okr_horizons input:checked");
     const horizons = Array.from(horizonEls).map(el => el.value);
     if (!title) { toast("请填写目标名称"); return; }
     if (!horizons.length) { toast("请至少选择一个周期"); return; }
+    /* 新填的分类自动加入选项列表（持久化，不重复） */
+    if (category && category !== "其他" && !okrCatAll().includes(category)) {
+      const custom = okrCatCustom();
+      if (!custom.includes(category)) { custom.push(category); storeSet("wb_okr_categories", custom); }
+    }
     const data = loadOKR();
     data.push({ id: "o" + Date.now(), title, category, horizons, krs: [] });
     storeSet("wb_okr", data);
