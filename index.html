@@ -120,24 +120,32 @@
   .app-header {
     position: fixed; top: 0; left: 0; right: 0; z-index: 50;
     display: flex; align-items: center; justify-content: space-between;
-    padding: calc(10px + env(safe-area-inset-top)) 18px 10px;
+    padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
     background: linear-gradient(180deg, rgba(10,15,40,0.92), rgba(10,15,40,0.55));
     -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(246,215,138,0.22);
   }
-  .ah-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
-  .ah-emoji { font-size: 20px; filter: drop-shadow(0 0 8px rgba(246,215,138,0.8)); }
+  .ah-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex:1; }
+  .ah-back {
+    display:inline-flex; align-items:center; gap:4px;
+    font-size:13px; font-weight:800; color: var(--gold);
+    background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+    border-radius:10px; padding:6px 11px; cursor:pointer; white-space:nowrap;
+  }
   .ah-title {
     font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: var(--text-on-dark);
-    outline: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 62vw;
+    outline: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 46vw;
     text-shadow: 0 0 12px rgba(246,215,138,0.35);
   }
-  .ah-date { font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+  .ah-home {
+    font-size:20px; cursor:pointer; padding:6px; border-radius:10px;
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+  }
 
   main {
     position: relative; z-index: 1;
     max-width: 720px; margin: 0 auto;
-    padding: calc(78px + env(safe-area-inset-top)) 14px calc(100px + env(safe-area-inset-bottom));
+    padding: calc(70px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));
   }
 
   /* 愿景横幅 · 流星金光 */
@@ -158,55 +166,55 @@
   .vision-banner .vb-text { font-size: 14.5px; line-height: 1.75; font-weight: 500; position:relative; z-index:1; }
   .vision-banner .vb-note { margin-top:10px; font-size:12px; color: var(--text-muted); position:relative; z-index:1; }
 
-  /* 首页星球地图 */
-  .hero-title {
-    text-align:center; margin: 8px 0 20px;
+  /* 首页 · 星图选场景 */
+  .map-wrap { min-height: calc(100vh - 110px); display:flex; flex-direction:column; align-items:center; padding-top:6px; }
+  .map-title {
+    text-align:center; margin-bottom:8px;
   }
-  .hero-title h1 {
-    font-size: 26px; font-weight: 900; color:#fff; letter-spacing:-0.02em;
-    text-shadow:
-      0 0 8px rgba(255,255,255,0.6),
-      0 0 20px rgba(246,215,138,0.6),
-      0 0 40px rgba(246,215,138,0.35),
-      0 0 70px rgba(240,168,192,0.25);
+  .map-title h1 {
+    font-size: 30px; font-weight: 900; color:#fff; letter-spacing:0.02em;
+    text-shadow: 0 0 8px rgba(255,255,255,0.6), 0 0 24px rgba(246,215,138,0.6), 0 0 50px rgba(240,168,192,0.35);
   }
-  .hero-title .ht-sub {
-    font-size: 13px; color: var(--text-muted); margin-top:6px; font-weight:600;
+  .map-title .mt-sub { font-size:13px; color:var(--text-muted); margin-top:6px; font-weight:600; }
+  .map-ring {
+    position:relative; width:100%; max-width:560px; flex:1; display:flex; flex-direction:column; justify-content:center;
   }
-
-  .planet-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 13px;
+  .map-constellation {
+    position:absolute; inset:0; z-index:0; pointer-events:none;
   }
-  @media (max-width: 540px){ .planet-grid { grid-template-columns: 1fr; } }
-  .planet-card {
-    position: relative; cursor: pointer; user-select: none;
-    padding: 17px 17px 17px 22px;
+  .scene-grid {
+    position:relative; z-index:1;
+    display:grid; grid-template-columns:1fr 1fr; gap:14px; width:100%;
+  }
+  @media (max-width: 540px){
+    .scene-grid { grid-template-columns:1fr; gap:16px; padding:0 8px; }
+    .map-title h1 { font-size:26px; }
+  }
+  .scene-card {
+    position:relative; cursor:pointer; user-select:none;
+    padding:22px 18px 18px; text-align:center;
     transition: transform .18s, box-shadow .2s;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
   }
-  .planet-card:active { transform: scale(0.985); }
-  .planet-card:hover { box-shadow: var(--glow-gold), var(--shadow); }
-  .planet-card .pc-top { display:flex; align-items:center; gap:11px; margin-bottom:10px; }
-  .planet-icon {
-    width:42px; height:42px; border-radius:50%; flex:none;
-    display:flex; align-items:center; justify-content:center; font-size:22px;
-    box-shadow: 0 0 16px rgba(255,255,255,0.18), inset 0 2px 4px rgba(255,255,255,0.3);
-    position:relative;
+  .scene-card:active { transform: scale(0.985); }
+  .scene-card:hover { box-shadow: var(--glow-gold), var(--shadow); }
+  .scene-planet {
+    width:72px; height:72px; border-radius:50%; position:relative;
+    display:flex; align-items:center; justify-content:center; font-size:34px;
+    box-shadow: 0 0 24px rgba(255,255,255,0.18), inset 0 3px 8px rgba(255,255,255,0.35), inset 0 -4px 10px rgba(0,0,0,0.2);
   }
-  .planet-icon::after {
-    content:""; position:absolute; inset:-5px; border-radius:50%;
-    border: 1px solid rgba(255,255,255,0.25); transform: rotate(-15deg) scaleX(1.15);
+  .scene-planet::after {
+    content:""; position:absolute; inset:-8px; border-radius:50%;
+    border: 1.5px solid rgba(255,255,255,0.28); transform: rotate(-14deg) scaleX(1.22);
+    box-shadow: 0 0 12px rgba(255,255,255,0.12);
   }
-  .planet-icon.gold { background: linear-gradient(135deg, #ffe9b3, #e8b85c); }
-  .planet-icon.rose { background: linear-gradient(135deg, #ffd4e0, #e089a8); }
-  .planet-icon.lavender { background: linear-gradient(135deg, #e8d9f7, #a884c9); }
-  .planet-icon.cyan { background: linear-gradient(135deg, #d4f0ff, #7abbd4); }
-  .planet-icon.earth { background: linear-gradient(135deg, #b8e6d4, #5fa88a); }
-  .pc-title { font-size: 16px; font-weight: 800; color:#fff; letter-spacing:-0.01em; }
-  .pc-sub { font-size: 11.5px; color: var(--text-muted); margin-top:2px; font-weight:600; }
-  .pc-body { display:none; margin-top:12px; padding-top:12px; border-top:1px dashed rgba(255,255,255,0.12); }
-  .planet-card.open .pc-body { display:block; }
-  .planet-card .pc-chev { position:absolute; top:18px; right:16px; font-size:12px; color:var(--text-muted); transition:transform .2s; }
-  .planet-card.open .pc-chev { transform: rotate(180deg); }
+  .scene-planet.gold { background: radial-gradient(circle at 35% 30%, #fff4d1, #f6d78a 45%, #c79a5e); }
+  .scene-planet.lavender { background: radial-gradient(circle at 35% 30%, #f0e6ff, #c4a8e0 45%, #8a6fb0); }
+  .scene-planet.rose { background: radial-gradient(circle at 35% 30%, #ffe8f0, #f0a8c0 45%, #c66a88); }
+  .scene-planet.cyan { background: radial-gradient(circle at 35% 30%, #e4f8ff, #9ed8f0 45%, #5fa9c4); }
+  .scene-planet.earth { background: radial-gradient(circle at 35% 30%, #d8f5e8, #8ad4b4 45%, #5a9a80); }
+  .scene-card .sc-title { font-size:16px; font-weight:800; color:#fff; letter-spacing:0.02em; }
+  .scene-card .sc-sub { font-size:11.5px; color:var(--text-muted); font-weight:600; line-height:1.4; }
 
   /* 模块内容样式 */
   .li { display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.08); }
@@ -282,23 +290,6 @@
   .rv-del { position:absolute; top:7px; right:8px; border:none; background:transparent; color:var(--rose); font-size:13px; cursor:pointer; }
   .empty { font-size:12.5px; color:var(--text-muted); padding:8px 2px; }
 
-  /* 底部导航 */
-  .bottom-nav {
-    position: fixed; left:0; right:0; bottom:0; z-index:50;
-    display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; justify-content:center;
-    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-    background: linear-gradient(0deg, rgba(10,15,40,0.96), rgba(10,15,40,0.78));
-    -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(246,215,138,0.22);
-  }
-  .bottom-nav::-webkit-scrollbar { display:none; }
-  .nav-tab {
-    flex:none; border:none; background:transparent; color: var(--text-muted);
-    font-size:13px; font-weight:700; padding:9px 16px; border-radius:999px;
-    cursor:pointer; white-space:nowrap; transition: background .15s, color .15s, box-shadow .2s;
-  }
-  .nav-tab.active { color:#5a3d1f; background: linear-gradient(180deg,#ffe7b3,#f5c977); box-shadow: 0 4px 14px rgba(245,201,119,0.4); }
-
   /* 贴纸装饰 */
   .sticker {
     position: fixed; z-index: 0; pointer-events:none; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.25));
@@ -308,17 +299,31 @@
   .sticker-rose { top: 46%; right: 2px; width: 55px; opacity: 0.75; }
   @media (max-width: 540px){ .sticker-prince { width: 80px; top: 120px; } .sticker-fox { width: 70px; } .sticker-rose { width: 45px; } }
 
-  /* 开屏 */
-  .splash { position:fixed; inset:0; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:28px; text-align:center;
-    background: linear-gradient(180deg, #0a0f28 0%, #141a3e 30%, #221a42 60%, #4a3058 88%, #6a3b5c 100%); }
+  /* 开屏 · 图2 封面 */
+  .splash { position:fixed; inset:0; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:0; text-align:center;
+    background: linear-gradient(180deg, #0a0f28 0%, #141a3e 28%, #221a42 55%, #4a3058 82%, #6a3b5c 100%); }
   .splash.hidden { display:none; }
-  .splash svg { width: 240px; height: 240px; margin-bottom: 10px; filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4)); }
-  .splash h1 { color:#fff; font-size:26px; font-weight:900; letter-spacing:-0.02em;
-    text-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 30px rgba(246,215,138,0.5), 0 0 60px rgba(240,168,192,0.35); }
-  .splash .sp-sub { color: var(--gold); font-size:14px; margin-top:8px; font-weight:700; }
-  .splash .sp-quote { color: var(--text-muted); font-size:12.5px; margin-top:16px; line-height:1.7; max-width:300px; font-style:italic; }
-  .splash .sp-enter { margin-top:24px; border:none; border-radius:999px; padding:14px 40px; font-size:15px; font-weight:800; color:#5a3d1f; background: linear-gradient(180deg,#ffe7b3,#f5c977); box-shadow: 0 8px 24px rgba(245,201,119,0.5); cursor:pointer; }
-  .topback { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color: var(--gold); background: rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:6px 12px; cursor:pointer; margin-bottom:12px; }
+  .splash-title {
+    margin-top: calc(42px + env(safe-area-inset-top));
+    position:relative;
+  }
+  .splash-title h1 {
+    color:#fff; font-size:36px; font-weight:900; letter-spacing:0.06em;
+    text-shadow: 0 0 12px rgba(255,255,255,0.55), 0 0 34px rgba(246,215,138,0.55), 0 0 70px rgba(240,168,192,0.35);
+  }
+  .splash-title .st-swoosh {
+    position:absolute; bottom:-10px; left:50%; transform:translateX(-50%);
+    width:180px; height:14px;
+  }
+  .splash-illustration { flex:1; display:flex; align-items:center; justify-content:center; width:100%; position:relative; }
+  .splash-illustration svg { width: min(320px, 78vw); height: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.35)); }
+  .splash-bottom { padding: 0 28px calc(34px + env(safe-area-inset-bottom)); }
+  .splash .sp-sub { color: var(--gold); font-size:14px; font-weight:700; margin-bottom:6px; }
+  .splash .sp-quote { color: var(--text-muted); font-size:12.5px; line-height:1.65; margin-bottom:20px; max-width:300px; }
+  .splash .sp-enter {
+    border:none; border-radius:999px; padding:14px 52px; font-size:15px; font-weight:800; color:#5a3d1f;
+    background: linear-gradient(180deg,#ffe7b3,#f5c977); box-shadow: 0 8px 28px rgba(245,201,119,0.5); cursor:pointer;
+  }
 
   /* 详情页面板 */
   .panel { margin-bottom: 16px; }
@@ -330,6 +335,11 @@
   .panel.collapsed .panel-b { display: none; }
   .panel.collapsed .chev { transform: rotate(-90deg); }
   .panel-b { position: relative; padding: 0 18px 18px 24px; }
+
+  /* 周期子菜单页 */
+  .menu-title { text-align:center; margin:8px 0 18px; }
+  .menu-title h2 { font-size:22px; font-weight:800; color:#fff; text-shadow:0 0 12px rgba(246,215,138,0.35); }
+  .menu-title p { font-size:12.5px; color:var(--text-muted); margin-top:6px; }
 </style>
 </head>
 <body>
@@ -393,57 +403,74 @@
   <circle cx="30" cy="20" r="3" fill="#ffd4e0"/>
 </svg>
 
+<!-- 开屏页 · 图2 封面 -->
 <div class="splash" id="splash">
-  <svg viewBox="0 0 240 240" aria-hidden="true">
-    <defs>
-      <radialGradient id="sSun" cx="50%" cy="50%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="50%" stop-color="#E8A96E"/><stop offset="100%" stop-color="rgba(232,169,110,0)"/></radialGradient>
-      <radialGradient id="sPlanet" cx="35%" cy="30%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="60%" stop-color="#E8C98A"/><stop offset="100%" stop-color="#c79a5e"/></radialGradient>
-    </defs>
-    <circle cx="190" cy="55" r="26" fill="url(#sSun)" opacity="0.9"/>
-    <circle cx="40" cy="40" r="1.8" fill="#fff"/><circle cx="90" cy="28" r="2" fill="#f6e7b0"/>
-    <circle cx="160" cy="25" r="1.6" fill="#fff"/><circle cx="220" cy="100" r="1.8" fill="#f6e7b0"/>
-    <circle cx="30" cy="120" r="1.5" fill="#fff"/><circle cx="210" cy="170" r="1.7" fill="#f6e7b0"/>
-    <circle cx="180" cy="195" r="1.5" fill="#fff"/><circle cx="55" cy="195" r="2" fill="#f6e7b0"/>
-    <!-- 大玫瑰星球 -->
-    <path d="M60 160 Q75 130 95 145 Q115 130 125 160 Q130 185 95 195 Q55 185 60 160" fill="#d44a4a"/>
-    <path d="M70 155 Q82 140 95 155 Q108 140 115 160 Q120 178 95 188 Q68 178 70 155" fill="#e86b6b"/>
-    <path d="M82 158 Q90 150 98 160 Q105 152 108 165 Q110 178 95 182 Q78 178 82 158" fill="#f59090"/>
-    <ellipse cx="95" cy="175" rx="50" ry="10" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.2" transform="rotate(-8 95 175)"/>
-    <!-- 小王子 -->
-    <g transform="translate(58,112)" fill="#fff6e0">
-      <circle cx="14" cy="11" r="10"/>
-      <path d="M4 52 Q14 22 24 52 Z"/>
-      <rect x="11" y="22" width="6" height="22" rx="3"/>
-      <path d="M11 34 L-2 26 M17 34 L30 24" stroke="#fff6e0" stroke-width="3" stroke-linecap="round" fill="none"/>
-      <path d="M12 44 L2 62 M16 44 L26 62" stroke="#fff6e0" stroke-width="3.4" stroke-linecap="round" fill="none"/>
-    </g>
-    <path d="M100 150 L100 122" stroke="#8FB0CB" stroke-width="2.2" fill="none"/>
-    <circle cx="100" cy="116" r="6" fill="#f0a8c0"/>
-    <circle cx="95" cy="121" r="4" fill="#e089a8"/><circle cx="105" cy="121" r="4" fill="#e089a8"/>
-    <!-- 月亮与玻璃罩玫瑰 -->
-    <path d="M205 140 A28 28 0 1 1 200 196 A22 22 0 1 0 205 140" fill="#fff6e0" opacity="0.85"/>
-    <ellipse cx="214" cy="182" rx="14" ry="5" fill="rgba(246,215,138,0.2)"/>
-    <path d="M214 178 L214 160" stroke="#8FB0CB" stroke-width="1.5" fill="none"/>
-    <circle cx="214" cy="156" r="4" fill="#f0a8c0"/>
-    <path d="M200 150 Q214 138 228 150 Q228 176 214 184 Q200 176 200 150" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.2"/>
-  </svg>
-  <h1>🌹 个人成长全景工作台</h1>
-  <div class="sp-sub">星球环游记 · 你的人生中控后台</div>
-  <div class="sp-quote">「也许世界上也有五千朵和你一模一样的花，<br/>但只有你浇灌的那朵，才属于你。」</div>
-  <button class="sp-enter" onclick="enterApp()">🌟 进入我的星球</button>
+  <div class="splash-title">
+    <h1>星球环游记</h1>
+    <svg class="st-swoosh" viewBox="0 0 180 14" preserveAspectRatio="none">
+      <path d="M0 10 Q45 0, 90 7 T180 10" fill="none" stroke="url(#swooshGrad)" stroke-width="3" stroke-linecap="round"/>
+      <defs><linearGradient id="swooshGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f6d78a"/><stop offset="50%" stop-color="#f0a8c0"/><stop offset="100%" stop-color="#c4a8e0"/></linearGradient></defs>
+    </svg>
+  </div>
+
+  <div class="splash-illustration">
+    <svg viewBox="0 0 300 260" aria-hidden="true">
+      <defs>
+        <radialGradient id="sSun" cx="50%" cy="50%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="50%" stop-color="#E8A96E"/><stop offset="100%" stop-color="rgba(232,169,110,0)"/></radialGradient>
+        <radialGradient id="sPlanet" cx="35%" cy="30%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="60%" stop-color="#E8C98A"/><stop offset="100%" stop-color="#c79a5e"/></radialGradient>
+        <radialGradient id="rosePlanet" cx="40%" cy="35%"><stop offset="0%" stop-color="#ffd4e0"/><stop offset="55%" stop-color="#e86b6b"/><stop offset="100%" stop-color="#a83c3c"/></radialGradient>
+      </defs>
+      <!-- 落日 -->
+      <circle cx="230" cy="55" r="32" fill="url(#sSun)" opacity="0.9"/>
+      <!-- 散星 -->
+      <circle cx="35" cy="35" r="1.8" fill="#fff"/><circle cx="80" cy="22" r="2" fill="#f6e7b0"/>
+      <circle cx="150" cy="18" r="1.6" fill="#fff"/><circle cx="270" cy="105" r="1.8" fill="#f6e7b0"/>
+      <circle cx="25" cy="115" r="1.5" fill="#fff"/><circle cx="260" cy="185" r="1.7" fill="#f6e7b0"/>
+      <circle cx="200" cy="210" r="1.5" fill="#fff"/><circle cx="60" cy="205" r="2" fill="#f6e7b0"/>
+      <!-- 小王子的玫瑰星球 -->
+      <ellipse cx="150" cy="208" rx="82" ry="16" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.4" transform="rotate(-6 150 208)"/>
+      <path d="M85 175 Q105 145 130 160 Q155 145 170 170 Q180 195 150 205 Q115 198 85 175" fill="url(#rosePlanet)"/>
+      <path d="M95 168 Q110 155 125 170 Q140 155 148 175 Q155 192 125 198 Q95 190 95 168" fill="#f59090" opacity="0.6"/>
+      <!-- 小王子 -->
+      <g transform="translate(108,108)" fill="#fff6e0">
+        <circle cx="18" cy="14" r="12"/>
+        <path d="M6 58 Q18 28 30 58 Z"/>
+        <rect x="14" y="28" width="8" height="26" rx="4"/>
+        <path d="M14 40 L-2 32 M22 40 L38 30" stroke="#fff6e0" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+        <path d="M15 52 L2 70 M21 52 L34 70" stroke="#fff6e0" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+      </g>
+      <path d="M126 165 L126 130" stroke="#8FB0CB" stroke-width="2.4" fill="none"/>
+      <circle cx="126" cy="124" r="7" fill="#f0a8c0"/>
+      <circle cx="120" cy="130" r="4.5" fill="#e089a8"/><circle cx="132" cy="130" r="4.5" fill="#e089a8"/>
+      <!-- 月亮 -->
+      <path d="M252 145 A26 26 0 1 1 248 195 A21 21 0 1 0 252 145" fill="#fff6e0" opacity="0.85"/>
+      <!-- 玻璃罩玫瑰 -->
+      <ellipse cx="258" cy="184" rx="12" ry="4" fill="rgba(246,215,138,0.2)"/>
+      <path d="M258 180 L258 162" stroke="#8FB0CB" stroke-width="1.5" fill="none"/>
+      <circle cx="258" cy="158" r="4" fill="#f0a8c0"/>
+      <path d="M245 152 Q258 142 271 152 Q271 176 258 184 Q245 176 245 152" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
+      <!-- 小行星带 -->
+      <circle cx="55" cy="140" r="10" fill="url(#sPlanet)" opacity="0.9"/>
+      <ellipse cx="55" cy="140" rx="14" ry="3.5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.9" transform="rotate(20 55 140)"/>
+    </svg>
+  </div>
+
+  <div class="splash-bottom">
+    <div class="sp-sub">你想跟小王子一起星际旅行吗？</div>
+    <div class="sp-quote">点击开启梦幻之旅<br/>所有目标与行动，终将抵达你的星球</div>
+    <button class="sp-enter" onclick="enterApp()">✨ 点击开启</button>
+  </div>
 </div>
 
-<header class="app-header">
+<header class="app-header" id="appHeader">
   <div class="ah-left">
-    <span class="ah-emoji">🌹</span>
-    <h1 class="ah-title" id="appTitle" contenteditable="true" spellcheck="false">个人成长全景工作台</h1>
+    <button class="ah-back" id="ahBack" style="display:none;" onclick="goBack()">← 返回</button>
+    <h1 class="ah-title" id="appTitle" contenteditable="true" spellcheck="false">星球环游记</h1>
   </div>
-  <div class="ah-date" id="ahDate"></div>
+  <div class="ah-home" id="ahHome" style="display:none;" onclick="goHome()" title="返回首页">🏠</div>
 </header>
 
 <main id="container"></main>
-
-<nav class="bottom-nav" id="nav"></nav>
 
 <script>
 /* ===================== 数据 ===================== */
@@ -556,11 +583,19 @@ const CYCLE_DETAIL = {
   },
 };
 
+const SCENES = [
+  { id:"north", emoji:"🌟", tone:"gold", title:"人生北极星", sub:"5年终极愿景" },
+  { id:"cycles", emoji:"🪐", tone:"lavender", title:"四大时间周期", sub:"层层递进 · 闭环迭代" },
+  { id:"dims", emoji:"🧭", tone:"rose", title:"五大成长维度", sub:"终身固定 · 全赛道归类" },
+  { id:"habits", emoji:"🌱", tone:"cyan", title:"每日深耕复利", sub:"长期复利 · 每日执行" },
+  { id:"reviews", emoji:"🔄", tone:"earth", title:"复盘迭代体系", sub:"周 / 月 / 年 三级校准" },
+];
+
 /* ===================== 存储 ===================== */
 function storeGet(k, def){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; }catch(e){ return def; } }
 function storeSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&quot;","'":"&#39;"}[c])); }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c])); }
 
 /* 三套打卡数据 */
 function getGoals(){ return storeGet("pgw_goals", {}); }
@@ -568,44 +603,101 @@ function getHabits(){ return storeGet("pgw_habits", {}); }
 function getReviews(){ return storeGet("pgw_reviews", []); }
 
 /* ===================== 状态 / 渲染 ===================== */
-let currentView = "home";
+let currentView = "home-map";
+let viewStack = ["home-map"];
+let pageTitle = "星球环游记";
 
-const NAV = [
-  { id:"home", label:"首页" },
-  { id:"2026", label:"2026" },
-  { id:"1y", label:"1年" },
-  { id:"3y", label:"3年" },
-  { id:"5y", label:"5年" },
-];
-
-function renderNav(){
-  const nav = document.getElementById("nav");
-  nav.innerHTML = NAV.map(t => `<button class="nav-tab ${currentView===t.id?'active':''}" onclick="setView('${t.id}')">${t.label}</button>`).join("");
+function navigateTo(view, push=true){
+  if(push) viewStack.push(view); else viewStack[viewStack.length-1] = view;
+  currentView = view;
+  updateHeader(); render(); window.scrollTo(0,0);
 }
-function setView(v){ currentView = v; renderNav(); render(); window.scrollTo(0,0); }
+function goBack(){
+  if(viewStack.length > 1){
+    viewStack.pop();
+    currentView = viewStack[viewStack.length-1];
+    updateHeader(); render(); window.scrollTo(0,0);
+  }
+}
+function goHome(){
+  viewStack = ["home-map"]; currentView = "home-map";
+  updateHeader(); render(); window.scrollTo(0,0);
+}
+
+function updateHeader(){
+  const backBtn = document.getElementById("ahBack");
+  const homeBtn = document.getElementById("ahHome");
+  const titleEl = document.getElementById("appTitle");
+  if(!backBtn || !homeBtn || !titleEl) return;
+  if(currentView === "home-map"){
+    backBtn.style.display = "none";
+    homeBtn.style.display = "none";
+    pageTitle = "星球环游记";
+  } else {
+    backBtn.style.display = "inline-flex";
+    homeBtn.style.display = "inline-flex";
+    pageTitle = viewTitle(currentView);
+  }
+  titleEl.textContent = pageTitle;
+}
+
+function viewTitle(v){
+  if(v === "home-map") return "星球环游记";
+  if(v === "north") return "人生北极星";
+  if(v === "cycles") return "四大时间周期";
+  if(v === "dims") return "五大成长维度";
+  if(v === "habits") return "每日深耕复利";
+  if(v === "reviews") return "复盘迭代体系";
+  const cyc = CYCLES.find(c=>c.id===v);
+  if(cyc) return cyc.name + " · " + cyc.mission;
+  return "星球环游记";
+}
 
 function render(){
   const c = document.getElementById("container");
-  if(currentView === "home") c.innerHTML = renderHome();
+  if(currentView === "home-map") c.innerHTML = renderHomeMap();
+  else if(currentView === "north") c.innerHTML = renderNorthPage();
+  else if(currentView === "cycles") c.innerHTML = renderCyclesMenuPage();
+  else if(currentView === "dims") c.innerHTML = renderDimsPage();
+  else if(currentView === "habits") c.innerHTML = renderHabitsPage();
+  else if(currentView === "reviews") c.innerHTML = renderReviewsPage();
   else c.innerHTML = renderCycle(currentView);
 }
 
-/* —— 首页 · 星球地图 —— */
-function renderHome(){
+/* —— 首页 · 星球地图（图1） —— */
+function renderHomeMap(){
   return `
-    <div class="hero-title">
-      <h1>星球环游记</h1>
-      <div class="ht-sub">绘制你的人生星图 · 所有行动指向北极星</div>
-    </div>
-    ${visionBanner()}
-    <div class="planet-grid">
-      ${planetCard("north", "🌟", "gold", "人生北极星", "5年终极愿景", renderNorthStar(), true)}
-      ${planetCard("cycles", "🪐", "lavender", "四大时间周期", "层层递进 · 闭环迭代", renderCyclesOverview(), true)}
-      ${planetCard("dims", "🧭", "rose", "五大成长维度", "终身固定 · 全赛道归类", renderDimensions(), true)}
-      ${planetCard("habits", "🌱", "cyan", "每日深耕复利", "长期复利 · 每日执行", renderHabits(), true)}
-      ${planetCard("reviews", "🔄", "earth", "复盘迭代体系", "周 / 月 / 年 三级校准", renderReviews(), true)}
+    <div class="map-wrap">
+      <div class="map-title">
+        <h1>点击进入任意场景</h1>
+        <div class="mt-sub">绘制你的人生星图 · 所有行动指向北极星</div>
+      </div>
+      <div class="map-ring">
+        <svg class="map-constellation" viewBox="0 0 320 420" preserveAspectRatio="xMidYMid meet">
+          <circle cx="160" cy="210" r="145" fill="none" stroke="rgba(246,215,138,0.12)" stroke-width="1" stroke-dasharray="4,6"/>
+          <circle cx="160" cy="210" r="110" fill="none" stroke="rgba(240,168,192,0.10)" stroke-width="1" stroke-dasharray="2,8"/>
+          <polyline points="70,110 160,70 250,110 280,210 250,310 160,350 70,310 40,210 70,110" fill="none" stroke="rgba(200,170,230,0.18)" stroke-width="1" stroke-dasharray="3,5"/>
+          <circle cx="70" cy="110" r="2.5" fill="rgba(246,215,138,0.7)"/>
+          <circle cx="250" cy="110" r="2.5" fill="rgba(255,255,255,0.7)"/>
+          <circle cx="280" cy="210" r="2.5" fill="rgba(246,215,138,0.7)"/>
+          <circle cx="250" cy="310" r="2.5" fill="rgba(255,255,255,0.7)"/>
+          <circle cx="70" cy="310" r="2.5" fill="rgba(246,215,138,0.7)"/>
+        </svg>
+        <div class="scene-grid">
+          ${SCENES.map(s=>sceneCard(s)).join("")}
+        </div>
+      </div>
+      ${visionBanner()}
     </div>
   `;
+}
+
+function sceneCard(s){
+  return `<section class="scene-card glass-card" onclick="navigateTo('${s.id}')">
+    <div class="scene-planet ${s.tone}">${s.emoji}</div>
+    <div class="sc-title">${s.title}</div>
+    <div class="sc-sub">${s.sub}</div>
+  </section>`;
 }
 
 function visionBanner(){
@@ -616,85 +708,86 @@ function visionBanner(){
   </div>`;
 }
 
-function planetCard(id, emoji, tone, title, sub, body, collapsed){
-  return `<section class="planet-card glass-card ${collapsed?'':'open'}" id="pc-${id}" onclick="togglePlanetCard(event,'${id}')">
-    <div class="pc-top">
-      <div class="planet-icon ${tone}">${emoji}</div>
-      <div style="min-width:0;">
-        <div class="pc-title">${title}</div>
-        <div class="pc-sub">${sub}</div>
-      </div>
-    </div>
-    <span class="pc-chev">▾</span>
-    <div class="pc-body" onclick="event.stopPropagation()">${body}</div>
-  </section>`;
-}
-function togglePlanetCard(e, id){
-  if(e && e.target){
-    const t = e.target;
-    if(t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.tagName==='BUTTON' || t.tagName==='A' || t.closest('.pc-body')) return;
-  }
-  document.getElementById('pc-'+id).classList.toggle('open');
+/* —— 人生北极星页 —— */
+function renderNorthPage(){
+  return `
+    <div class="menu-title"><h2>人生北极星</h2><p>5年终极愿景 · 四大维度</p></div>
+    ${visionBanner()}
+    <div class="dim-grid">` + NORTH_STAR.map(d => `
+      <div class="glass-card dim-card">
+        <h3>✦ ${d.dim}</h3>
+        <ul>${d.items.map(i=>`<li>${escapeHtml(i)}</li>`).join("")}</ul>
+      </div>`).join("") + `</div>`;
 }
 
-function renderNorthStar(){
-  return `<div class="dim-grid">` + NORTH_STAR.map(d => `
-    <div class="dim-card">
-      <h3>✦ ${d.dim}</h3>
-      <ul>${d.items.map(i=>`<li>${escapeHtml(i)}</li>`).join("")}</ul>
-    </div>`).join("") + `</div>`;
+/* —— 四大时间周期 · 子菜单页 —— */
+function renderCyclesMenuPage(){
+  return `
+    <div class="menu-title"><h2>四大时间周期</h2><p>选择星球 · 进入双轨详情页</p></div>
+    <div class="cycle-grid">` + CYCLES.map(c => `
+      <div class="glass-card cycle-card" onclick="navigateTo('${c.id}')">
+        <div class="cc-name">${c.name}</div>
+        <span class="cc-mission">${c.mission}</span>
+        <div class="cc-desc">${escapeHtml(c.desc)}</div>
+        <div class="cc-go">查看双轨详情 →</div>
+      </div>`).join("") + `</div>`;
 }
 
-function renderCyclesOverview(){
-  return `<div class="cycle-grid">` + CYCLES.map(c => `
-    <div class="cycle-card" onclick="setView('${c.id}')">
-      <div class="cc-name">${c.name}</div>
-      <span class="cc-mission">${c.mission}</span>
-      <div class="cc-desc">${escapeHtml(c.desc)}</div>
-      <div class="cc-go">查看双轨详情 →</div>
-    </div>`).join("") + `</div>`;
+/* —— 五大成长维度页 —— */
+function renderDimsPage(){
+  return `
+    <div class="menu-title"><h2>五大成长维度</h2><p>全人生赛道 · 终身固定</p></div>
+    <div class="dim-grid">` + DIMENSIONS.map(d => `
+      <div class="glass-card dim-card">
+        <h3>◆ ${d.name}</h3>
+        <ul>${d.items.map(i=>`<li>${escapeHtml(i)}</li>`).join("")}</ul>
+      </div>`).join("") + `</div>`;
 }
 
-function renderDimensions(){
-  return `<div class="dim-grid">` + DIMENSIONS.map(d => `
-    <div class="dim-card">
-      <h3>◆ ${d.name}</h3>
-      <ul>${d.items.map(i=>`<li>${escapeHtml(i)}</li>`).join("")}</ul>
-    </div>`).join("") + `</div>`;
-}
-
-function renderHabits(){
+/* —— 每日深耕习惯页 —— */
+function renderHabitsPage(){
   const habits = getHabits();
   const today = habits[todayStr()] || {};
-  let html = "";
+  let html = `<div class="menu-title"><h2>每日深耕复利</h2><p>长期复利 · 每日执行</p></div>`;
   HABITS.forEach((cat, ci) => {
-    html += `<div style="margin-bottom:12px;">
-      <div class="track-title">${cat.name}</div>
-      ${cat.items.map((it, ii) => {
+    html += `<section class="glass-card panel" style="margin-bottom:14px;">
+      <div class="panel-h" onclick="toggleCollapse(this)">
+        <div class="ph-main"><h2>${cat.name}</h2></div>
+        <span class="chev">▾</span>
+      </div>
+      <div class="panel-b">${cat.items.map((it, ii) => {
         const hid = `h-${ci}-${ii}`;
         const on = !!today[hid];
         return `<div class="li">
           <button class="chk ${on?'on':''}" onclick="toggleHabit('${hid}', this)"></button>
           <div class="li-text">${escapeHtml(it)}</div>
         </div>`;
-      }).join("")}
-    </div>`;
+      }).join("")}</div>
+    </section>`;
   });
   return html;
 }
 
-function renderReviews(){
+/* —— 复盘页 —— */
+function renderReviewsPage(){
   const reviews = getReviews();
-  return REVIEWS.map(r => {
+  let html = `<div class="menu-title"><h2>复盘迭代体系</h2><p>周 / 月 / 年 三级校准</p></div>`;
+  html += REVIEWS.map(r => {
     const items = reviews.filter(x=>x.type===r.id).slice().reverse();
-    return `<div class="review-block">
-      <h4>📝 ${r.name}</h4>
-      <div class="rb-desc">${escapeHtml(r.desc)}</div>
-      <textarea class="note" id="rv_${r.id}" placeholder="记录本次${r.name}…"></textarea>
-      <div style="margin-top:8px;"><button class="btn btn-primary" onclick="saveReview('${r.id}')">保存${r.name}</button></div>
-      <div class="rv-list">${items.length? items.map(it=>`<div class="rv-item"><button class="rv-del" onclick="delReview('${it.id}')">✕</button><div class="rv-date">${it.date}</div><div class="rv-text">${escapeHtml(it.text)}</div></div>`).join("") : `<div class="empty">暂无记录，写下第一条复盘 ✍️</div>`}</div>
-    </div>`;
+    return `<section class="glass-card panel">
+      <div class="panel-h" onclick="toggleCollapse(this)">
+        <div class="ph-main"><h2>📝 ${r.name}</h2></div>
+        <span class="chev">▾</span>
+      </div>
+      <div class="panel-b">
+        <div class="rb-desc">${escapeHtml(r.desc)}</div>
+        <textarea class="note" id="rv_${r.id}" placeholder="记录本次${r.name}…"></textarea>
+        <div style="margin-top:8px;"><button class="btn btn-primary" onclick="saveReview('${r.id}')">保存${r.name}</button></div>
+        <div class="rv-list">${items.length? items.map(it=>`<div class="rv-item"><button class="rv-del" onclick="delReview('${it.id}')">✕</button><div class="rv-date">${it.date}</div><div class="rv-text">${escapeHtml(it.text)}</div></div>`).join("") : `<div class="empty">暂无记录，写下第一条复盘 ✍️</div>`}</div>
+      </div>
+    </section>`;
   }).join("");
+  return html;
 }
 
 /* —— 周期详情页 —— */
@@ -735,7 +828,7 @@ function renderCycle(id){
   }).join("");
 
   return `
-    <button class="topback" onclick="setView('home')">← 返回首页总览</button>
+    <div class="menu-title"><h2>${cyc.name}</h2><p>核心使命：${cyc.mission} · ${cyc.desc}</p></div>
     <div class="vision-banner glass-card" style="margin-bottom:14px;">
       <div class="vb-tag">🌹 核心使命 · ${cyc.mission}</div>
       <div class="vb-text" style="font-size:14px;">${cyc.name}｜${cyc.mission}：${escapeHtml(cyc.desc)}</div>
@@ -785,17 +878,14 @@ function setGoalPct(gid, val){
   refreshCycleProgress();
 }
 function refreshCycleProgress(){
-  if(currentView==="home") return;
   const det = CYCLE_DETAIL[currentView]; if(!det) return;
   const g = getGoals();
   const pcts = det.results.map((_,i)=>{ const o=g[`${currentView}-r${i}`]; return o?o.pct:0; });
   const overall = pcts.length? Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length):0;
   const bar = document.querySelector(".bar-wrap > span");
-  const lbl = document.querySelector(".bar-label");
-  if(bar) bar.style.width = overall+"%";
   const sub = document.querySelector(".track-head .track-sub");
+  if(bar) bar.style.width = overall+"%";
   if(sub) sub.textContent = overall+"%";
-  if(lbl) lbl.textContent = "基于「结果目标」完成度自动计算";
 }
 function toggleHabit(hid, el){
   const h = getHabits(); const d = todayStr();
@@ -826,16 +916,15 @@ function enterApp(){
   try{ sessionStorage.setItem("pgw_splash_seen","1"); }catch(e){}
 }
 function initTitle(){
-  const t = storeGet(APP_TITLE_KEY, "个人成长全景工作台");
+  const t = storeGet(APP_TITLE_KEY, "星球环游记");
+  pageTitle = t;
   const el = document.getElementById("appTitle");
   el.textContent = t;
-  el.addEventListener("input", ()=>{ storeSet(APP_TITLE_KEY, el.textContent.trim()||"个人成长全景工作台"); });
-  el.addEventListener("blur", ()=>{ if(!el.textContent.trim()){ el.textContent="个人成长全景工作台"; } });
-}
-function initDate(){
-  const d = new Date();
-  const wk = ["日","一","二","三","四","五","六"][d.getDay()];
-  document.getElementById("ahDate").textContent = `${d.getMonth()+1}月${d.getDate()}日 周${wk}`;
+  el.addEventListener("input", ()=>{
+    const val = el.textContent.trim() || "星球环游记";
+    pageTitle = val; storeSet(APP_TITLE_KEY, val);
+  });
+  el.addEventListener("blur", ()=>{ if(!el.textContent.trim()){ el.textContent="星球环游记"; pageTitle="星球环游记"; storeSet(APP_TITLE_KEY, "星球环游记"); } });
 }
 function makePetals(){
   const box = document.getElementById("petals");
@@ -850,8 +939,8 @@ function makePetals(){
   }
 }
 function init(){
-  initTitle(); initDate(); makePetals();
-  renderNav(); render();
+  initTitle(); makePetals();
+  updateHeader(); render();
   let seen = false; try{ seen = sessionStorage.getItem("pgw_splash_seen")==="1"; }catch(e){}
   if(seen) document.getElementById("splash").classList.add("hidden");
   if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
