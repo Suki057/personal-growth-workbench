@@ -700,22 +700,19 @@
   /* ============ 类目 + 模块注册表（对标市面 App） ============ */
   const CATS_DEFAULT = [
     { id: "home",   icon: "🏠", label: "首页",       leaf: true },
-    { id: "okr",    icon: "🎯", label: "目标OKR", open: true, horizons: ["今年","近三年","近五年","近十年"] },
+    { id: "okr",    icon: "🎯", label: "目标OKR", open: true, horizons: ["2026年","2027年","2028年","2029年"] },
     { id: "todo",   icon: "✅", label: "待办事项", leaf: true },
     { id: "money",  icon: "💰", label: "赚钱方式",  subs: ["fulltime","side"] },
     { id: "account",icon: "📱", label: "账号运营",  subs: ["acc_edit","acc_sell","acc_video"] }
   ];
   let CATS = storeGet("wb_cats", CATS_DEFAULT);
-  // 迁移：OKR 子类目统一为 今年 / 近三年 / 近五年 / 近十年（旧版只有3项或无近十年则升级）
+  // 迁移：OKR 子类目统一为 2026年 / 2027年 / 2028年 / 2029年
   (function () {
     const okr = CATS.find(c => c.id === "okr");
-    const canonical = ["今年", "近三年", "近五年", "近十年"];
+    const canonical = ["2026年", "2027年", "2028年", "2029年"];
     if (okr) {
-      const cur = Array.isArray(okr.horizons) ? okr.horizons : [];
-      if (!cur.some(h => (h || "").indexOf("近十年") >= 0)) {
-        okr.horizons = canonical;
-        storeSet("wb_cats", CATS);
-      }
+      okr.horizons = canonical;
+      storeSet("wb_cats", CATS);
     }
   })();
   (function () {
@@ -2251,7 +2248,7 @@
     const data = storeGet("wb_okr", []);
     const list = horizon ? data.filter(o => o.horizon === horizon) : data;
     const okrCat = CATS.find(c => c.id === "okr");
-    const horOpts = (okrCat && Array.isArray(okrCat.horizons) && okrCat.horizons.length) ? okrCat.horizons : ["今年", "近三年", "近五年", "近十年"];
+    const horOpts = (okrCat && Array.isArray(okrCat.horizons) && okrCat.horizons.length) ? okrCat.horizons : ["2026年", "2027年", "2028年", "2029年"];
     const cards = list.length ? list.map(o => {
       const avg = o.krs.length ? Math.round(o.krs.reduce((s, k) => s + (k.p||0), 0) / o.krs.length) : (o._manualPct || (o.logs && o.logs.length ? o.logs[o.logs.length - 1].pct : 0));
       return `<div class="okr-card" data-oid="${o.id}">
