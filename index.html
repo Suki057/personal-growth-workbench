@@ -134,8 +134,19 @@
   }
   .ah-title {
     font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: var(--text-on-dark);
-    outline: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 46vw;
+    outline: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 38vw;
     text-shadow: 0 0 12px rgba(246,215,138,0.35);
+    cursor: pointer; user-select: none;
+  }
+  .ah-title[contenteditable="true"] {
+    cursor: text; user-select: text; -webkit-user-select: text;
+    border-bottom: 1.5px dashed var(--gold); padding-bottom: 1px; max-width: 52vw;
+  }
+  .ah-confirm {
+    display:none; align-items:center; font-size:13px; font-weight:800; color:#1c2350;
+    background: linear-gradient(135deg, var(--gold), #f0a8c0);
+    border:none; border-radius:10px; padding:6px 14px; cursor:pointer; white-space:nowrap;
+    box-shadow: 0 4px 14px rgba(232,169,110,0.35);
   }
   .ah-home {
     font-size:20px; cursor:pointer; padding:6px; border-radius:10px;
@@ -406,7 +417,7 @@
 <!-- 开屏页 · 图2 封面 -->
 <div class="splash" id="splash">
   <div class="splash-title">
-    <h1>星球环游记</h1>
+    <h1 id="splashTitle">Suki🌍工作星球</h1>
     <svg class="st-swoosh" viewBox="0 0 180 14" preserveAspectRatio="none">
       <path d="M0 10 Q45 0, 90 7 T180 10" fill="none" stroke="url(#swooshGrad)" stroke-width="3" stroke-linecap="round"/>
       <defs><linearGradient id="swooshGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f6d78a"/><stop offset="50%" stop-color="#f0a8c0"/><stop offset="100%" stop-color="#c4a8e0"/></linearGradient></defs>
@@ -465,7 +476,8 @@
 <header class="app-header" id="appHeader">
   <div class="ah-left">
     <button class="ah-back" id="ahBack" style="display:none;" onclick="goBack()">← 返回</button>
-    <h1 class="ah-title" id="appTitle" contenteditable="true" spellcheck="false">星球环游记</h1>
+    <h1 class="ah-title" id="appTitle" spellcheck="false" title="双击修改名称" ondblclick="startEditTitle()">Suki🌍工作星球</h1>
+    <button class="ah-confirm" id="ahConfirm" onclick="confirmTitle()">确认</button>
   </div>
   <div class="ah-home" id="ahHome" style="display:none;" onclick="goHome()" title="返回首页">🏠</div>
 </header>
@@ -475,6 +487,7 @@
 <script>
 /* ===================== 数据 ===================== */
 const APP_TITLE_KEY = "pgw_title";
+const DEFAULT_TITLE = "Suki🌍工作星球";
 const VISION = "通过事业+新媒体实现高收入，5年达成税后百万年收入、掌握金融投资、完成房车置业；持续深耕身材、阅读输出、双语能力；孝顺家人、生活自律有序；人际随缘，挚友互助、爱情顺其自然，拥有富足、自由、可控的人生。";
 
 const NORTH_STAR = [
@@ -605,7 +618,7 @@ function getReviews(){ return storeGet("pgw_reviews", []); }
 /* ===================== 状态 / 渲染 ===================== */
 let currentView = "home-map";
 let viewStack = ["home-map"];
-let pageTitle = "星球环游记";
+let pageTitle = DEFAULT_TITLE;
 
 function navigateTo(view, push=true){
   if(push) viewStack.push(view); else viewStack[viewStack.length-1] = view;
@@ -632,17 +645,19 @@ function updateHeader(){
   if(currentView === "home-map"){
     backBtn.style.display = "none";
     homeBtn.style.display = "none";
-    pageTitle = "星球环游记";
+    pageTitle = DEFAULT_TITLE;
   } else {
     backBtn.style.display = "inline-flex";
     homeBtn.style.display = "inline-flex";
     pageTitle = viewTitle(currentView);
   }
-  titleEl.textContent = pageTitle;
+  if(titleEl.getAttribute("contenteditable") !== "true"){
+    titleEl.textContent = pageTitle;
+  }
 }
 
 function viewTitle(v){
-  if(v === "home-map") return "星球环游记";
+  if(v === "home-map") return DEFAULT_TITLE;
   if(v === "north") return "人生北极星";
   if(v === "cycles") return "四大时间周期";
   if(v === "dims") return "五大成长维度";
@@ -650,7 +665,7 @@ function viewTitle(v){
   if(v === "reviews") return "复盘迭代体系";
   const cyc = CYCLES.find(c=>c.id===v);
   if(cyc) return cyc.name + " · " + cyc.mission;
-  return "星球环游记";
+  return DEFAULT_TITLE;
 }
 
 function render(){
@@ -916,15 +931,36 @@ function enterApp(){
   try{ sessionStorage.setItem("pgw_splash_seen","1"); }catch(e){}
 }
 function initTitle(){
-  const t = storeGet(APP_TITLE_KEY, "星球环游记");
+  const t = storeGet(APP_TITLE_KEY, DEFAULT_TITLE);
   pageTitle = t;
   const el = document.getElementById("appTitle");
   el.textContent = t;
-  el.addEventListener("input", ()=>{
-    const val = el.textContent.trim() || "星球环游记";
-    pageTitle = val; storeSet(APP_TITLE_KEY, val);
-  });
-  el.addEventListener("blur", ()=>{ if(!el.textContent.trim()){ el.textContent="星球环游记"; pageTitle="星球环游记"; storeSet(APP_TITLE_KEY, "星球环游记"); } });
+  const sp = document.getElementById("splashTitle");
+  if(sp) sp.textContent = t;
+}
+function startEditTitle(){
+  const el = document.getElementById("appTitle");
+  const btn = document.getElementById("ahConfirm");
+  if(!el) return;
+  el.setAttribute("contenteditable","true");
+  el.focus();
+  const r = document.createRange(); r.selectNodeContents(el);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  if(btn) btn.style.display = "inline-flex";
+}
+function confirmTitle(){
+  const el = document.getElementById("appTitle");
+  const btn = document.getElementById("ahConfirm");
+  if(!el) return;
+  let val = el.textContent.trim();
+  if(!val) val = DEFAULT_TITLE;
+  pageTitle = val;
+  storeSet(APP_TITLE_KEY, val);
+  el.textContent = val;
+  el.setAttribute("contenteditable","false");
+  if(btn) btn.style.display = "none";
+  const sp = document.getElementById("splashTitle");
+  if(sp) sp.textContent = val;
 }
 function makePetals(){
   const box = document.getElementById("petals");
