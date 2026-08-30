@@ -321,7 +321,13 @@
   .splash-title h1 {
     color:#fff; font-size:36px; font-weight:900; letter-spacing:0.06em;
     text-shadow: 0 0 12px rgba(255,255,255,0.55), 0 0 34px rgba(246,215,138,0.55), 0 0 70px rgba(240,168,192,0.35);
+    cursor:pointer; user-select:none;
   }
+  .splash-title h1[contenteditable="true"] {
+    cursor:text; user-select:text; -webkit-user-select:text; outline:none;
+    border-bottom:2px dashed var(--gold); padding-bottom:3px;
+  }
+  .splash-confirm { margin-top:16px; }
   .splash-title .st-swoosh {
     position:absolute; bottom:-10px; left:50%; transform:translateX(-50%);
     width:180px; height:14px;
@@ -417,7 +423,8 @@
 <!-- 开屏页 · 图2 封面 -->
 <div class="splash" id="splash">
   <div class="splash-title">
-    <h1 id="splashTitle">Suki🌍工作星球</h1>
+    <h1 id="splashTitle" spellcheck="false" title="双击修改名称" ondblclick="startEditSplash()">Suki🌍工作星球</h1>
+    <button class="ah-confirm splash-confirm" id="splashConfirm" onclick="confirmSplash()">确认</button>
     <svg class="st-swoosh" viewBox="0 0 180 14" preserveAspectRatio="none">
       <path d="M0 10 Q45 0, 90 7 T180 10" fill="none" stroke="url(#swooshGrad)" stroke-width="3" stroke-linecap="round"/>
       <defs><linearGradient id="swooshGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f6d78a"/><stop offset="50%" stop-color="#f0a8c0"/><stop offset="100%" stop-color="#c4a8e0"/></linearGradient></defs>
@@ -476,8 +483,8 @@
 <header class="app-header" id="appHeader">
   <div class="ah-left">
     <button class="ah-back" id="ahBack" style="display:none;" onclick="goBack()">← 返回</button>
-    <h1 class="ah-title" id="appTitle" spellcheck="false" title="双击修改名称" ondblclick="startEditTitle()">Suki🌍工作星球</h1>
-    <button class="ah-confirm" id="ahConfirm" onclick="confirmTitle()">确认</button>
+    <h1 class="ah-title" id="appTitle" spellcheck="false" title="双击修改名称" ondblclick="startEditTitle('appTitle','ahConfirm')">Suki🌍工作星球</h1>
+    <button class="ah-confirm" id="ahConfirm" onclick="confirmTitle('appTitle')">确认</button>
   </div>
   <div class="ah-home" id="ahHome" style="display:none;" onclick="goHome()" title="返回首页">🏠</div>
 </header>
@@ -938,9 +945,9 @@ function initTitle(){
   const sp = document.getElementById("splashTitle");
   if(sp) sp.textContent = t;
 }
-function startEditTitle(){
-  const el = document.getElementById("appTitle");
-  const btn = document.getElementById("ahConfirm");
+function startEditTitle(elId, btnId){
+  const el = document.getElementById(elId);
+  const btn = document.getElementById(btnId);
   if(!el) return;
   el.setAttribute("contenteditable","true");
   el.focus();
@@ -948,20 +955,24 @@ function startEditTitle(){
   const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
   if(btn) btn.style.display = "inline-flex";
 }
-function confirmTitle(){
-  const el = document.getElementById("appTitle");
-  const btn = document.getElementById("ahConfirm");
-  if(!el) return;
-  let val = el.textContent.trim();
-  if(!val) val = DEFAULT_TITLE;
+function syncTitle(val){
   pageTitle = val;
   storeSet(APP_TITLE_KEY, val);
-  el.textContent = val;
-  el.setAttribute("contenteditable","false");
-  if(btn) btn.style.display = "none";
-  const sp = document.getElementById("splashTitle");
-  if(sp) sp.textContent = val;
+  const a = document.getElementById("appTitle");
+  const s = document.getElementById("splashTitle");
+  if(a){ a.textContent = val; a.setAttribute("contenteditable","false"); }
+  if(s){ s.textContent = val; s.setAttribute("contenteditable","false"); }
+  const c1 = document.getElementById("ahConfirm"); if(c1) c1.style.display = "none";
+  const c2 = document.getElementById("splashConfirm"); if(c2) c2.style.display = "none";
 }
+function confirmTitle(elId){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  let val = el.textContent.trim() || DEFAULT_TITLE;
+  syncTitle(val);
+}
+function startEditSplash(){ startEditTitle("splashTitle","splashConfirm"); }
+function confirmSplash(){ confirmTitle("splashTitle"); }
 function makePetals(){
   const box = document.getElementById("petals");
   if(!box) return;
