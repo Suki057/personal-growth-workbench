@@ -332,14 +332,26 @@
     position:absolute; bottom:-10px; left:50%; transform:translateX(-50%);
     width:180px; height:14px;
   }
-  .splash-illustration { flex:1; display:flex; align-items:center; justify-content:center; width:100%; position:relative; }
-  .splash-illustration svg { width: min(320px, 78vw); height: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.35)); }
-  .splash-bottom { padding: 0 28px calc(34px + env(safe-area-inset-bottom)); }
+  .splash-body { width:100%; padding:0 26px; display:flex; flex-direction:column; gap:16px; margin-top:18px; margin-bottom:18px; }
+  .splash-box {
+    width:100%; border-radius:20px; border:1.5px solid rgba(240,168,192,0.65);
+    background: rgba(255,255,255,0.05); box-shadow: inset 0 0 24px rgba(240,168,192,0.08), 0 6px 22px rgba(0,0,0,0.18);
+    position:relative; overflow:hidden;
+  }
+  .splash-box.top { height: clamp(240px, 42vh, 360px); display:flex; align-items:center; justify-content:center; }
+  .splash-box.bottom { padding:22px 24px 24px; text-align:center; }
+  .splash-illustration { width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  .splash-illustration svg { width: min(300px, 78vw); height: auto; filter: drop-shadow(0 10px 30px rgba(0,0,0,0.35)); }
+  .splash-bottom { padding: 0 28px calc(28px + env(safe-area-inset-bottom)); }
   .splash .sp-sub { color: var(--gold); font-size:14px; font-weight:700; margin-bottom:6px; }
-  .splash .sp-quote { color: var(--text-muted); font-size:12.5px; line-height:1.65; margin-bottom:20px; max-width:300px; }
+  .splash .sp-quote { color: var(--text-muted); font-size:12.5px; line-height:1.65; margin-bottom:18px; max-width:300px; margin-left:auto; margin-right:auto; }
   .splash .sp-enter {
     border:none; border-radius:999px; padding:14px 52px; font-size:15px; font-weight:800; color:#5a3d1f;
     background: linear-gradient(180deg,#ffe7b3,#f5c977); box-shadow: 0 8px 28px rgba(245,201,119,0.5); cursor:pointer;
+  }
+  @media (max-height: 720px){
+    .splash-box.top { height: clamp(210px, 38vh, 300px); }
+    .splash-box.bottom { padding:18px 22px 20px; }
   }
 
   /* 详情页面板 */
@@ -431,51 +443,56 @@
     </svg>
   </div>
 
-  <div class="splash-illustration">
-    <svg viewBox="0 0 300 260" aria-hidden="true">
-      <defs>
-        <radialGradient id="sSun" cx="50%" cy="50%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="50%" stop-color="#E8A96E"/><stop offset="100%" stop-color="rgba(232,169,110,0)"/></radialGradient>
-        <radialGradient id="sPlanet" cx="35%" cy="30%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="60%" stop-color="#E8C98A"/><stop offset="100%" stop-color="#c79a5e"/></radialGradient>
-        <radialGradient id="rosePlanet" cx="40%" cy="35%"><stop offset="0%" stop-color="#ffd4e0"/><stop offset="55%" stop-color="#e86b6b"/><stop offset="100%" stop-color="#a83c3c"/></radialGradient>
-      </defs>
-      <!-- 落日 -->
-      <circle cx="230" cy="55" r="32" fill="url(#sSun)" opacity="0.9"/>
-      <!-- 散星 -->
-      <circle cx="35" cy="35" r="1.8" fill="#fff"/><circle cx="80" cy="22" r="2" fill="#f6e7b0"/>
-      <circle cx="150" cy="18" r="1.6" fill="#fff"/><circle cx="270" cy="105" r="1.8" fill="#f6e7b0"/>
-      <circle cx="25" cy="115" r="1.5" fill="#fff"/><circle cx="260" cy="185" r="1.7" fill="#f6e7b0"/>
-      <circle cx="200" cy="210" r="1.5" fill="#fff"/><circle cx="60" cy="205" r="2" fill="#f6e7b0"/>
-      <!-- 小王子的玫瑰星球 -->
-      <ellipse cx="150" cy="208" rx="82" ry="16" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.4" transform="rotate(-6 150 208)"/>
-      <path d="M85 175 Q105 145 130 160 Q155 145 170 170 Q180 195 150 205 Q115 198 85 175" fill="url(#rosePlanet)"/>
-      <path d="M95 168 Q110 155 125 170 Q140 155 148 175 Q155 192 125 198 Q95 190 95 168" fill="#f59090" opacity="0.6"/>
-      <!-- 小王子 -->
-      <g transform="translate(108,108)" fill="#fff6e0">
-        <circle cx="18" cy="14" r="12"/>
-        <path d="M6 58 Q18 28 30 58 Z"/>
-        <rect x="14" y="28" width="8" height="26" rx="4"/>
-        <path d="M14 40 L-2 32 M22 40 L38 30" stroke="#fff6e0" stroke-width="3.2" stroke-linecap="round" fill="none"/>
-        <path d="M15 52 L2 70 M21 52 L34 70" stroke="#fff6e0" stroke-width="3.6" stroke-linecap="round" fill="none"/>
-      </g>
-      <path d="M126 165 L126 130" stroke="#8FB0CB" stroke-width="2.4" fill="none"/>
-      <circle cx="126" cy="124" r="7" fill="#f0a8c0"/>
-      <circle cx="120" cy="130" r="4.5" fill="#e089a8"/><circle cx="132" cy="130" r="4.5" fill="#e089a8"/>
-      <!-- 月亮 -->
-      <path d="M252 145 A26 26 0 1 1 248 195 A21 21 0 1 0 252 145" fill="#fff6e0" opacity="0.85"/>
-      <!-- 玻璃罩玫瑰 -->
-      <ellipse cx="258" cy="184" rx="12" ry="4" fill="rgba(246,215,138,0.2)"/>
-      <path d="M258 180 L258 162" stroke="#8FB0CB" stroke-width="1.5" fill="none"/>
-      <circle cx="258" cy="158" r="4" fill="#f0a8c0"/>
-      <path d="M245 152 Q258 142 271 152 Q271 176 258 184 Q245 176 245 152" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
-      <!-- 小行星带 -->
-      <circle cx="55" cy="140" r="10" fill="url(#sPlanet)" opacity="0.9"/>
-      <ellipse cx="55" cy="140" rx="14" ry="3.5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.9" transform="rotate(20 55 140)"/>
-    </svg>
+  <div class="splash-body">
+    <div class="splash-box top">
+      <div class="splash-illustration">
+        <svg viewBox="0 0 300 260" aria-hidden="true">
+          <defs>
+            <radialGradient id="sSun" cx="50%" cy="50%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="50%" stop-color="#E8A96E"/><stop offset="100%" stop-color="rgba(232,169,110,0)"/></radialGradient>
+            <radialGradient id="sPlanet" cx="35%" cy="30%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="60%" stop-color="#E8C98A"/><stop offset="100%" stop-color="#c79a5e"/></radialGradient>
+            <radialGradient id="rosePlanet" cx="40%" cy="35%"><stop offset="0%" stop-color="#ffd4e0"/><stop offset="55%" stop-color="#e86b6b"/><stop offset="100%" stop-color="#a83c3c"/></radialGradient>
+          </defs>
+          <!-- 落日 -->
+          <circle cx="230" cy="55" r="32" fill="url(#sSun)" opacity="0.9"/>
+          <!-- 散星 -->
+          <circle cx="35" cy="35" r="1.8" fill="#fff"/><circle cx="80" cy="22" r="2" fill="#f6e7b0"/>
+          <circle cx="150" cy="18" r="1.6" fill="#fff"/><circle cx="270" cy="105" r="1.8" fill="#f6e7b0"/>
+          <circle cx="25" cy="115" r="1.5" fill="#fff"/><circle cx="260" cy="185" r="1.7" fill="#f6e7b0"/>
+          <circle cx="200" cy="210" r="1.5" fill="#fff"/><circle cx="60" cy="205" r="2" fill="#f6e7b0"/>
+          <!-- 小王子的玫瑰星球 -->
+          <ellipse cx="150" cy="208" rx="82" ry="16" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.4" transform="rotate(-6 150 208)"/>
+          <path d="M85 175 Q105 145 130 160 Q155 145 170 170 Q180 195 150 205 Q115 198 85 175" fill="url(#rosePlanet)"/>
+          <path d="M95 168 Q110 155 125 170 Q140 155 148 175 Q155 192 125 198 Q95 190 95 168" fill="#f59090" opacity="0.6"/>
+          <!-- 小王子 -->
+          <g transform="translate(108,108)" fill="#fff6e0">
+            <circle cx="18" cy="14" r="12"/>
+            <path d="M6 58 Q18 28 30 58 Z"/>
+            <rect x="14" y="28" width="8" height="26" rx="4"/>
+            <path d="M14 40 L-2 32 M22 40 L38 30" stroke="#fff6e0" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+            <path d="M15 52 L2 70 M21 52 L34 70" stroke="#fff6e0" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+          </g>
+          <path d="M126 165 L126 130" stroke="#8FB0CB" stroke-width="2.4" fill="none"/>
+          <circle cx="126" cy="124" r="7" fill="#f0a8c0"/>
+          <circle cx="120" cy="130" r="4.5" fill="#e089a8"/><circle cx="132" cy="130" r="4.5" fill="#e089a8"/>
+          <!-- 月亮 -->
+          <path d="M252 145 A26 26 0 1 1 248 195 A21 21 0 1 0 252 145" fill="#fff6e0" opacity="0.85"/>
+          <!-- 玻璃罩玫瑰 -->
+          <ellipse cx="258" cy="184" rx="12" ry="4" fill="rgba(246,215,138,0.2)"/>
+          <path d="M258 180 L258 162" stroke="#8FB0CB" stroke-width="1.5" fill="none"/>
+          <circle cx="258" cy="158" r="4" fill="#f0a8c0"/>
+          <path d="M245 152 Q258 142 271 152 Q271 176 258 184 Q245 176 245 152" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
+          <!-- 小行星带 -->
+          <circle cx="55" cy="140" r="10" fill="url(#sPlanet)" opacity="0.9"/>
+          <ellipse cx="55" cy="140" rx="14" ry="3.5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.9" transform="rotate(20 55 140)"/>
+        </svg>
+      </div>
+    </div>
+    <div class="splash-box bottom">
+      <div class="sp-quote">点击开启梦幻之旅<br/>所有目标与行动，终将抵达你的星球</div>
+    </div>
   </div>
 
   <div class="splash-bottom">
-    <div class="sp-sub">你想跟小王子一起星际旅行吗？</div>
-    <div class="sp-quote">点击开启梦幻之旅<br/>所有目标与行动，终将抵达你的星球</div>
     <button class="sp-enter" onclick="enterApp()">✨ 点击开启</button>
   </div>
 </div>
