@@ -302,7 +302,7 @@
   .btn-gold { color:#5a3d1f; background: linear-gradient(180deg,#ffe7b3,#f5c977); box-shadow: 0 6px 16px rgba(245,201,119,0.35); }
   .btn-ghost { color: var(--text-on-dark); background: rgba(255,255,255,0.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14); }
   .rv-list { margin-top:10px; display:flex; flex-direction:column; gap:8px; }
-  .rv-item { background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); border-radius:10px; padding:9px 11px; position:relative; }
+  .rv-item { background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); border-radius:10px; padding:11px 42px 11px 12px; position:relative; }
   .rv-item .rv-date { font-size:11px; color:var(--text-muted); font-weight:700; margin-bottom:3px; }
   .rv-item .rv-text { font-size:13px; line-height:1.55; color:var(--text-on-dark); white-space:pre-wrap; word-break:break-word; }
   .rv-del { position:absolute; top:7px; right:8px; border:none; background:transparent; color:var(--rose); font-size:13px; cursor:pointer; }
@@ -377,6 +377,35 @@
   .menu-title { text-align:center; margin:8px 0 18px; }
   .menu-title h2 { font-size:22px; font-weight:800; color:#fff; text-shadow:0 0 12px rgba(246,215,138,0.35); }
   .menu-title p { font-size:12.5px; color:var(--text-muted); margin-top:6px; }
+/* 成长时间 · 左滑删除 */
+.cycle-list{ display:flex; flex-direction:column; }
+.cycle-row{ position:relative; overflow:hidden; margin-bottom:12px; border-radius:14px; }
+.cycle-card{ transition:transform .2s ease; touch-action:pan-y; cursor:pointer; }
+.cycle-row.open .cycle-card{ transform:translateX(-76px); }
+.cycle-del{ position:absolute; right:0; top:0; bottom:0; width:76px; border:none; background:linear-gradient(135deg,#c0506a,#a83f57); color:#fff; font-size:14px; font-weight:700; border-radius:0 14px 14px 0; display:flex; align-items:center; justify-content:center; }
+.cycle-del:active{ filter:brightness(.9); }
+.cycle-add-form{ background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:14px; margin:6px 0 14px; display:flex; flex-direction:column; gap:10px; }
+.cycle-add-form input, .cycle-add-form textarea{ width:100%; box-sizing:border-box; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:var(--text-on-dark); padding:10px 12px; font-size:14px; font-family:inherit; }
+.cycle-add-form textarea{ resize:vertical; }
+.add-cycle-btn, .trash-entry{ width:100%; margin-top:4px; padding:12px; border-radius:12px; border:1px dashed rgba(246,215,138,0.5); background:transparent; color:var(--gold); font-size:14px; font-weight:700; cursor:pointer; }
+.trash-entry{ border-style:solid; border-color:rgba(255,255,255,0.14); color:var(--text-muted); margin-top:10px; }
+.row-btns{ display:flex; gap:10px; }
+.row-btns .btn{ flex:1; }
+/* 事项内删除 / 添加 */
+.item-del{ margin-left:auto; border:none; background:transparent; color:var(--rose); font-size:14px; cursor:pointer; opacity:.65; padding:2px 4px; }
+.item-del:active{ opacity:1; }
+.panel-add{ border:none; background:rgba(246,215,138,0.16); color:var(--gold); border-radius:8px; padding:3px 10px; font-size:12px; font-weight:700; cursor:pointer; margin-left:4px; }
+.cyc-confirm{ border:none; background:rgba(246,215,138,0.9); color:#3a2a12; border-radius:8px; padding:4px 12px; font-size:12px; font-weight:700; cursor:pointer; margin-left:8px; }
+.goal-main, .li{ display:flex; align-items:flex-start; gap:8px; flex-wrap:wrap; }
+.li-text, .goal-text{ flex:1; min-width:0; }
+/* 回收站 */
+.trash-list{ display:flex; flex-direction:column; gap:12px; }
+.trash-item{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; }
+.ti-name{ font-size:15px; font-weight:700; color:var(--text-on-dark); }
+.ti-sub{ font-size:12px; color:var(--text-muted); margin-top:3px; }
+.ti-btns{ display:flex; gap:8px; flex-shrink:0; }
+.btn-danger{ background:linear-gradient(135deg,#c0506a,#a83f57); color:#fff; border:none; border-radius:10px; padding:7px 12px; font-size:13px; font-weight:700; cursor:pointer; }
+.btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,0.2); color:var(--text-muted); border-radius:10px; padding:7px 12px; font-size:13px; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -635,7 +664,7 @@ const CYCLE_DETAIL = {
 
 const SCENES = [
   { id:"north", emoji:"🌟", tone:"gold", title:"人生北极星", sub:"5年终极愿景" },
-  { id:"cycles", emoji:"🪐", tone:"lavender", title:"四大时间周期", sub:"层层递进 · 闭环迭代" },
+  { id:"cycles", emoji:"🪐", tone:"lavender", title:"成长时间", sub:"层层递进 · 闭环迭代" },
   { id:"dims", emoji:"🧭", tone:"rose", title:"五大成长维度", sub:"终身固定 · 全赛道归类" },
   { id:"habits", emoji:"🌱", tone:"cyan", title:"每日深耕复利", sub:"长期复利 · 每日执行" },
   { id:"reviews", emoji:"🔄", tone:"earth", title:"复盘迭代体系", sub:"周 / 月 / 年 三级校准" },
@@ -651,6 +680,26 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<
 function getGoals(){ return storeGet("pgw_goals", {}); }
 function getHabits(){ return storeGet("pgw_habits", {}); }
 function getReviews(){ return storeGet("pgw_reviews", []); }
+
+/* —— 成长时间 · 自定义周期 / 回收站 / 事项 / 标题 —— */
+function getCustomCycles(){ return storeGet("pgw_cycles_custom", []); }
+function getTrash(){ return storeGet("pgw_cycle_trash", []); }
+function getCycles(){
+  const trashed = getTrash().filter(t=>!t.custom).map(t=>t.id);
+  return CYCLES.filter(c=>!trashed.includes(c.id)).concat(getCustomCycles());
+}
+function getCycle(id){ return getCycles().find(c=>c.id===id); }
+function getCycleMetaStore(){ return storeGet("pgw_cycle_meta", {}); }
+function getCycleMeta(id){ return getCycleMetaStore()[id] || {}; }
+function setCycleMeta(id, m){ const s=getCycleMetaStore(); s[id]=Object.assign({}, s[id]||{}, m); storeSet("pgw_cycle_meta", s); }
+function getItemsStore(){ return storeGet("pgw_cycle_items", {}); }
+function getCycleItems(id){ return getItemsStore()[id] || { results:[], deeps:[] }; }
+function setCycleItems(id, obj){ const s=getItemsStore(); s[id]=obj; storeSet("pgw_cycle_items", s); }
+function cleanupTrash(){
+  const now=Date.now(); const t=getTrash(); const before=t.length;
+  const kept=t.filter(x=> (now-(x.deletedAt||0)) < 7*86400000 );
+  if(kept.length!==before) storeSet("pgw_cycle_trash", kept);
+}
 
 /* ===================== 状态 / 渲染 ===================== */
 let currentView = "home-map";
@@ -696,12 +745,13 @@ function updateHeader(){
 function viewTitle(v){
   if(v === "home-map") return DEFAULT_TITLE;
   if(v === "north") return "人生北极星";
-  if(v === "cycles") return "四大时间周期";
+  if(v === "cycles") return "成长时间";
   if(v === "dims") return "五大成长维度";
   if(v === "habits") return "每日深耕复利";
   if(v === "reviews") return "复盘迭代体系";
-  const cyc = CYCLES.find(c=>c.id===v);
-  if(cyc) return cyc.name + " · " + cyc.mission;
+  if(v === "cycle-trash") return "回收站";
+  const cyc = getCycle(v);
+  if(cyc) return cyc.name + (cyc.mission ? " · " + cyc.mission : "");
   return DEFAULT_TITLE;
 }
 
@@ -713,6 +763,7 @@ function render(){
   else if(currentView === "dims") c.innerHTML = renderDimsPage();
   else if(currentView === "habits") c.innerHTML = renderHabitsPage();
   else if(currentView === "reviews") c.innerHTML = renderReviewsPage();
+  else if(currentView === "cycle-trash") c.innerHTML = renderTrashPage();
   else c.innerHTML = renderCycle(currentView);
 }
 
@@ -773,17 +824,37 @@ function renderNorthPage(){
       </div>`).join("") + `</div>`;
 }
 
-/* —— 四大时间周期 · 子菜单页 —— */
+/* —— 成长时间 · 列表页 —— */
 function renderCyclesMenuPage(){
-  return `
-    <div class="menu-title"><h2>四大时间周期</h2><p>选择星球 · 进入双轨详情页</p></div>
-    <div class="cycle-grid">` + CYCLES.map(c => `
-      <div class="glass-card cycle-card" onclick="navigateTo('${c.id}')">
-        <div class="cc-name">${c.name}</div>
-        <span class="cc-mission">${c.mission}</span>
-        <div class="cc-desc">${escapeHtml(c.desc)}</div>
+  const cycles = getCycles();
+  const cards = cycles.map(c => `
+    <div class="cycle-row" data-id="${c.id}">
+      <div class="cycle-card glass-card"
+        ontouchstart="cycTouchStart(event,'${c.id}')"
+        ontouchmove="cycTouchMove(event,'${c.id}')"
+        ontouchend="cycTouchEnd(event,'${c.id}')"
+        onclick="cycClick(event)">
+        <div class="cc-name">${escapeHtml(c.name)}</div>
+        ${c.mission ? `<span class="cc-mission">${escapeHtml(c.mission)}</span>` : ""}
+        <div class="cc-desc">${escapeHtml(c.desc||"")}</div>
         <div class="cc-go">查看双轨详情 →</div>
-      </div>`).join("") + `</div>`;
+      </div>
+      <button class="cycle-del" onclick="deleteCycle('${c.id}')">删除</button>
+    </div>`).join("");
+  return `
+    <div class="menu-title"><h2>成长时间</h2><p>选择阶段 · 进入双轨详情页</p></div>
+    <div class="cycle-list">${cards}</div>
+    <button class="add-cycle-btn" onclick="toggleAddCycle()">＋ 添加成长阶段</button>
+    <div class="cycle-add-form" id="cycAddForm" style="display:none;">
+      <input id="cycAddName" placeholder="阶段名称（如：8年期）" />
+      <textarea id="cycAddDesc" placeholder="愿景说明（这个阶段的重点愿景 / 任务）" rows="3"></textarea>
+      <div class="row-btns">
+        <button class="btn btn-primary" onclick="addCycle()">保存</button>
+        <button class="btn btn-ghost" onclick="toggleAddCycle()">取消</button>
+      </div>
+    </div>
+    <button class="trash-entry" onclick="openTrash()">🗑 回收站（${getTrash().length}）</button>
+  `;
 }
 
 /* —— 五大成长维度页 —— */
@@ -845,24 +916,23 @@ function renderReviewsPage(){
 
 /* —— 周期详情页 —— */
 function renderCycle(id){
-  const cyc = CYCLES.find(c=>c.id===id);
-  const det = CYCLE_DETAIL[id];
+  const cyc = getCycle(id); if(!cyc) return renderCyclesMenuPage();
+  const meta = getCycleMeta(id);
+  const name = meta.name || cyc.name;
+  const mission = (meta.mission !== undefined ? meta.mission : (cyc.mission || ""));
+  const items = getCycleItems(id);
   const goals = getGoals();
-  const habits = getHabits();
-  const today = habits[todayStr()] || {};
-
-  /* 整体进度 */
-  const gids = det.results.map((_,i)=>`${id}-r${i}`);
+  const habits = getHabits(); const today = habits[todayStr()] || {};
+  const gids = items.results.map((_,i)=> id+"-r"+i);
   const pcts = gids.map(g=> (goals[g] && goals[g].pct) ? goals[g].pct : 0);
   const overall = pcts.length ? Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length) : 0;
-
-  const resultsHtml = det.results.map((t,i)=>{
-    const gid = `${id}-r${i}`;
-    const g = goals[gid] || {done:false, pct:0};
+  const resultsHtml = items.results.map((r,i)=>{
+    const gid = id+"-r"+i; const g = goals[gid] || {done:false, pct:0};
     return `<div class="goal ${g.done?'done':''}" id="goal_${gid}">
       <div class="goal-main">
         <button class="chk ${g.done?'on':''}" onclick="toggleGoal('${gid}')"></button>
-        <div class="goal-text">${escapeHtml(t)}</div>
+        <div class="goal-text" ondblclick="editGoalText('${gid}')" title="双击修改">${escapeHtml(r.t)}</div>
+        <button class="item-del" onclick="delResult('${id}',${i})" title="删除">🗑</button>
       </div>
       <div class="goal-prog">
         <input type="range" min="0" max="100" value="${g.pct}" onchange="setGoalPct('${gid}',this.value)" oninput="setGoalPct('${gid}',this.value)">
@@ -870,38 +940,45 @@ function renderCycle(id){
       </div>
     </div>`;
   }).join("");
-
-  const deepsHtml = det.deeps.map((t,i)=>{
-    const hid = `${id}-d${i}`;
-    const on = !!today[hid];
+  const deepsHtml = items.deeps.map((d,i)=>{
+    const hid = id+"-d"+i; const on = !!today[hid];
     return `<div class="li">
       <button class="chk ${on?'on':''}" onclick="toggleHabit('${hid}', this)"></button>
-      <div class="li-text">${escapeHtml(t)}</div>
+      <div class="li-text" ondblclick="editDeepText('${id}',${i})" title="双击修改">${escapeHtml(d.t)}</div>
+      <button class="item-del" onclick="delDeep('${id}',${i})" title="删除">🗑</button>
     </div>`;
   }).join("");
-
+  const emptyR = `<div class="empty">还没有结果目标，点击下方「＋ 添加」开始设定 🎯</div>`;
+  const emptyD = `<div class="empty">还没有深耕坚持事项，点击下方「＋ 添加」设定每日打卡 🌱</div>`;
   return `
-    <div class="menu-title"><h2>${cyc.name}</h2><p>核心使命：${cyc.mission} · ${cyc.desc}</p></div>
+    <div class="menu-title">
+      <h2 id="cycName" title="双击修改阶段名称" ondblclick="editCycleName('${id}')">${escapeHtml(name)}</h2>
+      <button class="cyc-confirm" id="cycNameConfirm" onclick="commitEdit()" style="display:none">保存</button>
+      <p>核心使命：<span id="cycMission" title="双击修改核心使命" ondblclick="editCycleMission('${id}')">${escapeHtml(mission)||'（未设置，双击编辑）'}</span>
+      <button class="cyc-confirm" id="cycMissionConfirm" onclick="commitEdit()" style="display:none">保存</button></p>
+    </div>
     <div class="vision-banner glass-card" style="margin-bottom:14px;">
-      <div class="vb-tag">🌹 核心使命 · ${cyc.mission}</div>
-      <div class="vb-text" style="font-size:14px;">${cyc.name}｜${cyc.mission}：${escapeHtml(cyc.desc)}</div>
+      <div class="vb-tag">🌹 核心使命 · ${escapeHtml(mission)||'待补充'}</div>
+      <div class="vb-text" style="font-size:14px;">${escapeHtml(name)}｜${escapeHtml(mission)||'待补充'}：${escapeHtml(cyc.desc||'')}</div>
     </div>
     <div class="glass-card panel" style="padding:14px 18px 14px 24px;">
       <div class="track-head"><div class="track-title">🎯 阶段总进度</div><div class="track-sub">${overall}%</div></div>
       <div class="bar-wrap"><span style="width:${overall}%"></span></div>
       <div class="bar-label">基于「结果目标」完成度自动计算</div>
     </div>
-    ${panel("🎯 结果目标（可量化落地）", `${det.results.length} 项`, resultsHtml, false)}
-    ${panel("🌱 深耕坚持事项（日常常态化执行）", `${det.deeps.length} 项 · 每日打卡`, deepsHtml, false)}
+    ${panel("🎯 结果目标（可量化落地）", (items.results.length?items.results.length+" 项":"未添加"), resultsHtml || emptyR, false, id, "r")}
+    ${panel("🌱 深耕坚持事项（日常常态化执行）", (items.deeps.length?items.deeps.length+" 项":"未添加"), deepsHtml || emptyD, false, id, "d")}
   `;
 }
 
-function panel(title, sub, body, collapsed){
+function panel(title, sub, body, collapsed, addId, addType){
+  const addBtn = (addId && addType) ? `<button class="panel-add" onclick="event.stopPropagation();add${addType==='r'?'Result':'Deep'}('${addId}')">＋ 添加</button>` : "";
   return `<section class="glass-card panel ${collapsed?'collapsed':''}">
     <div class="panel-h" onclick="toggleCollapse(this)">
       <div class="ph-main"><h2>${title}</h2></div>
       <div style="display:flex;align-items:center;gap:8px;">
         ${sub?`<span class="ph-sub">${sub}</span>`:""}
+        ${addBtn}
         <span class="chev">▾</span>
       </div>
     </div>
@@ -961,6 +1038,149 @@ function delReview(rid){
   list = list.filter(x=>x.id!==rid);
   storeSet("pgw_reviews", list);
   render();
+}
+
+/* ===================== 成长时间 · 交互 ===================== */
+let _cyc = { id:null, x0:0, moved:false, card:null, row:null };
+function cycTouchStart(e, id){
+  const card = e.currentTarget; const row = card.closest(".cycle-row");
+  _cyc = { id, x0:e.touches[0].clientX, moved:false, card, row };
+}
+function cycTouchMove(e, id){
+  if(_cyc.id!==id) return;
+  const dx = e.touches[0].clientX - _cyc.x0;
+  if(Math.abs(dx) > 6) _cyc.moved = true;
+  const tx = Math.max(-76, Math.min(0, dx));
+  _cyc.card.style.transform = "translateX("+tx+"px)";
+}
+function cycTouchEnd(e, id){
+  if(_cyc.id!==id) return;
+  const dx = e.changedTouches[0].clientX - _cyc.x0;
+  const open = dx < -40;
+  _cyc.card.style.transform = open ? "translateX(-76px)" : "translateX(0)";
+  if(open) _cyc.row.classList.add("open"); else _cyc.row.classList.remove("open");
+  _cyc.moved = false;
+}
+function cycClick(e){
+  if(_cyc.moved) return;
+  const row = e.currentTarget.closest(".cycle-row");
+  const id = row.getAttribute("data-id");
+  if(row.classList.contains("open")){ row.classList.remove("open"); e.currentTarget.style.transform = "translateX(0)"; return; }
+  navigateTo(id);
+}
+function toggleAddCycle(){
+  const f = document.getElementById("cycAddForm");
+  if(!f) return;
+  const show = (f.style.display === "none" || !f.style.display);
+  f.style.display = show ? "block" : "none";
+  if(show){ const n = document.getElementById("cycAddName"); if(n) n.focus(); }
+}
+function addCycle(){
+  const name = (document.getElementById("cycAddName").value || "").trim();
+  const desc = (document.getElementById("cycAddDesc").value || "").trim();
+  if(!name){ alert("请输入阶段名称"); return; }
+  const id = "c" + Date.now();
+  const cs = getCustomCycles();
+  cs.push({ id, name, mission:"", desc, custom:true });
+  storeSet("pgw_cycles_custom", cs);
+  render();
+}
+function deleteCycle(id){
+  const cyc = getCycle(id); if(!cyc) return;
+  const cs = getCustomCycles();
+  storeSet("pgw_cycles_custom", cs.filter(x=>x.id!==id));
+  const trash = getTrash();
+  trash.push({ id, name:cyc.name, mission:cyc.mission||"", desc:cyc.desc||"", custom:!!cyc.custom, deletedAt:Date.now() });
+  storeSet("pgw_cycle_trash", trash);
+  render();
+}
+function restoreCycle(id){
+  let trash = getTrash(); const t = trash.find(x=>x.id===id); if(!t) return;
+  if(t.custom){ const cs = getCustomCycles(); if(!cs.find(x=>x.id===id)) cs.push({ id:t.id, name:t.name, mission:t.mission, desc:t.desc, custom:true }); storeSet("pgw_cycles_custom", cs); }
+  storeSet("pgw_cycle_trash", trash.filter(x=>x.id!==id));
+  render();
+}
+function purgeCycle(id){
+  let trash = getTrash(); trash = trash.filter(x=>x.id!==id); storeSet("pgw_cycle_trash", trash);
+  const it = getItemsStore(); delete it[id]; storeSet("pgw_cycle_items", it);
+  const g = getGoals(); Object.keys(g).forEach(k=>{ if(k.indexOf(id+"-")===0) delete g[k]; }); storeSet("pgw_goals", g);
+  render();
+}
+function openTrash(){ cleanupTrash(); navigateTo("cycle-trash"); }
+function renderTrashPage(){
+  const trash = getTrash();
+  let html = `<div class="menu-title"><h2>回收站</h2><p>可恢复 · 7 天后自动永久删除</p></div>`;
+  if(!trash.length){ html += `<div class="empty glass-card">回收站是空的 ✨</div>`; return html; }
+  html += `<div class="trash-list">` + trash.map(t=>{
+    const left = Math.max(0, Math.ceil((7*86400000 - (Date.now()-(t.deletedAt||0)))/86400000));
+    return `<div class="glass-card trash-item">
+      <div class="ti-main">
+        <div class="ti-name">${escapeHtml(t.name)}</div>
+        <div class="ti-sub">${t.custom?"自定义阶段":"固定阶段"} · ${left} 天后永久删除</div>
+      </div>
+      <div class="ti-btns">
+        <button class="btn btn-primary" onclick="restoreCycle('${t.id}')">恢复</button>
+        <button class="btn btn-danger" onclick="purgeCycle('${t.id}')">永久删除</button>
+      </div>
+    </div>`;
+  }).join("") + `</div>`;
+  return html;
+}
+let _edit = null;
+function beginEdit(el, confirmId, onSave){
+  el.setAttribute("contenteditable","true"); el.focus();
+  const r = document.createRange(); r.selectNodeContents(el); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  if(confirmId){ const b = document.getElementById(confirmId); if(b) b.style.display = "inline-flex"; }
+  _edit = { el, onSave, orig: el.innerText };
+}
+function commitEdit(){
+  if(!_edit) return;
+  const v = _edit.el.innerText.trim();
+  if(_edit.onSave) _edit.onSave(v);
+  endEdit();
+}
+function cancelEdit(){
+  if(!_edit) return;
+  _edit.el.innerText = _edit.orig;
+  endEdit();
+}
+function endEdit(){
+  if(_edit && _edit.el){ _edit.el.setAttribute("contenteditable","false"); }
+  _edit = null;
+}
+document.addEventListener("click", function(e){
+  if(_edit && !_edit.el.contains(e.target)){ cancelEdit(); }
+});
+function editCycleName(id){
+  const el = document.getElementById("cycName");
+  beginEdit(el, "cycNameConfirm", function(v){ const m = getCycleMeta(id); m.name = v || getCycle(id).name; setCycleMeta(id, m); });
+}
+function editCycleMission(id){
+  const el = document.getElementById("cycMission");
+  beginEdit(el, "cycMissionConfirm", function(v){ const m = getCycleMeta(id); m.mission = v; setCycleMeta(id, m); });
+}
+function addResult(id){ const t = (prompt("输入结果目标名称：")||"").trim(); if(!t) return; const it = getCycleItems(id); it.results.push({ t }); setCycleItems(id, it); render(); }
+function addDeep(id){ const t = (prompt("输入深耕坚持事项：")||"").trim(); if(!t) return; const it = getCycleItems(id); it.deeps.push({ t }); setCycleItems(id, it); render(); }
+function editGoalText(gid){
+  const id = gid.split("-r")[0]; const i = parseInt(gid.split("-r")[1],10);
+  const it = getCycleItems(id); const nv = (prompt("修改结果目标：", it.results[i].t)||"").trim();
+  if(nv){ it.results[i].t = nv; setCycleItems(id, it); render(); }
+}
+function delResult(id, i){
+  const it = getCycleItems(id); it.results.splice(i,1); setCycleItems(id, it);
+  const g = getGoals(); delete g[id+"-r"+i];
+  for(let k=i+1; k<=100; k++){ const from = id+"-r"+k; if(g[from]){ g[id+"-r"+(k-1)] = g[from]; delete g[from]; } else break; }
+  storeSet("pgw_goals", g); render();
+}
+function editDeepText(id, i){
+  const it = getCycleItems(id); const nv = (prompt("修改深耕坚持事项：", it.deeps[i].t)||"").trim();
+  if(nv){ it.deeps[i].t = nv; setCycleItems(id, it); render(); }
+}
+function delDeep(id, i){
+  const it = getCycleItems(id); it.deeps.splice(i,1); setCycleItems(id, it);
+  const h = getHabits();
+  Object.keys(h).forEach(d=>{ const map = h[d]; if(!map) return; delete map[id+"-d"+i]; for(let k=i+1; k<=100; k++){ const from = id+"-d"+k; if(map[from]){ map[id+"-d"+(k-1)] = map[from]; delete map[from]; } else break; } });
+  storeSet("pgw_habits", h); render();
 }
 
 /* ===================== 开屏 / 初始化 ===================== */
