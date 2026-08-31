@@ -174,7 +174,14 @@
     content:"✦"; position:absolute; bottom:10px; right:14px; font-size:40px; color:rgba(246,215,138,0.15);
   }
   .vision-banner .vb-tag { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--gold); letter-spacing:.04em; margin-bottom:8px; }
-  .vision-banner .vb-text { font-size: 14.5px; line-height: 1.75; font-weight: 500; position:relative; z-index:1; }
+  .vision-banner .vb-root { font-size:17px; font-weight:800; color:var(--gold); text-shadow:0 0 10px rgba(246,215,138,0.45); }
+  .vision-banner .vb-text { font-size: 14.5px; line-height: 1.75; font-weight: 500; position:relative; z-index:1; outline:none; }
+  .vision-banner .vb-text[contenteditable="true"] { border-bottom:1.5px dashed rgba(246,215,138,0.7); }
+  .vision-banner .vb-confirm {
+    margin-top:10px; display:none; align-items:center; gap:6px; align-self:flex-start;
+    border:none; border-radius:999px; padding:7px 22px; font-size:13px; font-weight:800; color:#5a3d1f;
+    background: linear-gradient(180deg,#ffe7b3,#f5c977); box-shadow: 0 6px 18px rgba(245,201,119,0.45); cursor:pointer;
+  }
   .vision-banner .vb-note { margin-top:10px; font-size:12px; color: var(--text-muted); position:relative; z-index:1; }
 
   /* 首页 · 星图选场景 */
@@ -514,6 +521,11 @@
 const APP_TITLE_KEY = "pgw_title";
 const DEFAULT_TITLE = "Suki🌍工作星球";
 const VISION = "通过事业+新媒体实现高收入，5年达成税后百万年收入、掌握金融投资、完成房车置业；持续深耕身材、阅读输出、双语能力；孝顺家人、生活自律有序；人际随缘，挚友互助、爱情顺其自然，拥有富足、自由、可控的人生。";
+const VISION_KEY = "pgw_vision";
+function getVision(){
+  const v = storeGet(VISION_KEY, null);
+  return v ? v : VISION;
+}
 
 const NORTH_STAR = [
   { dim:"财富维度", items:["税后年收入100w","掌握成熟金融投资能力","购置两套平层房产 + 一台车辆 + 专属车位"] },
@@ -742,8 +754,9 @@ function sceneCard(s){
 
 function visionBanner(){
   return `<div class="vision-banner glass-card">
-    <div class="vb-tag">🌹 置顶核心人生愿景 · 永久固定</div>
-    <div class="vb-text">${escapeHtml(VISION)}</div>
+    <div class="vb-tag">那些付出没看到结果的日子，叫 <span class="vb-root">「扎根」</span>。</div>
+    <div class="vb-text" id="visionText" spellcheck="false" title="双击修改愿景文字" ondblclick="startEditVision()">${escapeHtml(getVision())}</div>
+    <button class="vb-confirm" id="visionConfirm" onclick="confirmVision()">确认</button>
     <div class="vb-note">所有目标、所有行动，全部服务于这一条愿景。</div>
   </div>`;
 }
@@ -991,6 +1004,29 @@ function confirmTitle(elId){
 }
 function startEditSplash(){ startEditTitle("splashTitle","splashConfirm"); }
 function confirmSplash(){ confirmTitle("splashTitle"); }
+
+/* 愿景文字 · 双击修改 */
+function startEditVision(){
+  const el = document.getElementById("visionText");
+  const btn = document.getElementById("visionConfirm");
+  if(!el) return;
+  el.setAttribute("contenteditable","true");
+  el.focus();
+  const r = document.createRange(); r.selectNodeContents(el);
+  const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  if(btn) btn.style.display = "inline-flex";
+}
+function confirmVision(){
+  const el = document.getElementById("visionText");
+  const btn = document.getElementById("visionConfirm");
+  if(!el) return;
+  let val = el.textContent.trim();
+  if(!val) val = VISION;
+  storeSet(VISION_KEY, val);
+  el.textContent = val;
+  el.setAttribute("contenteditable","false");
+  if(btn) btn.style.display = "none";
+}
 function makePetals(){
   const box = document.getElementById("petals");
   if(!box) return;
