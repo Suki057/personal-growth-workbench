@@ -175,7 +175,7 @@
   }
   .vision-banner .vb-tag { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--gold); letter-spacing:.04em; margin-bottom:8px; }
   .vision-banner .vb-root { font-size:17px; font-weight:800; color:var(--gold); text-shadow:0 0 10px rgba(246,215,138,0.45); }
-  .vision-banner .vb-text { font-size: 14.5px; line-height: 1.75; font-weight: 500; position:relative; z-index:1; outline:none; }
+  .vision-banner .vb-text { font-size: 14.5px; line-height: 1.75; font-weight: 500; position:relative; z-index:1; outline:none; white-space: pre-wrap; word-break: break-word; }
   .vision-banner .vb-text[contenteditable="true"] { border-bottom:1.5px dashed rgba(246,215,138,0.7); }
   .vision-banner .vb-confirm {
     margin-top:10px; display:none; align-items:center; gap:6px; align-self:flex-start;
@@ -755,7 +755,7 @@ function sceneCard(s){
 function visionBanner(){
   return `<div class="vision-banner glass-card">
     <div class="vb-tag">那些付出没看到结果的日子，叫 <span class="vb-root">「扎根」</span>。</div>
-    <div class="vb-text" id="visionText" spellcheck="false" title="双击修改愿景文字" ondblclick="startEditVision()">${escapeHtml(getVision())}</div>
+    <div class="vb-text" id="visionText" spellcheck="false" title="双击修改愿景文字" ondblclick="startEditVision()">${escapeHtml(getVision()).replace(/\n/g, "<br>")}</div>
     <button class="vb-confirm" id="visionConfirm" onclick="confirmVision()">确认</button>
     <div class="vb-note">所有目标、所有行动，全部服务于这一条愿景。</div>
   </div>`;
@@ -1020,7 +1020,7 @@ function confirmVision(){
   const el = document.getElementById("visionText");
   const btn = document.getElementById("visionConfirm");
   if(!el) return;
-  let val = el.textContent.trim();
+  let val = el.innerText.trim();
   if(!val) val = VISION;
   storeSet(VISION_KEY, val);
   el.textContent = val;
