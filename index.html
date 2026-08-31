@@ -180,7 +180,7 @@
   /* 首页 · 星图选场景 */
   .map-wrap { min-height: calc(100vh - 110px); display:flex; flex-direction:column; align-items:center; padding-top:6px; }
   .map-title {
-    text-align:center; margin-bottom:8px;
+    text-align:center; margin: 4px 0 18px;
   }
   .map-title h1 {
     font-size: 30px; font-weight: 900; color:#fff; letter-spacing:0.02em;
@@ -195,10 +195,10 @@
   }
   .scene-grid {
     position:relative; z-index:1;
-    display:grid; grid-template-columns:1fr 1fr; gap:14px; width:100%;
+    display:grid; grid-template-columns:1fr 1fr; gap:18px; width:100%;
   }
   @media (max-width: 540px){
-    .scene-grid { grid-template-columns:1fr; gap:16px; padding:0 8px; }
+    .scene-grid { grid-template-columns:1fr; gap:18px; padding:0 8px; }
     .map-title h1 { font-size:26px; }
   }
   .scene-card {
@@ -708,6 +708,7 @@ function render(){
 function renderHomeMap(){
   return `
     <div class="map-wrap">
+      ${visionBanner()}
       <div class="map-title">
         <h1>点击进入任意场景</h1>
         <div class="mt-sub">绘制你的人生星图 · 所有行动指向北极星</div>
@@ -727,7 +728,6 @@ function renderHomeMap(){
           ${SCENES.map(s=>sceneCard(s)).join("")}
         </div>
       </div>
-      ${visionBanner()}
     </div>
   `;
 }
