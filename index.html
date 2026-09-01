@@ -423,6 +423,21 @@
   .goal-meta{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin:4px 0 0 30px; flex-wrap:wrap; }
   .goal-meta .gm{ font-size:11px; color:var(--text-muted); }
   .goal-meta .gm-btn{ font-size:11px; padding:4px 9px; border-radius:8px; border:1px solid rgba(246,215,138,0.4); background:rgba(246,215,138,0.08); color:var(--gold); cursor:pointer; white-space:nowrap; }
+  /* 数据明细表（默认收缩） */
+  .goal-records, .li-records{ margin-top:8px; border-top:1px dashed rgba(255,255,255,0.14); padding-top:6px; }
+  .gr-head{ display:flex; align-items:center; justify-content:space-between; font-size:12.5px; color:var(--lavender); cursor:pointer; user-select:none; padding:3px 2px; }
+  .gr-head .gr-title{ display:flex; align-items:center; gap:6px; }
+  .gr-head .chev{ transition:transform .2s ease; font-size:11px; }
+  .goal-records.collapsed .gr-body, .li-records.collapsed .gr-body{ display:none; }
+  .goal-records.collapsed .gr-head .chev, .li-records.collapsed .gr-head .chev{ transform:rotate(-90deg); }
+  .gr-body{ padding:4px 0 2px; }
+  .gr-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  .gr-table th{ text-align:left; color:var(--gold); font-weight:600; padding:5px 8px; border-bottom:1px solid rgba(255,255,255,0.16); }
+  .gr-table td{ padding:5px 8px; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .gr-table tr:last-child td{ border-bottom:none; }
+  .gr-empty{ font-size:12px; color:rgba(255,255,255,0.5); padding:4px 2px; }
+  .gr-del{ border:none; background:transparent; color:var(--rose); font-size:12px; cursor:pointer; opacity:.7; padding:0 2px; }
+  .gr-del:active{ opacity:1; }
 </style>
 </head>
 <body>
@@ -957,6 +972,7 @@ function renderCycle(id){
         <span class="pct">${fmtPct(pct)}%</span>
       </div>
       <div class="goal-meta">${meta}</div>
+      ${goalRecordsHtml(id, i, r)}
     </div>`;
   }).join("");
   const deepsHtml = items.deeps.map((d,i)=>{
@@ -965,7 +981,7 @@ function renderCycle(id){
       <button class="chk ${on?'on':''}" onclick="toggleHabit('${hid}', this)"></button>
       <div class="li-text" ondblclick="editDeepText('${id}',${i})" title="双击修改">${escapeHtml(d.t)}</div>
       <button class="item-del" onclick="confirmDelDeep('${id}',${i})" title="删除">🗑</button>
-    </div>`;
+    </div>${deepRecordsHtml(hid)}`;
   }).join("");
   const emptyR = `<div class="empty">还没有结果目标，点击下方「＋ 添加」开始设定 🎯</div>`;
   const emptyD = `<div class="empty">还没有深耕坚持事项，点击下方「＋ 添加」设定每日打卡 🌱</div>`;
@@ -990,6 +1006,31 @@ function renderCycle(id){
   `;
 }
 
+function fmtNum(n){ n = Number(n); if(isNaN(n)) return '—'; return (Math.round(n*10)/10).toString(); }
+function goalRecordsHtml(id, i, r){
+  const recs = (r.records || []).slice().sort((a,b)=> a.date < b.date ? 1 : -1);
+  const rows = recs.map(rec=> `<tr><td>${rec.date}</td><td>${fmtNum(rec.cur)}</td><td>${fmtPct(rec.pct)}%</td><td><button class="gr-del" onclick="delRecord('${id}',${i},'${rec.id}')" title="删除该记录">✕</button></td></tr>`).join("");
+  return `<div class="goal-records collapsed" id="rec_${id}_${i}">
+    <div class="gr-head" onclick="toggleRecords('rec_${id}_${i}')"><span class="gr-title">📋 数据明细（${recs.length} 条）</span><span class="chev">▾</span></div>
+    <div class="gr-body">${ recs.length ? `<table class="gr-table"><thead><tr><th>日期</th><th>数值</th><th>进度</th><th></th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="gr-empty">还没有记录，点上方「📊 记录进度」添加</div>` }</div>
+  </div>`;
+}
+function deepRecordsHtml(hid){
+  const h = getHabits();
+  const dates = Object.keys(h).filter(d=> h[d] && h[d][hid]).sort((a,b)=> a < b ? 1 : -1);
+  const rows = dates.map(d=> `<tr><td>${d}</td><td>已完成 ✅</td></tr>`).join("");
+  return `<div class="li-records collapsed" id="drec_${hid}">
+    <div class="gr-head" onclick="toggleRecords('drec_${hid}')"><span class="gr-title">📋 完成明细（${dates.length} 天）</span><span class="chev">▾</span></div>
+    <div class="gr-body">${ dates.length ? `<table class="gr-table"><thead><tr><th>日期</th><th>状态</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="gr-empty">还没有打卡记录，勾选左侧方框即记录当天</div>` }</div>
+  </div>`;
+}
+function toggleRecords(elId){ const el = document.getElementById(elId); if(el) el.classList.toggle('collapsed'); }
+function delRecord(id, i, rid){
+  const it = getCycleItems(id); const r = it.results[i]; if(!r || !r.records) return;
+  r.records = r.records.filter(x=> x.id !== rid);
+  if(r.records.length){ const last = r.records.slice().sort((a,b)=> a.date < b.date ? -1 : 1).pop(); r.current = last.cur; }
+  it.results[i] = r; setCycleItems(id, it); render();
+}
 function panel(title, sub, body, collapsed, addId, addType){
   const addBtn = (addId && addType) ? `<button class="panel-add" onclick="event.stopPropagation();add${addType==='r'?'Result':'Deep'}('${addId}')">＋ 添加</button>` : "";
   return `<section class="glass-card panel ${collapsed?'collapsed':''}">
@@ -1189,6 +1230,8 @@ function calcPct(r){
 function fmtPct(p){ p = Math.round(p*10)/10; return (p % 1 === 0) ? String(Math.round(p)) : p.toFixed(1); }
 function resultPct(r, gid){
   if(r.mode === 'manual') return Number(r.pct)||0;
+  const recs = r.records || [];
+  if(recs.length){ const last = recs.slice().sort((a,b)=> a.date < b.date ? -1 : 1).pop(); return Number(last.pct)||0; }
   if(r.base !== undefined && r.target !== undefined) return calcPct(r);
   const g = getGoals(); return (g[gid] && g[gid].pct) ? g[gid].pct : 0;
 }
@@ -1204,19 +1247,24 @@ function showModal(o){
 }
 function recordResult(id, i){
   const it = getCycleItems(id); const r = it.results[i];
+  const recs = r.records || (r.records = []);
   showModal({
     title: '记录进度：' + r.t,
-    body: '起始 <b>' + (r.base===undefined?'—':r.base) + '</b> → 目标 <b>' + (r.target===undefined?'—':r.target) + '</b><br>' +
-      '<label>当前数值（当前体重 / 累计完成量）</label><input id=\'recCur\' type=\'number\' value=\'' + (r.current===undefined?'':r.current) + '\' placeholder=\'如 52 或 200\'>' +
-      '<label>或 本期新增量（自动累计到当前）</label><input id=\'recAdd\' type=\'number\' placeholder=\'可选，如 100\'>',
-    confirmText: '计算进度',
+    body: '记录日期：<input id=\'recDate\' type=\'date\' value=\'' + todayStr() + '\'>' +
+      '<label>当前数值（当前体重 / 累计完成量）</label><input id=\'recCur\' type=\'number\' step=\'any\' value=\'' + (r.current===undefined?'':r.current) + '\' placeholder=\'如 52 或 200\'>' +
+      '<label>或 本期新增量（自动累计到当前）</label><input id=\'recAdd\' type=\'number\' step=\'any\' placeholder=\'可选，如 100\'>',
+    confirmText: '保存记录',
     onConfirm: ()=>{
       const curEl = document.getElementById('recCur');
       const addEl = document.getElementById('recAdd');
+      const dateEl = document.getElementById('recDate');
       let cur = Number(curEl.value);
       if(curEl.value === '' || isNaN(cur)){ alert('请输入当前数值'); return false; }
       const add = Number(addEl.value);
       if(!isNaN(add) && add !== 0) cur = (Number(r.current)||0) + add;
+      const date = dateEl.value || todayStr();
+      const pct = calcPct({ base:r.base, target:r.target, current:cur });
+      recs.push({ id:'r'+Date.now()+Math.floor(Math.random()*900), date, cur, pct });
       r.current = cur; r.mode = 'auto';
       it.results[i] = r; setCycleItems(id, it); render();
     }
@@ -1261,7 +1309,7 @@ function addResult(id){
       const hasNum = baseV !== '' && targetV !== '';
       const base = baseV === '' ? undefined : Number(baseV);
       const target = targetV === '' ? undefined : Number(targetV);
-      const r = { t:t, base:base, target:target, current: base !== undefined ? base : 0, mode: hasNum ? 'auto' : 'manual', pct:0, done:false };
+      const r = { t:t, base:base, target:target, current: base !== undefined ? base : 0, mode: hasNum ? 'auto' : 'manual', pct:0, done:false, records:[] };
       const it = getCycleItems(id); it.results.push(r); setCycleItems(id, it); render();
     }
   });
