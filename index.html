@@ -415,7 +415,7 @@
   .modal{ width:100%; max-width:340px; background:linear-gradient(160deg,#1c2350,#161b3e); border:1px solid rgba(246,215,138,0.3); border-radius:16px; padding:18px; box-shadow:0 12px 40px rgba(0,0,0,0.5); }
   .modal-title{ font-size:15px; font-weight:800; color:#fff; margin-bottom:10px; }
   .modal-body{ font-size:13px; line-height:1.6; color:var(--text-muted); }
-  .modal-body input{ width:100%; margin:4px 0 10px; padding:9px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:#fff; font-size:14px; }
+  .modal-body input{ width:100%; box-sizing:border-box; max-width:100%; margin:4px 0 10px; padding:9px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:#fff; font-size:14px; }
   .modal-body label{ display:block; font-size:12px; color:var(--text-muted); margin-top:8px; }
   .modal-btns{ display:flex; gap:10px; margin-top:14px; }
   .modal-btns .btn{ flex:1; justify-content:center; }
@@ -1018,10 +1018,10 @@ function goalRecordsHtml(id, i, r){
 function deepRecordsHtml(hid){
   const h = getHabits();
   const dates = Object.keys(h).filter(d=> h[d] && h[d][hid]).sort((a,b)=> a < b ? 1 : -1);
-  const rows = dates.map(d=> `<tr><td>${d}</td><td>已完成 ✅</td></tr>`).join("");
+  const rows = dates.map(d=>{ const v = h[d][hid]; const t = (v && typeof v === 'object' && v.time) ? v.time : ''; return `<tr><td>${d}</td><td>${t ? t + ' 打卡 ✅' : '已完成 ✅'}</td></tr>`; }).join("");
   return `<div class="li-records collapsed" id="drec_${hid}">
     <div class="gr-head" onclick="toggleRecords('drec_${hid}')"><span class="gr-title">📋 完成明细（${dates.length} 天）</span><span class="chev">▾</span></div>
-    <div class="gr-body">${ dates.length ? `<table class="gr-table"><thead><tr><th>日期</th><th>状态</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="gr-empty">还没有打卡记录，勾选左侧方框即记录当天</div>` }</div>
+    <div class="gr-body">${ dates.length ? `<table class="gr-table"><thead><tr><th>日期</th><th>打卡时间</th></tr></thead><tbody>${rows}</tbody></table>` : `<div class="gr-empty">还没有打卡记录，勾选左侧方框即记录当天</div>` }</div>
   </div>`;
 }
 function toggleRecords(elId){ const el = document.getElementById(elId); if(el) el.classList.toggle('collapsed'); }
@@ -1080,9 +1080,18 @@ function refreshCycleProgress(){
 function toggleHabit(hid, el){
   const h = getHabits(); const d = todayStr();
   if(!h[d]) h[d] = {};
-  if(h[d][hid]) delete h[d][hid]; else h[d][hid] = true;
+  if(h[d][hid]){
+    delete h[d][hid];
+  } else {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    h[d][hid] = { time: hh + ':' + mm };
+  }
   storeSet("pgw_habits", h);
   if(el) el.classList.toggle("on", !!h[d][hid]);
+  const dr = document.getElementById('drec_' + hid);
+  if(dr) dr.outerHTML = deepRecordsHtml(hid);
 }
 function saveReview(type){
   const ta = document.getElementById("rv_"+type);
