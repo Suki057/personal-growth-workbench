@@ -397,7 +397,7 @@
 .todo-add-form input, .todo-add-form select{ width:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none; min-width:0; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:var(--text-on-dark); padding:10px 12px; font-size:14px; font-family:inherit; }
 .todo-add-form input{ margin-bottom:12px; }
 .todo-add-form select{ margin-bottom:12px; }
-.todo-list{ display:flex; flex-direction:column; gap:12px; margin-top:6px; }
+.todo-list{ display:flex; flex-direction:column; gap:12px; margin-top:10px; }
 .todo-card{ display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:12px; }
 .todo-card.done .todo-task{ text-decoration:line-through; opacity:.55; }
 .todo-card .chk{ margin-top:2px; flex:0 0 auto; }
@@ -405,10 +405,12 @@
 .todo-task{ font-size:15px; font-weight:600; color:var(--text-on-dark); word-break:break-word; }
 .todo-meta{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; font-size:12px; color:var(--text-muted); }
 .todo-meta .urg{ padding:1px 8px; border-radius:999px; font-weight:700; }
-.urg-0{ background:rgba(255,255,255,0.12); color:var(--text-muted); }
+.urg-0{ background:rgba(232,90,90,0.22); color:#ef7a7a; }
 .urg-1{ background:rgba(240,168,92,0.18); color:#f0a85c; }
-.urg-2{ background:rgba(232,90,90,0.20); color:#ef7a7a; }
-.add-cycle-btn, .trash-entry{ width:100%; margin-top:4px; padding:12px; border-radius:12px; border:1px dashed rgba(246,215,138,0.5); background:transparent; color:var(--gold); font-size:14px; font-weight:700; cursor:pointer; }
+.urg-2{ background:rgba(138,180,240,0.18); color:#8ab4f0; }
+.urg-3{ background:rgba(255,255,255,0.12); color:var(--text-muted); }
+.add-cycle-btn, .trash-entry{ width:100%; margin-top:4px; margin-bottom:14px; padding:12px; border-radius:12px; border:1px dashed rgba(246,215,138,0.5); background:transparent; color:var(--gold); font-size:14px; font-weight:700; cursor:pointer; }
+.todo-empty{ margin-top:14px; }
 .trash-entry{ border-style:solid; border-color:rgba(255,255,255,0.14); color:var(--text-muted); margin-top:10px; }
 .row-btns{ display:flex; gap:10px; }
 .row-btns .btn{ flex:1; }
@@ -920,17 +922,41 @@ function renderCyclesMenuPage(){
 }
 
 /* —— 每日待办事项页 —— */
+function todoUrgencyLevel(u){
+  if(u === "紧急且重要") return 0;
+  if(u === "重要但不紧急") return 1;
+  if(u === "紧急但不重要") return 2;
+  return 3; // 不紧急也不重要
+}
+function todoCardHtml(t){
+  const lv = todoUrgencyLevel(t.urgency);
+  return `<div class="todo-card glass-card ${t.done?'done':''}" id="todo_${t.id}">
+    <button class="chk ${t.done?'on':''}" onclick="toggleTodo('${t.id}')"></button>
+    <div class="todo-body">
+      <div class="todo-task">${escapeHtml(t.task)}</div>
+      <div class="todo-meta">
+        <span class="tm-date">📅 ${escapeHtml(t.date)}</span>
+        <span class="urg urg-${lv}">${escapeHtml(t.urgency)}</span>
+        <span class="tm-ddl">⏰ DDL ${escapeHtml(t.ddl || "—")}</span>
+      </div>
+    </div>
+    <button class="item-del" onclick="confirmDelTodo('${t.id}')" title="删除">🗑</button>
+  </div>`;
+}
 function renderTodosPage(){
   const todos = getTodos();
+  const pending = todos.filter(t=>!t.done);
+  const done = todos.filter(t=>t.done);
   let html = `<div class="menu-title"><h2>每日待办事项</h2><p>今日规划 · 自主添加</p></div>`;
   html += `<button class="add-cycle-btn" onclick="toggleAddTodo()">＋ 添加待办</button>
     <div class="todo-add-form" id="todoAddForm" style="display:none;">
       <input type="date" id="todoDate" />
       <input type="text" id="todoTask" placeholder="事情（要做的那件事）" />
       <select id="todoUrg">
-        <option value="普通">普通</option>
-        <option value="紧急">紧急</option>
-        <option value="非常紧急">非常紧急</option>
+        <option value="紧急且重要">紧急且重要</option>
+        <option value="重要但不紧急">重要但不紧急</option>
+        <option value="紧急但不重要">紧急但不重要</option>
+        <option value="不紧急也不重要" selected>不紧急也不重要</option>
       </select>
       <input type="date" id="todoDdl" placeholder="DDL 截止日期" />
       <div class="row-btns">
@@ -939,23 +965,28 @@ function renderTodosPage(){
       </div>
     </div>`;
   if(!todos.length){
-    html += `<div class="empty glass-card">还没有待办事项，点上方「＋ 添加待办」开始规划今天的清单 ✨</div>`;
+    html += `<div class="empty glass-card todo-empty">还没有待办事项，点上方「＋ 添加待办」开始规划今天的清单 ✨</div>`;
   } else {
-    html += `<div class="todo-list">` + todos.map(t => {
-      const lv = t.urgency === "非常紧急" ? 2 : t.urgency === "紧急" ? 1 : 0;
-      return `<div class="todo-card glass-card ${t.done?'done':''}" id="todo_${t.id}">
-        <button class="chk ${t.done?'on':''}" onclick="toggleTodo('${t.id}')"></button>
-        <div class="todo-body">
-          <div class="todo-task">${escapeHtml(t.task)}</div>
-          <div class="todo-meta">
-            <span class="tm-date">📅 ${escapeHtml(t.date)}</span>
-            <span class="urg urg-${lv}">${escapeHtml(t.urgency)}</span>
-            <span class="tm-ddl">⏰ DDL ${escapeHtml(t.ddl || "—")}</span>
-          </div>
+    html += `<section class="glass-card panel" style="margin-bottom:14px;">
+      <div class="panel-h" onclick="toggleCollapse(this)">
+        <div class="ph-main"><h2>📝 待办事项</h2></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="ph-sub">${pending.length}</span><span class="chev">▾</span></div>
+      </div>
+      <div class="panel-b">
+        ${pending.length ? `<div class="todo-list">${pending.map(todoCardHtml).join("")}</div>` : `<div class="empty">全部完成啦 ✨ 可以安心休息或添加新目标</div>`}
+      </div>
+    </section>`;
+    if(done.length){
+      html += `<section class="glass-card panel">
+        <div class="panel-h" onclick="toggleCollapse(this)">
+          <div class="ph-main"><h2>✅ 已完成</h2></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="ph-sub">${done.length}</span><span class="chev">▾</span></div>
         </div>
-        <button class="item-del" onclick="confirmDelTodo('${t.id}')" title="删除">🗑</button>
-      </div>`;
-    }).join("") + `</div>`;
+        <div class="panel-b">
+          <div class="todo-list">${done.map(todoCardHtml).join("")}</div>
+        </div>
+      </section>`;
+    }
   }
   return html;
 }
@@ -973,7 +1004,7 @@ function addTodo(){
   const task = (document.getElementById("todoTask").value || "").trim();
   if(!task){ toast("请先填写「事情」"); return; }
   const date = document.getElementById("todoDate").value || todayStr();
-  const urgency = document.getElementById("todoUrg").value || "普通";
+  const urgency = document.getElementById("todoUrg").value || "不紧急也不重要";
   const ddl = document.getElementById("todoDdl").value || "";
   const todos = getTodos();
   todos.push({ id: "t" + Date.now(), date:date, task:task, urgency:urgency, ddl:ddl, done:false });
