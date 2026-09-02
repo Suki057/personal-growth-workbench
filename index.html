@@ -266,7 +266,7 @@
   .cycle-card .cc-go { margin-top:9px; font-size:12px; font-weight:700; color: var(--gold); }
 
   /* 结果目标 / 深耕 行（独立卡片，彼此保持间距不粘连） */
-  .goal { padding:12px 14px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; background:rgba(255,255,255,0.04); }
+  .goal { padding:12px 14px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; background:rgba(255,255,255,0.04); transition:transform .12s ease, box-shadow .12s ease, background .12s ease; }
   .goal:last-child { margin-bottom:0; }
   .goal-main { display:flex; gap:10px; align-items:flex-start; }
   .goal-text { font-size:14px; line-height:1.55; flex:1; min-width:0; color:var(--text-on-dark); }
@@ -437,11 +437,19 @@
 .panel-b.sorting .item-del{ display:none; }
 .panel-b.sorting .li-wrap, .panel-b.sorting .goal{ cursor:grab; }
 .panel-b.sorting .goal-records, .panel-b.sorting .deep-records{ pointer-events:none; }
-.si-dragging{ opacity:.5; }
-.si-lift{ box-shadow:0 8px 22px rgba(0,0,0,0.35); border-color:var(--gold) !important; }
+.si-dragging{ opacity:1; }
+.si-lift{
+  box-shadow:0 18px 42px rgba(0,0,0,0.55);
+  border:2px solid var(--gold) !important;
+  background:rgba(232,201,138,0.16) !important;
+  transform:scale(1.04);
+  position:relative;
+  z-index:60;
+  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
 .toast{ position:fixed; left:50%; bottom:88px; transform:translateX(-50%); z-index:3000; background:rgba(28,35,80,0.94); color:#fff; border:1px solid rgba(232,201,138,0.45); border-radius:12px; padding:10px 18px; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,0.35); animation:toastIn .22s ease; pointer-events:none; }
 @keyframes toastIn{ from{ opacity:0; transform:translate(-50%,10px);} to{ opacity:1; transform:translate(-50%,0);} }
-.li{ padding:12px 14px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; background:rgba(255,255,255,0.04); }
+.li{ padding:12px 14px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; background:rgba(255,255,255,0.04); transition:transform .12s ease, box-shadow .12s ease, background .12s ease; }
 .li-text, .goal-text{ flex:1; min-width:0; }
 /* 回收站 */
 .trash-list{ display:flex; flex-direction:column; gap:12px; }
@@ -1117,13 +1125,13 @@ function renderCycle(id){
       <div class="vb-text" id="cycVision" title="双击修改愿景描述" ondblclick="editCycleVision('${id}')" style="font-size:14px; white-space:pre-wrap;">${escapeHtml(vision)}</div>
       <button class="cyc-confirm" id="cycVisionConfirm" onclick="commitEdit()" style="display:none; margin-top:8px;">保存</button>
     </div>
-    ${panel("🌱 深耕坚持事项（日常常态化执行）", (items.deeps.length?items.deeps.length+" 项":"未添加"), deepsHtml || emptyD, false, id, "d")}
     <div class="glass-card panel" style="padding:14px 18px 14px 24px;">
       <div class="track-head"><div class="track-title">🎯 阶段总进度</div><div class="track-sub">${overall}%</div></div>
       <div class="bar-wrap"><span style="width:${overall}%"></span></div>
       <div class="bar-label">基于「结果目标」完成度自动计算</div>
     </div>
     ${panel("🎯 结果目标（可量化落地）", (items.results.length?items.results.length+" 项":"未添加"), resultsHtml || emptyR, false, id, "r")}
+    ${panel("🌱 深耕坚持事项（日常常态化执行）", (items.deeps.length?items.deeps.length+" 项":"未添加"), deepsHtml || emptyD, false, id, "d")}
   `;
 }
 
