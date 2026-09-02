@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<html lang="zh-CN" data-page-node-id="XxBd36LbP4o2AaA4BTnJ9U">
+<head data-page-node-id="fSkztu6pmdOTWGfxyNddUv">
+<meta charset="UTF-8" data-page-node-id="GAXiKJLYEZgzOrTHlXveEa" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" data-page-node-id="whZItAHazRZ45xcBbuWjH6" />
 <title>个人成长全景工作台</title>
-<meta name="theme-color" content="#0c1230" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="成长全景台" />
-<link rel="manifest" href="manifest.webmanifest" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<meta name="theme-color" content="#0c1230" data-page-node-id="jEqmXE0a0O8o3chs8m1o6z" />
+<meta name="apple-mobile-web-app-capable" content="yes" data-page-node-id="kCoKDqYYvui0MgRW6RXEU2" />
+<meta name="mobile-web-app-capable" content="yes" data-page-node-id="w4cGo7JfpPZKUDVVq2JRzz" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" data-page-node-id="iisvrMHbYEmWUqZCMCHlyt" />
+<meta name="apple-mobile-web-app-title" content="成长全景台" data-page-node-id="gBQcu5zPeBpRe0nlGXjTLk" />
+<link rel="manifest" href="manifest.webmanifest" data-page-node-id="ocoT2B9hAI7iZbGLQTQo29" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" data-page-node-id="4amncZUwcVUFLydgly6Fs9" />
 <style>
   :root {
     /* 小王子星球环游记 · 深蓝星空 + 玻璃星球 + 暖金玫瑰 */
@@ -265,9 +265,9 @@
   .cycle-card .cc-desc { margin-top:8px; font-size:12px; line-height:1.55; color:var(--text-muted); }
   .cycle-card .cc-go { margin-top:9px; font-size:12px; font-weight:700; color: var(--gold); }
 
-  /* 结果目标 / 深耕 行 */
-  .goal { padding:11px 0; border-bottom:1px solid rgba(255,255,255,0.08); }
-  .goal:last-child { border-bottom:none; }
+  /* 结果目标 / 深耕 行（独立卡片，彼此保持间距不粘连） */
+  .goal { padding:12px 14px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; background:rgba(255,255,255,0.04); }
+  .goal:last-child { margin-bottom:0; }
   .goal-main { display:flex; gap:10px; align-items:flex-start; }
   .goal-text { font-size:14px; line-height:1.55; flex:1; min-width:0; color:var(--text-on-dark); }
   .goal.done .goal-text { text-decoration: line-through; color: var(--text-muted); }
@@ -401,6 +401,9 @@
 .panel-add{ border:none; background:rgba(246,215,138,0.16); color:var(--gold); border-radius:8px; padding:3px 10px; font-size:12px; font-weight:700; cursor:pointer; margin-left:4px; }
 .cyc-confirm{ border:none; background:rgba(246,215,138,0.9); color:#3a2a12; border-radius:8px; padding:4px 12px; font-size:12px; font-weight:700; cursor:pointer; margin-left:8px; }
 .goal-main, .li{ display:flex; align-items:flex-start; gap:8px; flex-wrap:wrap; }
+.li-wrap{ margin-bottom:12px; }
+.li-wrap:last-child{ margin-bottom:0; }
+.li{ padding:12px 14px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; background:rgba(255,255,255,0.04); }
 .li-text, .goal-text{ flex:1; min-width:0; }
 /* 回收站 */
 .trash-list{ display:flex; flex-direction:column; gap:12px; }
@@ -412,10 +415,11 @@
 .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,0.2); color:var(--text-muted); border-radius:10px; padding:7px 12px; font-size:13px; cursor:pointer; }
   /* 通用弹窗 modal */
   .modal-overlay{ position:fixed; inset:0; background:rgba(8,12,35,0.72); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px; }
-  .modal{ width:100%; max-width:340px; background:linear-gradient(160deg,#1c2350,#161b3e); border:1px solid rgba(246,215,138,0.3); border-radius:16px; padding:18px; box-shadow:0 12px 40px rgba(0,0,0,0.5); }
+  .modal{ width:100%; max-width:340px; background:linear-gradient(160deg,#1c2350,#161b3e); border:1px solid rgba(246,215,138,0.3); border-radius:16px; padding:18px; box-shadow:0 12px 40px rgba(0,0,0,0.5); overflow:hidden; }
   .modal-title{ font-size:15px; font-weight:800; color:#fff; margin-bottom:10px; }
   .modal-body{ font-size:13px; line-height:1.6; color:var(--text-muted); }
-  .modal-body input{ width:100%; box-sizing:border-box; max-width:100%; margin:4px 0 10px; padding:9px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:#fff; font-size:14px; }
+  .modal-body input{ width:100%; box-sizing:border-box; max-width:100%; min-width:0; margin:4px 0 10px; padding:9px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:#fff; font-size:14px; }
+  .modal-body input[type=date]{ -webkit-appearance:none; appearance:none; }
   .modal-body label{ display:block; font-size:12px; color:var(--text-muted); margin-top:8px; }
   .modal-btns{ display:flex; gap:10px; margin-top:14px; }
   .modal-btns .btn{ flex:1; justify-content:center; }
@@ -440,142 +444,142 @@
   .gr-del:active{ opacity:1; }
 </style>
 </head>
-<body>
+<body data-page-node-id="3taRE3s7zL6vcEsnJ6kQsx">
 
 <!-- 背景 -->
-<div class="starfield"></div>
-<svg class="constellation" viewBox="0 0 400 800" preserveAspectRatio="none">
-  <polyline points="120,120 200,180 320,150 280,260 340,420 180,520 80,400" fill="none" stroke="rgba(246,215,138,0.25)" stroke-width="1" stroke-dasharray="4,4"/>
-  <polyline points="60,260 160,300 140,440" fill="none" stroke="rgba(240,168,192,0.20)" stroke-width="1" stroke-dasharray="3,5"/>
-  <circle cx="120" cy="120" r="2" fill="rgba(246,215,138,0.6)"/>
-  <circle cx="200" cy="180" r="2" fill="rgba(255,255,255,0.6)"/>
-  <circle cx="320" cy="150" r="2" fill="rgba(246,215,138,0.6)"/>
-  <circle cx="280" cy="260" r="2" fill="rgba(255,255,255,0.6)"/>
-  <circle cx="340" cy="420" r="2" fill="rgba(240,168,192,0.6)"/>
-  <circle cx="180" cy="520" r="2" fill="rgba(246,215,138,0.6)"/>
-  <circle cx="80" cy="400" r="2" fill="rgba(255,255,255,0.6)"/>
+<div class="starfield" data-page-node-id="ZjrDH993D2sbnIED0opRK2"></div>
+<svg class="constellation" viewBox="0 0 400 800" preserveAspectRatio="none" data-page-node-id="vgt3aDG380CiKMsq9gN0xA">
+  <polyline points="120,120 200,180 320,150 280,260 340,420 180,520 80,400" fill="none" stroke="rgba(246,215,138,0.25)" stroke-width="1" stroke-dasharray="4,4" data-page-node-id="2q9bFXPSMuJdBCrFcNQCJs"/>
+  <polyline points="60,260 160,300 140,440" fill="none" stroke="rgba(240,168,192,0.20)" stroke-width="1" stroke-dasharray="3,5" data-page-node-id="nQj09rdC3mX7iwIP6YluGl"/>
+  <circle cx="120" cy="120" r="2" fill="rgba(246,215,138,0.6)" data-page-node-id="rCQhruQB6kCyHPj4PVbWcJ"/>
+  <circle cx="200" cy="180" r="2" fill="rgba(255,255,255,0.6)" data-page-node-id="huQ9C7g9W3dFu7MAD3KZmn"/>
+  <circle cx="320" cy="150" r="2" fill="rgba(246,215,138,0.6)" data-page-node-id="ldh5itdGTbGIiFGZeBoJCn"/>
+  <circle cx="280" cy="260" r="2" fill="rgba(255,255,255,0.6)" data-page-node-id="JcU60imZWAaWnbvNGFnZFP"/>
+  <circle cx="340" cy="420" r="2" fill="rgba(240,168,192,0.6)" data-page-node-id="GtlY6zizsmcTMu9VhUHxAj"/>
+  <circle cx="180" cy="520" r="2" fill="rgba(246,215,138,0.6)" data-page-node-id="Uem7fV6S6ewrQpMpR0ajKS"/>
+  <circle cx="80" cy="400" r="2" fill="rgba(255,255,255,0.6)" data-page-node-id="DcGo7n9qqbuhVqTm8Dex78"/>
 </svg>
-<div class="petals" id="petals"></div>
+<div class="petals" id="petals" data-page-node-id="JkwdaQZRIdmWNZ8wWk0XCd"></div>
 
 <!-- 贴纸装饰 -->
-<svg class="sticker sticker-prince" viewBox="0 0 120 140" aria-hidden="true">
-  <defs><radialGradient id="pPlanet" cx="35%" cy="30%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="60%" stop-color="#E8C98A"/><stop offset="100%" stop-color="#c79a5e"/></radialGradient></defs>
-  <circle cx="70" cy="110" r="32" fill="url(#pPlanet)"/>
-  <ellipse cx="70" cy="110" rx="38" ry="8" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" transform="rotate(-12 70 110)"/>
-  <g transform="translate(52,64)" fill="#fff6e0">
-    <circle cx="14" cy="12" r="10"/>
-    <path d="M4 52 Q14 24 24 52 Z"/>
-    <rect x="11" y="22" width="6" height="20" rx="3"/>
-    <path d="M11 32 L0 26 M17 32 L28 24" stroke="#fff6e0" stroke-width="2.8" stroke-linecap="round" fill="none"/>
-    <path d="M13 42 L4 58 M15 42 L24 58" stroke="#fff6e0" stroke-width="3" stroke-linecap="round" fill="none"/>
+<svg class="sticker sticker-prince" viewBox="0 0 120 140" aria-hidden="true" data-page-node-id="kbNW5popTSQntU8cAJPouk">
+  <defs data-page-node-id="vCHPlnYUnRRh6RpFuBlf1f"><radialGradient id="pPlanet" cx="35%" cy="30%" data-page-node-id="CKD6rTpCrblD2V2A0XlBUl"><stop offset="0%" stop-color="#ffe7b3" data-page-node-id="2XHkH61GxZQIUb8Ut4IAdn"/><stop offset="60%" stop-color="#E8C98A" data-page-node-id="F7n7uVM1RgjmZdxe1ZE7tl"/><stop offset="100%" stop-color="#c79a5e" data-page-node-id="sdNmTXC7J38sIEz4reUraP"/></radialGradient></defs>
+  <circle cx="70" cy="110" r="32" fill="url(#pPlanet)" data-page-node-id="o2tsWjgLTIQDqW3f26ITUp"/>
+  <ellipse cx="70" cy="110" rx="38" ry="8" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="1.2" transform="rotate(-12 70 110)" data-page-node-id="exwo4oxJomqhNj5DUEQx6N"/>
+  <g transform="translate(52,64)" fill="#fff6e0" data-page-node-id="uKADGFk3dk7Et3D9Mjf5bo">
+    <circle cx="14" cy="12" r="10" data-page-node-id="fBZIPLp9YR15cPoxdLgwvi"/>
+    <path d="M4 52 Q14 24 24 52 Z" data-page-node-id="wzzN7yg6fg2Pzs4EEznfrC"/>
+    <rect x="11" y="22" width="6" height="20" rx="3" data-page-node-id="gvBOJR9tGgACtsBNRHFj7F"/>
+    <path d="M11 32 L0 26 M17 32 L28 24" stroke="#fff6e0" stroke-width="2.8" stroke-linecap="round" fill="none" data-page-node-id="CWl7nboo33dxnbN3uTANx6"/>
+    <path d="M13 42 L4 58 M15 42 L24 58" stroke="#fff6e0" stroke-width="3" stroke-linecap="round" fill="none" data-page-node-id="QHp6fdU6dehor3UsIJJi4c"/>
   </g>
-  <path d="M78 110 L78 138" stroke="#8FB0CB" stroke-width="2" fill="none"/>
-  <circle cx="78" cy="106" r="5" fill="#f0a8c0"/>
-  <circle cx="74" cy="110" r="3.2" fill="#e089a8"/><circle cx="82" cy="110" r="3.2" fill="#e089a8"/>
+  <path d="M78 110 L78 138" stroke="#8FB0CB" stroke-width="2" fill="none" data-page-node-id="kAoXYx8Sn8AlqCIgncE7nj"/>
+  <circle cx="78" cy="106" r="5" fill="#f0a8c0" data-page-node-id="myA6mbpcSXkJoYQdBWR6sw"/>
+  <circle cx="74" cy="110" r="3.2" fill="#e089a8" data-page-node-id="5xSoLmLuEUXITf06vTrEPK"/><circle cx="82" cy="110" r="3.2" fill="#e089a8" data-page-node-id="Exrt0uMtdklrtPjAB7Zpz0"/>
 </svg>
 
-<svg class="sticker sticker-fox" viewBox="0 0 110 110" aria-hidden="true">
-  <circle cx="55" cy="55" r="48" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
-  <g transform="translate(18,20)">
-    <ellipse cx="37" cy="58" rx="26" ry="22" fill="#e07a5f"/>
-    <path d="M11 42 L4 18 L20 34 Z" fill="#e07a5f"/><path d="M63 42 L70 18 L54 34 Z" fill="#e07a5f"/>
-    <path d="M11 42 L4 18 L20 34 Z" fill="#d4684d" transform="scale(0.7) translate(12,22)"/>
-    <path d="M63 42 L70 18 L54 34 Z" fill="#d4684d" transform="scale(0.7) translate(24,22)"/>
-    <circle cx="28" cy="52" r="3" fill="#fff"/><circle cx="28" cy="52" r="1.2" fill="#333"/>
-    <circle cx="46" cy="52" r="3" fill="#fff"/><circle cx="46" cy="52" r="1.2" fill="#333"/>
-    <ellipse cx="37" cy="62" rx="5" ry="3" fill="#fff6e0"/>
-    <path d="M32 64 Q37 70 42 64" stroke="#333" stroke-width="1" fill="none"/>
-    <path d="M15 60 Q8 65 14 72" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M15 60 Q8 65 14 72" stroke="#f6d78a" stroke-width="2.5" fill="none" stroke-linecap="round" transform="translate(1,2)"/>
-    <path d="M59 60 Q66 65 60 72" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-    <path d="M59 60 Q66 65 60 72" stroke="#f6d78a" stroke-width="2.5" fill="none" stroke-linecap="round" transform="translate(-1,2)"/>
+<svg class="sticker sticker-fox" viewBox="0 0 110 110" aria-hidden="true" data-page-node-id="m3oKt2N406Hbv45gL2NTl0">
+  <circle cx="55" cy="55" r="48" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1" data-page-node-id="DflbtJImTzkpm7TA8tguvR"/>
+  <g transform="translate(18,20)" data-page-node-id="v7arW4Osxpu2vy8qD3bjts">
+    <ellipse cx="37" cy="58" rx="26" ry="22" fill="#e07a5f" data-page-node-id="Itma93FTofZt4nH8JFSihg"/>
+    <path d="M11 42 L4 18 L20 34 Z" fill="#e07a5f" data-page-node-id="oBnYvOC8wcW2XfVvxynXM1"/><path d="M63 42 L70 18 L54 34 Z" fill="#e07a5f" data-page-node-id="84CVEp99AsEjNJWE4tEpUK"/>
+    <path d="M11 42 L4 18 L20 34 Z" fill="#d4684d" transform="scale(0.7) translate(12,22)" data-page-node-id="BLpBmcngPQD4HFdymDig5H"/>
+    <path d="M63 42 L70 18 L54 34 Z" fill="#d4684d" transform="scale(0.7) translate(24,22)" data-page-node-id="tGrBrbVwf2XARtP8tjIPz3"/>
+    <circle cx="28" cy="52" r="3" fill="#fff" data-page-node-id="uBCp7HKbEPWCH1NA2YTQLj"/><circle cx="28" cy="52" r="1.2" fill="#333" data-page-node-id="xewXUd01dOEQsOvzGcHTTp"/>
+    <circle cx="46" cy="52" r="3" fill="#fff" data-page-node-id="a9CvgM4fWHDuBt4x1NuGSB"/><circle cx="46" cy="52" r="1.2" fill="#333" data-page-node-id="7MQLg6AoMTK8LhdBcbSUoc"/>
+    <ellipse cx="37" cy="62" rx="5" ry="3" fill="#fff6e0" data-page-node-id="Z5pIClhPMNDDuqzDTPHT97"/>
+    <path d="M32 64 Q37 70 42 64" stroke="#333" stroke-width="1" fill="none" data-page-node-id="dYKrpi0qClUrEDk3I2xrIe"/>
+    <path d="M15 60 Q8 65 14 72" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" data-page-node-id="uMuEwc4Amcc2XaOiDjCMTi"/>
+    <path d="M15 60 Q8 65 14 72" stroke="#f6d78a" stroke-width="2.5" fill="none" stroke-linecap="round" transform="translate(1,2)" data-page-node-id="JErfepAYj3cqJT33a8sId8"/>
+    <path d="M59 60 Q66 65 60 72" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" data-page-node-id="XQIw7CPFIOCDxhcapiTCIk"/>
+    <path d="M59 60 Q66 65 60 72" stroke="#f6d78a" stroke-width="2.5" fill="none" stroke-linecap="round" transform="translate(-1,2)" data-page-node-id="mCMMp7efLF8iBaiSKuvi1M"/>
   </g>
 </svg>
 
-<svg class="sticker sticker-rose" viewBox="0 0 60 80" aria-hidden="true">
-  <ellipse cx="30" cy="70" rx="20" ry="6" fill="rgba(246,215,138,0.2)"/>
-  <path d="M30 70 L30 35" stroke="#8FB0CB" stroke-width="2" fill="none"/>
-  <path d="M30 52 Q22 50 20 58 Q28 58 30 52" fill="#7abbd4"/>
-  <circle cx="30" cy="28" r="8" fill="#f0a8c0"/>
-  <circle cx="24" cy="33" r="5" fill="#e089a8"/><circle cx="36" cy="33" r="5" fill="#e089a8"/>
-  <circle cx="30" cy="20" r="3" fill="#ffd4e0"/>
+<svg class="sticker sticker-rose" viewBox="0 0 60 80" aria-hidden="true" data-page-node-id="LjD42qAxczrHpAYnahUMVD">
+  <ellipse cx="30" cy="70" rx="20" ry="6" fill="rgba(246,215,138,0.2)" data-page-node-id="VjV0nejrM5xzP2A3UA8tfj"/>
+  <path d="M30 70 L30 35" stroke="#8FB0CB" stroke-width="2" fill="none" data-page-node-id="RelXdcyc43HyQJ6Soyvd2k"/>
+  <path d="M30 52 Q22 50 20 58 Q28 58 30 52" fill="#7abbd4" data-page-node-id="TOgvWrs7Htk1pCS31y2E75"/>
+  <circle cx="30" cy="28" r="8" fill="#f0a8c0" data-page-node-id="WHb4DmSkgCXCY17G1y2krM"/>
+  <circle cx="24" cy="33" r="5" fill="#e089a8" data-page-node-id="lTyvAbDAILDs9eUXXteNP8"/><circle cx="36" cy="33" r="5" fill="#e089a8" data-page-node-id="R4oIjGBKgSPaiRDHIow7Pi"/>
+  <circle cx="30" cy="20" r="3" fill="#ffd4e0" data-page-node-id="uIJ7p6Fw8JZ1xUj8305mHh"/>
 </svg>
 
 <!-- 开屏页 · 图2 封面 -->
-<div class="splash" id="splash">
-  <div class="splash-title">
-    <h1 id="splashTitle" spellcheck="false" title="双击修改名称" ondblclick="startEditSplash()">Suki🌍工作星球</h1>
-    <button class="ah-confirm splash-confirm" id="splashConfirm" onclick="confirmSplash()">确认</button>
-    <svg class="st-swoosh" viewBox="0 0 180 14" preserveAspectRatio="none">
-      <path d="M0 10 Q45 0, 90 7 T180 10" fill="none" stroke="url(#swooshGrad)" stroke-width="3" stroke-linecap="round"/>
-      <defs><linearGradient id="swooshGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f6d78a"/><stop offset="50%" stop-color="#f0a8c0"/><stop offset="100%" stop-color="#c4a8e0"/></linearGradient></defs>
+<div class="splash" id="splash" data-page-node-id="cNXlc80iJlpUuKZ9tXkpRA">
+  <div class="splash-title" data-page-node-id="fgU7HmKF39j8fkv8TdeZuJ">
+    <h1 id="splashTitle" spellcheck="false" title="双击修改名称" ondblclick="startEditSplash()" data-page-node-id="DiPhXr97DUH8FW2CGFCA8D">Suki🌍工作星球</h1>
+    <button class="ah-confirm splash-confirm" id="splashConfirm" onclick="confirmSplash()" data-page-node-id="aRHy3CwAQUjNBmp4crz7EZ">确认</button>
+    <svg class="st-swoosh" viewBox="0 0 180 14" preserveAspectRatio="none" data-page-node-id="IX9rsDl98lMYQApFityPdB">
+      <path d="M0 10 Q45 0, 90 7 T180 10" fill="none" stroke="url(#swooshGrad)" stroke-width="3" stroke-linecap="round" data-page-node-id="1eFpaanFoLDcs5tniZCjkG"/>
+      <defs data-page-node-id="EJPCq4GXV8RtIiOVbiHpjk"><linearGradient id="swooshGrad" x1="0" y1="0" x2="1" y2="0" data-page-node-id="zgs6BCUKZfCqgmNbBHJQ6F"><stop offset="0%" stop-color="#f6d78a" data-page-node-id="FAdnRxIfG8tqys6sGyrNBw"/><stop offset="50%" stop-color="#f0a8c0" data-page-node-id="KTzZ4VOgDFh2ZqnyjYxHIL"/><stop offset="100%" stop-color="#c4a8e0" data-page-node-id="MxjgbHuYVASxZJ3yUDsDfc"/></linearGradient></defs>
     </svg>
   </div>
 
-  <div class="splash-body">
-    <div class="splash-box top">
-      <div class="splash-illustration">
-        <svg viewBox="0 0 300 260" aria-hidden="true">
-          <defs>
-            <radialGradient id="sSun" cx="50%" cy="50%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="50%" stop-color="#E8A96E"/><stop offset="100%" stop-color="rgba(232,169,110,0)"/></radialGradient>
-            <radialGradient id="sPlanet" cx="35%" cy="30%"><stop offset="0%" stop-color="#ffe7b3"/><stop offset="60%" stop-color="#E8C98A"/><stop offset="100%" stop-color="#c79a5e"/></radialGradient>
-            <radialGradient id="rosePlanet" cx="40%" cy="35%"><stop offset="0%" stop-color="#ffd4e0"/><stop offset="55%" stop-color="#e86b6b"/><stop offset="100%" stop-color="#a83c3c"/></radialGradient>
+  <div class="splash-body" data-page-node-id="lz7ieQDIZpae53syspkSvH">
+    <div class="splash-box top" data-page-node-id="o5lo4KP1AJT3PsQl2Nfthy">
+      <div class="splash-illustration" data-page-node-id="SfUpAd5EivFAJHKDBsQB3G">
+        <svg viewBox="0 0 300 260" aria-hidden="true" data-page-node-id="70lwYGMXoOaEOw0fr139D9">
+          <defs data-page-node-id="lPgtqGjQv4h3ZqtckzMufM">
+            <radialGradient id="sSun" cx="50%" cy="50%" data-page-node-id="lrt3Wg4xCBBgvOkMuxD1K0"><stop offset="0%" stop-color="#ffe7b3" data-page-node-id="9YLUCc2O7VFK9IAt7wehtz"/><stop offset="50%" stop-color="#E8A96E" data-page-node-id="rdSK7dtg1Pq4LGDkubG84M"/><stop offset="100%" stop-color="rgba(232,169,110,0)" data-page-node-id="IHSG2eGDexEdpOpHjYwQJe"/></radialGradient>
+            <radialGradient id="sPlanet" cx="35%" cy="30%" data-page-node-id="WYJ4gwieQjwjF9ktdRZnSx"><stop offset="0%" stop-color="#ffe7b3" data-page-node-id="466IftmpIv56mNacWONaQj"/><stop offset="60%" stop-color="#E8C98A" data-page-node-id="ovN0nEsFwk9Mj5imFguS8j"/><stop offset="100%" stop-color="#c79a5e" data-page-node-id="wA6bdfukCruV1jWxFOHnFT"/></radialGradient>
+            <radialGradient id="rosePlanet" cx="40%" cy="35%" data-page-node-id="XjG4e2lXmMpxTRQ023FbV0"><stop offset="0%" stop-color="#ffd4e0" data-page-node-id="mK5CIflpvBZJjOHLp5GreJ"/><stop offset="55%" stop-color="#e86b6b" data-page-node-id="IqH6da4Xn2jzG78KaPQDPH"/><stop offset="100%" stop-color="#a83c3c" data-page-node-id="KcA1KsfRt3NHja0iqaFW1Q"/></radialGradient>
           </defs>
           <!-- 落日 -->
-          <circle cx="230" cy="55" r="32" fill="url(#sSun)" opacity="0.9"/>
+          <circle cx="230" cy="55" r="32" fill="url(#sSun)" opacity="0.9" data-page-node-id="rfXcReBLNoC2rzl3tH1b7b"/>
           <!-- 散星 -->
-          <circle cx="35" cy="35" r="1.8" fill="#fff"/><circle cx="80" cy="22" r="2" fill="#f6e7b0"/>
-          <circle cx="150" cy="18" r="1.6" fill="#fff"/><circle cx="270" cy="105" r="1.8" fill="#f6e7b0"/>
-          <circle cx="25" cy="115" r="1.5" fill="#fff"/><circle cx="260" cy="185" r="1.7" fill="#f6e7b0"/>
-          <circle cx="200" cy="210" r="1.5" fill="#fff"/><circle cx="60" cy="205" r="2" fill="#f6e7b0"/>
+          <circle cx="35" cy="35" r="1.8" fill="#fff" data-page-node-id="GkwyGeFMdSBiebHoh3Oj0n"/><circle cx="80" cy="22" r="2" fill="#f6e7b0" data-page-node-id="yNJ5eyHhfjUD5Ch2peIFZT"/>
+          <circle cx="150" cy="18" r="1.6" fill="#fff" data-page-node-id="DUOyCoJBtdo2mkVdlFxEiU"/><circle cx="270" cy="105" r="1.8" fill="#f6e7b0" data-page-node-id="rKBYpCpj9aMGSOXqQfbcUD"/>
+          <circle cx="25" cy="115" r="1.5" fill="#fff" data-page-node-id="CHk0wnkNIOVJiAAkt4R7VJ"/><circle cx="260" cy="185" r="1.7" fill="#f6e7b0" data-page-node-id="b5R6uzBIfPFGT0ASCF2cpD"/>
+          <circle cx="200" cy="210" r="1.5" fill="#fff" data-page-node-id="dXBDhLrHkZrqibDCgqezRS"/><circle cx="60" cy="205" r="2" fill="#f6e7b0" data-page-node-id="vK2bWJd09ipfrn37WZ3SVE"/>
           <!-- 小王子的玫瑰星球 -->
-          <ellipse cx="150" cy="208" rx="82" ry="16" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.4" transform="rotate(-6 150 208)"/>
-          <path d="M85 175 Q105 145 130 160 Q155 145 170 170 Q180 195 150 205 Q115 198 85 175" fill="url(#rosePlanet)"/>
-          <path d="M95 168 Q110 155 125 170 Q140 155 148 175 Q155 192 125 198 Q95 190 95 168" fill="#f59090" opacity="0.6"/>
+          <ellipse cx="150" cy="208" rx="82" ry="16" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.4" transform="rotate(-6 150 208)" data-page-node-id="djaObBGPs70ZIACio7lDm2"/>
+          <path d="M85 175 Q105 145 130 160 Q155 145 170 170 Q180 195 150 205 Q115 198 85 175" fill="url(#rosePlanet)" data-page-node-id="iPLq4pMrrIbxFK9EodIjYY"/>
+          <path d="M95 168 Q110 155 125 170 Q140 155 148 175 Q155 192 125 198 Q95 190 95 168" fill="#f59090" opacity="0.6" data-page-node-id="u1YeRb1VZP0ZjG8p1Nqg9a"/>
           <!-- 小王子 -->
-          <g transform="translate(108,108)" fill="#fff6e0">
-            <circle cx="18" cy="14" r="12"/>
-            <path d="M6 58 Q18 28 30 58 Z"/>
-            <rect x="14" y="28" width="8" height="26" rx="4"/>
-            <path d="M14 40 L-2 32 M22 40 L38 30" stroke="#fff6e0" stroke-width="3.2" stroke-linecap="round" fill="none"/>
-            <path d="M15 52 L2 70 M21 52 L34 70" stroke="#fff6e0" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+          <g transform="translate(108,108)" fill="#fff6e0" data-page-node-id="oVsDFE2yYCtEcC7mECZ0Bs">
+            <circle cx="18" cy="14" r="12" data-page-node-id="FakbsYz0DHOGefwUGQjDsB"/>
+            <path d="M6 58 Q18 28 30 58 Z" data-page-node-id="roKGQjlJIkhwxtmPGXCg9c"/>
+            <rect x="14" y="28" width="8" height="26" rx="4" data-page-node-id="FtjZISGaIkEo8mzstLv9Zc"/>
+            <path d="M14 40 L-2 32 M22 40 L38 30" stroke="#fff6e0" stroke-width="3.2" stroke-linecap="round" fill="none" data-page-node-id="hEaVARgfoHQd93wiRVIXiS"/>
+            <path d="M15 52 L2 70 M21 52 L34 70" stroke="#fff6e0" stroke-width="3.6" stroke-linecap="round" fill="none" data-page-node-id="qBxeCF1EtfTv5e5Vhno85F"/>
           </g>
-          <path d="M126 165 L126 130" stroke="#8FB0CB" stroke-width="2.4" fill="none"/>
-          <circle cx="126" cy="124" r="7" fill="#f0a8c0"/>
-          <circle cx="120" cy="130" r="4.5" fill="#e089a8"/><circle cx="132" cy="130" r="4.5" fill="#e089a8"/>
+          <path d="M126 165 L126 130" stroke="#8FB0CB" stroke-width="2.4" fill="none" data-page-node-id="M9Wu66XwAULvlBwylKvA6I"/>
+          <circle cx="126" cy="124" r="7" fill="#f0a8c0" data-page-node-id="804icoVcj5zXiLnNpBCaHQ"/>
+          <circle cx="120" cy="130" r="4.5" fill="#e089a8" data-page-node-id="ctBkPFa4lAPi8ARMYoiVVd"/><circle cx="132" cy="130" r="4.5" fill="#e089a8" data-page-node-id="U7FEBb1kOBzcevHpZKiXjA"/>
           <!-- 月亮 -->
-          <path d="M252 145 A26 26 0 1 1 248 195 A21 21 0 1 0 252 145" fill="#fff6e0" opacity="0.85"/>
+          <path d="M252 145 A26 26 0 1 1 248 195 A21 21 0 1 0 252 145" fill="#fff6e0" opacity="0.85" data-page-node-id="rv0MKhXVRdfKFKTBWLwDKJ"/>
           <!-- 玻璃罩玫瑰 -->
-          <ellipse cx="258" cy="184" rx="12" ry="4" fill="rgba(246,215,138,0.2)"/>
-          <path d="M258 180 L258 162" stroke="#8FB0CB" stroke-width="1.5" fill="none"/>
-          <circle cx="258" cy="158" r="4" fill="#f0a8c0"/>
-          <path d="M245 152 Q258 142 271 152 Q271 176 258 184 Q245 176 245 152" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
+          <ellipse cx="258" cy="184" rx="12" ry="4" fill="rgba(246,215,138,0.2)" data-page-node-id="7gxYnrhFldyUn2BF2Njtji"/>
+          <path d="M258 180 L258 162" stroke="#8FB0CB" stroke-width="1.5" fill="none" data-page-node-id="VFLrKHNJZcqeCnCxw6iJGU"/>
+          <circle cx="258" cy="158" r="4" fill="#f0a8c0" data-page-node-id="EFVXs9cixU0SADoQm3SfY4"/>
+          <path d="M245 152 Q258 142 271 152 Q271 176 258 184 Q245 176 245 152" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.2" data-page-node-id="NXGOnuIbVf3NYlkJSY64Ab"/>
           <!-- 小行星带 -->
-          <circle cx="55" cy="140" r="10" fill="url(#sPlanet)" opacity="0.9"/>
-          <ellipse cx="55" cy="140" rx="14" ry="3.5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.9" transform="rotate(20 55 140)"/>
+          <circle cx="55" cy="140" r="10" fill="url(#sPlanet)" opacity="0.9" data-page-node-id="Q77FNyHqIgPHTimciHQoe6"/>
+          <ellipse cx="55" cy="140" rx="14" ry="3.5" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="0.9" transform="rotate(20 55 140)" data-page-node-id="8YdMITNH1RCwkrsNDuLRDQ"/>
         </svg>
       </div>
     </div>
-    <div class="splash-box bottom">
-      <div class="sp-quote">点击开启梦幻之旅<br/>所有目标与行动，终将抵达你的星球</div>
+    <div class="splash-box bottom" data-page-node-id="ZBqKaL0jH08ys9DTmaHvVI">
+      <div class="sp-quote" data-page-node-id="t29a0EcUCOVNAnF9GEHmcD">点击开启梦幻之旅<br data-page-node-id="aE2J8zjA3m5fKswN5vzFHh"/>所有目标与行动，终将抵达你的星球</div>
     </div>
   </div>
 
-  <div class="splash-bottom">
-    <button class="sp-enter" onclick="enterApp()">✨ 点击开启</button>
+  <div class="splash-bottom" data-page-node-id="WnpGkwD2cvjTnNrPcwnfwO">
+    <button class="sp-enter" onclick="enterApp()" data-page-node-id="m03zXGAUqk08e0e1jb84Gr">✨ 点击开启</button>
   </div>
 </div>
 
-<header class="app-header" id="appHeader">
-  <div class="ah-left">
-    <button class="ah-back" id="ahBack" style="display:none;" onclick="goBack()">← 返回</button>
-    <h1 class="ah-title" id="appTitle" spellcheck="false" title="双击修改名称" ondblclick="startEditTitle('appTitle','ahConfirm')">Suki🌍工作星球</h1>
-    <button class="ah-confirm" id="ahConfirm" onclick="confirmTitle('appTitle')">确认</button>
+<header class="app-header" id="appHeader" data-page-node-id="zvLwOynZsiHCFp7R4dOAVB">
+  <div class="ah-left" data-page-node-id="ySEYUrHivEPYGlgvm9ZHOJ">
+    <button class="ah-back" id="ahBack" style="display:none;" onclick="goBack()" data-page-node-id="a1oLGm4MVaVk4XVHP3J3So">← 返回</button>
+    <h1 class="ah-title" id="appTitle" spellcheck="false" title="双击修改名称" ondblclick="startEditTitle('appTitle','ahConfirm')" data-page-node-id="anYpnAEJAwPCw86cdUTQMq">Suki🌍工作星球</h1>
+    <button class="ah-confirm" id="ahConfirm" onclick="confirmTitle('appTitle')" data-page-node-id="XCywkArhDaqCZvtT2neVl6">确认</button>
   </div>
-  <div class="ah-home" id="ahHome" style="display:none;" onclick="goHome()" title="返回首页">🏠</div>
+  <div class="ah-home" id="ahHome" style="display:none;" onclick="goHome()" title="返回首页" data-page-node-id="bAcKxe6GyQ0APazG8HPcE0">🏠</div>
 </header>
 
-<main id="container"></main>
+<main id="container" data-page-node-id="oKxr2dmu2u2RsGtG0TKyjf"></main>
 
 <script>
 /* ===================== 数据 ===================== */
@@ -716,6 +720,8 @@ function getReviews(){ return storeGet("pgw_reviews", []); }
 /* —— 成长时间 · 自定义周期 / 回收站 / 事项 / 标题 —— */
 function getCustomCycles(){ return storeGet("pgw_cycles_custom", []); }
 function getTrash(){ return storeGet("pgw_cycle_trash", []); }
+function getItemTrash(){ return storeGet("pgw_item_trash", []); }
+function setItemTrash(arr){ storeSet("pgw_item_trash", arr); }
 function getCycles(){
   const trashed = getTrash().filter(t=>!t.custom).map(t=>t.id);
   return CYCLES.filter(c=>!trashed.includes(c.id)).concat(getCustomCycles());
@@ -728,9 +734,13 @@ function getItemsStore(){ return storeGet("pgw_cycle_items", {}); }
 function getCycleItems(id){ return getItemsStore()[id] || { results:[], deeps:[] }; }
 function setCycleItems(id, obj){ const s=getItemsStore(); s[id]=obj; storeSet("pgw_cycle_items", s); }
 function cleanupTrash(){
-  const now=Date.now(); const t=getTrash(); const before=t.length;
+  const now=Date.now();
+  const t=getTrash(); const before=t.length;
   const kept=t.filter(x=> (now-(x.deletedAt||0)) < 7*86400000 );
   if(kept.length!==before) storeSet("pgw_cycle_trash", kept);
+  const it=getItemTrash(); const ib=it.length;
+  const ik=it.filter(x=> (now-(x.deletedAt||0)) < 7*86400000 );
+  if(ik.length!==ib) storeSet("pgw_item_trash", ik);
 }
 
 /* ===================== 状态 / 渲染 ===================== */
@@ -885,7 +895,7 @@ function renderCyclesMenuPage(){
         <button class="btn btn-ghost" onclick="toggleAddCycle()">取消</button>
       </div>
     </div>
-    <button class="trash-entry" onclick="openTrash()">🗑 回收站（${getTrash().length}）</button>
+    <button class="trash-entry" onclick="openTrash()">🗑 回收站（${getTrash().length + getItemTrash().length}）</button>
   `;
 }
 
@@ -978,11 +988,13 @@ function renderCycle(id){
   }).join("");
   const deepsHtml = items.deeps.map((d,i)=>{
     const hid = id+"-d"+i; const on = !!today[hid];
-    return `<div class="li">
-      <button class="chk ${on?'on':''}" onclick="toggleHabit('${hid}', this)"></button>
-      <div class="li-text" ondblclick="editDeepText('${id}',${i})" title="双击修改">${escapeHtml(d.t)}</div>
-      <button class="item-del" onclick="confirmDelDeep('${id}',${i})" title="删除">🗑</button>
-    </div>${deepRecordsHtml(hid)}`;
+    return `<div class="li-wrap">
+      <div class="li">
+        <button class="chk ${on?'on':''}" onclick="toggleHabit('${hid}', this)"></button>
+        <div class="li-text" ondblclick="editDeepText('${id}',${i})" title="双击修改">${escapeHtml(d.t)}</div>
+        <button class="item-del" onclick="confirmDelDeep('${id}',${i})" title="删除">🗑</button>
+      </div>${deepRecordsHtml(hid)}
+    </div>`;
   }).join("");
   const emptyR = `<div class="empty">还没有结果目标，点击下方「＋ 添加」开始设定 🎯</div>`;
   const emptyD = `<div class="empty">还没有深耕坚持事项，点击下方「＋ 添加」设定每日打卡 🌱</div>`;
@@ -1177,14 +1189,38 @@ function purgeCycle(id){
   const g = getGoals(); Object.keys(g).forEach(k=>{ if(k.indexOf(id+"-")===0) delete g[k]; }); storeSet("pgw_goals", g);
   render();
 }
+/* 结果目标 / 深耕事项的回收与永久删除 */
+function restoreItem(idx){
+  const trash = getItemTrash(); const e = trash[idx]; if(!e) return;
+  if(e.kind==='deep'){
+    const it = getCycleItems(e.cycleId); it.deeps.push(e.data); setCycleItems(e.cycleId, it);
+    const newHid = e.cycleId+'-d'+(it.deeps.length-1);
+    const h = getHabits();
+    Object.keys(e.habits||{}).forEach(date=>{ if(!h[date]) h[date]={}; h[date][newHid]=e.habits[date]; });
+    storeSet('pgw_habits', h);
+  } else if(e.kind==='result'){
+    const it = getCycleItems(e.cycleId); it.results.push(e.data); setCycleItems(e.cycleId, it);
+    const newKey = e.cycleId+'-r'+(it.results.length-1);
+    const g = getGoals(); g[newKey] = e.goalState || { done:e.data.done, pct:e.data.pct }; storeSet('pgw_goals', g);
+  }
+  setItemTrash(trash.filter((_,j)=>j!==idx));
+  render();
+}
+function purgeItem(idx){
+  const trash = getItemTrash(); const e = trash[idx]; if(!e) return;
+  setItemTrash(trash.filter((_,j)=>j!==idx));
+  render();
+}
 function openTrash(){ cleanupTrash(); navigateTo("cycle-trash"); }
 function renderTrashPage(){
-  const trash = getTrash();
+  cleanupTrash();
+  const trash = getTrash(); const itrash = getItemTrash();
   let html = `<div class="menu-title"><h2>回收站</h2><p>可恢复 · 7 天后自动永久删除</p></div>`;
-  if(!trash.length){ html += `<div class="empty glass-card">回收站是空的 ✨</div>`; return html; }
-  html += `<div class="trash-list">` + trash.map(t=>{
+  if(!trash.length && !itrash.length){ html += `<div class="empty glass-card">回收站是空的 ✨</div>`; return html; }
+  html += `<div class="trash-list">`;
+  trash.forEach(t=>{
     const left = Math.max(0, Math.ceil((7*86400000 - (Date.now()-(t.deletedAt||0)))/86400000));
-    return `<div class="glass-card trash-item">
+    html += `<div class="glass-card trash-item">
       <div class="ti-main">
         <div class="ti-name">${escapeHtml(t.name)}</div>
         <div class="ti-sub">${t.custom?"自定义阶段":"固定阶段"} · ${left} 天后永久删除</div>
@@ -1194,7 +1230,24 @@ function renderTrashPage(){
         <button class="btn btn-danger" onclick="purgeCycle('${t.id}')">永久删除</button>
       </div>
     </div>`;
-  }).join("") + `</div>`;
+  });
+  itrash.forEach((e,idx)=>{
+    const cyc = getCycle(e.cycleId); const cycName = (cyc && (getCycleMeta(e.cycleId).name || cyc.name)) || "成长阶段";
+    const left = Math.max(0, Math.ceil((7*86400000 - (Date.now()-(e.deletedAt||0)))/86400000));
+    const kindLabel = e.kind==='result' ? "结果目标" : "深耕事项";
+    const extra = e.kind==='deep' && e.habits && Object.keys(e.habits).length ? `（含${Object.keys(e.habits).length}天打卡）` : "";
+    html += `<div class="glass-card trash-item">
+      <div class="ti-main">
+        <div class="ti-name">${escapeHtml(e.name||"未命名")}</div>
+        <div class="ti-sub">${kindLabel} · 所属「${escapeHtml(cycName)}」${extra} · ${left} 天后永久删除</div>
+      </div>
+      <div class="ti-btns">
+        <button class="btn btn-primary" onclick="restoreItem(${idx})">恢复</button>
+        <button class="btn btn-danger" onclick="purgeItem(${idx})">永久删除</button>
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
   return html;
 }
 let _edit = null;
@@ -1349,17 +1402,22 @@ function confirmDelResult(id, i){
   const it = getCycleItems(id); const r = it.results[i]; if(!r) return;
   showModal({
     title: '删除结果目标？',
-    body: '「' + escapeHtml(r.t) + '」删除后不可恢复（请确认无误）。',
+    body: '「' + escapeHtml(r.t) + '」删除后将进入回收站，可在回收站恢复；超过 7 天会自动永久删除。',
     confirmText: '确认删除',
-    onConfirm: ()=> delResult(id, i)
+    onConfirm: ()=> trashResultItem(id, i)
   });
 }
-function delResult(id, i){
-  const it = getCycleItems(id); it.results.splice(i,1); setCycleItems(id, it);
-  const g = getGoals(); delete g[id+'-r'+i];
+function trashResultItem(id, i){
+  const it = getCycleItems(id); const r = it.results[i]; if(!r) return;
+  const gkey = id+'-r'+i; const g = getGoals(); const goalState = g[gkey] || { done:r.done, pct:r.pct };
+  const entry = { kind:'result', cycleId:id, name:r.t, data:r, goalState, deletedAt:Date.now() };
+  const trash = getItemTrash(); trash.push(entry); setItemTrash(trash);
+  it.results.splice(i,1); setCycleItems(id, it);
+  delete g[gkey];
   for(let k=i+1; k<=100; k++){ const from = id+'-r'+k; if(g[from]){ g[id+'-r'+(k-1)] = g[from]; delete g[from]; } else break; }
   storeSet('pgw_goals', g); render();
 }
+function delResult(){ /* 已改为回收站机制，保留函数名避免旧引用报错 */ }
 function editDeepText(id, i){
   const it = getCycleItems(id); const nv = (prompt('修改深耕坚持事项：', it.deeps[i].t)||'').trim();
   if(nv){ it.deeps[i].t = nv; setCycleItems(id, it); render(); }
@@ -1368,17 +1426,23 @@ function confirmDelDeep(id, i){
   const it = getCycleItems(id); const d = it.deeps[i]; if(!d) return;
   showModal({
     title: '删除深耕事项？',
-    body: '「' + escapeHtml(d.t) + '」删除后不可恢复（请确认无误）。',
+    body: '「' + escapeHtml(d.t) + '」删除后将进入回收站，可在回收站恢复（含历史打卡记录）；超过 7 天会自动永久删除。',
     confirmText: '确认删除',
-    onConfirm: ()=> delDeep(id, i)
+    onConfirm: ()=> trashDeepItem(id, i)
   });
 }
-function delDeep(id, i){
-  const it = getCycleItems(id); it.deeps.splice(i,1); setCycleItems(id, it);
-  const h = getHabits();
-  Object.keys(h).forEach(d=>{ const map = h[d]; if(!map) return; delete map[id+'-d'+i]; for(let k=i+1; k<=100; k++){ const from = id+'-d'+k; if(map[from]){ map[id+'-d'+(k-1)] = map[from]; delete map[from]; } else break; } });
+function trashDeepItem(id, i){
+  const it = getCycleItems(id); const d = it.deeps[i]; if(!d) return;
+  const hid = id+'-d'+i;
+  const h = getHabits(); const habits = {};
+  Object.keys(h).forEach(date=>{ const map=h[date]; if(map && map[hid]) habits[date]=map[hid]; });
+  const entry = { kind:'deep', cycleId:id, name:d.t, data:{ t:d.t }, habits, deletedAt:Date.now() };
+  const trash = getItemTrash(); trash.push(entry); setItemTrash(trash);
+  it.deeps.splice(i,1); setCycleItems(id, it);
+  Object.keys(h).forEach(date=>{ const map=h[date]; if(!map) return; delete map[hid]; for(let k=i+1; k<=100; k++){ const from = id+'-d'+k; if(map[from]){ map[id+'-d'+(k-1)] = map[from]; delete map[from]; } else break; } });
   storeSet('pgw_habits', h); render();
 }
+function delDeep(){ /* 已改为回收站机制，保留函数名避免旧引用报错 */ }
 
 /* ===================== 开屏 / 初始化 ===================== */
 function enterApp(){
