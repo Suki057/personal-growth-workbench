@@ -397,6 +397,9 @@
 .todo-add-form input, .todo-add-form select{ width:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none; min-width:0; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:var(--text-on-dark); padding:10px 12px; font-size:14px; font-family:inherit; }
 .todo-add-form input{ margin-bottom:12px; }
 .todo-add-form select{ margin-bottom:12px; }
+.ddl-row{ display:flex; align-items:center; gap:10px; }
+.ddl-label{ flex:0 0 auto; font-size:13px; font-weight:700; color:var(--text-muted); }
+.ddl-row input[type=datetime-local]{ flex:1; min-width:0; width:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none; margin-bottom:12px; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:var(--text-on-dark); padding:10px 12px; font-size:14px; font-family:inherit; }
 .todo-list{ display:flex; flex-direction:column; gap:12px; margin-top:10px; }
 .todo-card{ display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:12px; }
 .todo-card.done .todo-task{ text-decoration:line-through; opacity:.55; }
@@ -937,7 +940,7 @@ function todoCardHtml(t){
       <div class="todo-meta">
         <span class="tm-date">📅 ${escapeHtml(t.date)}</span>
         <span class="urg urg-${lv}">${escapeHtml(t.urgency)}</span>
-        <span class="tm-ddl">⏰ DDL ${escapeHtml(t.ddl || "—")}</span>
+        <span class="tm-ddl">⏰ DDL ${escapeHtml((t.ddl||"").replace("T"," ") || "—")}</span>
       </div>
     </div>
     <button class="item-del" onclick="confirmDelTodo('${t.id}')" title="删除">🗑</button>
@@ -958,14 +961,17 @@ function renderTodosPage(){
         <option value="紧急但不重要">紧急但不重要</option>
         <option value="不紧急也不重要" selected>不紧急也不重要</option>
       </select>
-      <input type="date" id="todoDdl" placeholder="DDL 截止日期" />
+      <div class="ddl-row">
+        <span class="ddl-label">DDL</span>
+        <input type="datetime-local" id="todoDdl" />
+      </div>
       <div class="row-btns">
         <button class="btn btn-primary" onclick="addTodo()">保存</button>
         <button class="btn btn-ghost" onclick="toggleAddTodo()">取消</button>
       </div>
     </div>`;
   if(!todos.length){
-    html += `<div class="empty glass-card todo-empty">还没有待办事项，点上方「＋ 添加待办」开始规划今天的清单 ✨</div>`;
+    html += `<div class="empty glass-card todo-empty">点上方「＋ 添加待办」开始规划今天的清单 ✨</div>`;
   } else {
     html += `<section class="glass-card panel" style="margin-bottom:14px;">
       <div class="panel-h" onclick="toggleCollapse(this)">
