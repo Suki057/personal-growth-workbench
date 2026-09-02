@@ -404,6 +404,22 @@
 .goal-main, .li{ display:flex; align-items:flex-start; gap:8px; flex-wrap:wrap; }
 .li-wrap{ margin-bottom:12px; }
 .li-wrap:last-child{ margin-bottom:0; }
+/* —— 拖动排序 —— */
+.sort-bar{ display:flex; align-items:center; gap:8px; padding:8px 10px; margin-bottom:12px; border-radius:10px; background:rgba(232,201,138,0.13); border:1px dashed rgba(232,201,138,0.5); font-size:13px; color:var(--gold); }
+.sort-bar .sb-tip{ flex:1; line-height:1.4; }
+.sort-bar button{ border:none; border-radius:8px; padding:6px 13px; font-size:13px; font-weight:700; cursor:pointer; }
+.sort-bar .sb-ok{ background:rgba(246,215,138,0.92); color:#3a2a12; }
+.sort-bar .sb-cancel{ background:rgba(255,255,255,0.12); color:var(--text-on-dark); }
+.drag-handle{ display:none; align-items:center; justify-content:center; flex-shrink:0; width:26px; min-height:26px; margin-right:2px; border-radius:8px; background:rgba(232,201,138,0.16); color:var(--gold); font-size:15px; line-height:1; letter-spacing:-1px; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; }
+.panel-b.sorting .drag-handle{ display:flex; }
+.panel-b.sorting .li, .panel-b.sorting .goal{ border:1px dashed rgba(232,201,138,0.55); background:rgba(232,201,138,0.07); }
+.panel-b.sorting .item-del{ display:none; }
+.panel-b.sorting .li-wrap, .panel-b.sorting .goal{ cursor:grab; }
+.panel-b.sorting .goal-records, .panel-b.sorting .deep-records{ pointer-events:none; }
+.si-dragging{ opacity:.5; }
+.si-lift{ box-shadow:0 8px 22px rgba(0,0,0,0.35); border-color:var(--gold) !important; }
+.toast{ position:fixed; left:50%; bottom:88px; transform:translateX(-50%); z-index:3000; background:rgba(28,35,80,0.94); color:#fff; border:1px solid rgba(232,201,138,0.45); border-radius:12px; padding:10px 18px; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,0.35); animation:toastIn .22s ease; pointer-events:none; }
+@keyframes toastIn{ from{ opacity:0; transform:translate(-50%,10px);} to{ opacity:1; transform:translate(-50%,0);} }
 .li{ padding:12px 14px; border:1px solid rgba(255,255,255,0.10); border-radius:12px; background:rgba(255,255,255,0.04); }
 .li-text, .goal-text{ flex:1; min-width:0; }
 /* 回收站 */
@@ -799,6 +815,7 @@ function viewTitle(v){
 }
 
 function render(){
+  if(typeof SORT !== "undefined" && SORT) exitSortMode(false, true);
   const c = document.getElementById("container");
   if(currentView === "home-map") c.innerHTML = renderHomeMap();
   else if(currentView === "north") c.innerHTML = renderNorthPage();
@@ -973,8 +990,9 @@ function renderCycle(id){
     const meta = r.mode==='manual'
       ? `<span class="gm">手动进度</span>`
       : `<span class="gm">起始 ${r.base===undefined?'—':r.base} → 目标 ${r.target===undefined?'—':r.target} · 当前 ${r.current===undefined?'—':r.current}</span><button class="gm-btn" onclick="recordResult('${id}',${i})">📊 记录进度</button>`;
-    return `<div class="goal ${r.done?'done':''}" id="goal_${id}_${i}">
+    return `<div class="goal ${r.done?'done':''}" id="goal_${id}_${i}" data-si="${i}" data-press="${id}|r|${i}">
       <div class="goal-main">
+        <span class="drag-handle" title="按住拖动">⠿</span>
         <button class="chk ${r.done?'on':''}" onclick="toggleResult('${id}',${i})"></button>
         <div class="goal-text" ondblclick="editGoalText('${id}',${i})" title="双击修改">${escapeHtml(r.t)}</div>
         <button class="item-del" onclick="confirmDelResult('${id}',${i})" title="删除">🗑</button>
@@ -989,8 +1007,9 @@ function renderCycle(id){
   }).join("");
   const deepsHtml = items.deeps.map((d,i)=>{
     const hid = id+"-d"+i; const on = !!today[hid];
-    return `<div class="li-wrap">
-      <div class="li">
+    return `<div class="li-wrap" data-si="${i}">
+      <div class="li" data-press="${id}|d|${i}">
+        <span class="drag-handle" title="按住拖动">⠿</span>
         <button class="chk ${on?'on':''}" onclick="toggleHabit('${hid}', this)"></button>
         <div class="li-text" ondblclick="editDeepText('${id}',${i})" title="双击修改">${escapeHtml(d.t)}</div>
         <button class="item-del" onclick="confirmDelDeep('${id}',${i})" title="删除">🗑</button>
@@ -1048,19 +1067,176 @@ function delRecord(id, i, rid){
 }
 function panel(title, sub, body, collapsed, addId, addType){
   const addBtn = (addId && addType) ? `<button class="panel-add" onclick="event.stopPropagation();add${addType==='r'?'Result':'Deep'}('${addId}')">＋ 添加</button>` : "";
+  const sortBtn = (addId && addType) ? `<button class="panel-add" onclick="event.stopPropagation();enterSortMode('${addId}','${addType}')" title="拖动排序">⇅ 排序</button>` : "";
+  const pbId = (addId && addType) ? ` id="pb_${addId}_${addType}"` : "";
+  const sortBar = (addId && addType) ? `<div class="sort-bar" id="sb_${addId}_${addType}" style="display:none;">
+      <span class="sb-tip">拖动右侧 ⠿ 把手调整顺序</span>
+      <button class="sb-cancel" onclick="exitSortMode(false)">取消</button>
+      <button class="sb-ok" onclick="exitSortMode(true)">确定</button>
+    </div>` : "";
   return `<section class="glass-card panel ${collapsed?'collapsed':''}">
     <div class="panel-h" onclick="toggleCollapse(this)">
       <div class="ph-main"><h2>${title}</h2></div>
       <div style="display:flex;align-items:center;gap:8px;">
         ${sub?`<span class="ph-sub">${sub}</span>`:""}
+        ${sortBtn}
         ${addBtn}
         <span class="chev">▾</span>
       </div>
     </div>
-    <div class="panel-b">${body}</div>
+    <div class="panel-b"${pbId} data-cycle="${addId||''}" data-kind="${addType||''}">${sortBar}${body}</div>
   </section>`;
 }
 function toggleCollapse(el){ el.closest(".panel").classList.toggle("collapsed"); }
+
+/* ===================== 拖动排序（长按进入 · 确定保存） ===================== */
+let SORT = null;   // { cycleId, kind, pb, bar }
+let DRAG = null;   // { el, startY }
+let LP = { timer:null, x:0, y:0, fired:false };
+let suppressClick = false;
+function toast(msg){
+  const old = document.querySelector(".toast"); if(old) old.remove();
+  const d = document.createElement("div"); d.className = "toast"; d.textContent = msg;
+  document.body.appendChild(d);
+  setTimeout(()=>{ d.remove(); }, 1600);
+}
+function sortEls(pb){
+  return Array.from(pb.querySelectorAll(".li-wrap, .goal"));
+}
+function nextSortable(el){
+  let n = el.nextElementSibling;
+  while(n && !n.matches(".li-wrap, .goal")) n = n.nextElementSibling;
+  return n;
+}
+function enterSortMode(cycleId, kind){
+  const it = getCycleItems(cycleId);
+  const n = (kind === "d" ? it.deeps : it.results).length;
+  if(n < 2){ toast("至少需要 2 项才能排序 ✨"); return; }
+  if(SORT) exitSortMode(false, true);
+  const pb = document.getElementById("pb_" + cycleId + "_" + kind);
+  if(!pb) return;
+  pb.classList.add("sorting");
+  const bar = document.getElementById("sb_" + cycleId + "_" + kind);
+  if(bar) bar.style.display = "flex";
+  SORT = { cycleId:cycleId, kind:kind, pb:pb, bar:bar };
+  toast("已进入排序模式，拖动把手调整");
+}
+function exitSortMode(save, silent){
+  if(!SORT) return;
+  const st = SORT; let changed = false;
+  if(save){
+    const newOrder = sortEls(st.pb).map(el => parseInt(el.dataset.si, 10));
+    const orig = newOrder.slice().sort((a,b)=> a-b);
+    changed = newOrder.some((v,i)=> v !== orig[i]);
+    if(changed) applySort(st.cycleId, st.kind, newOrder);
+  }
+  st.pb.classList.remove("sorting");
+  if(st.bar) st.bar.style.display = "none";
+  st.pb.querySelectorAll(".si-dragging, .si-lift").forEach(el=> el.classList.remove("si-dragging","si-lift"));
+  SORT = null; DRAG = null;
+  if(!silent) render();
+  if(save) toast(changed ? "顺序已保存 ✅" : "顺序没有变化");
+}
+function applySort(cycleId, kind, newOrder){
+  const it = getCycleItems(cycleId);
+  if(kind === "d"){
+    const arr = it.deeps; it.deeps = newOrder.map(oi => arr[oi]);
+    const h = getHabits(); const pre = cycleId + "-d";
+    Object.keys(h).forEach(date=>{
+      const map = h[date]; if(!map) return;
+      const snap = {};
+      newOrder.forEach((oi, ni)=>{ if(map[pre + oi] !== undefined) snap[ni] = map[pre + oi]; });
+      newOrder.forEach((oi)=>{ delete map[pre + oi]; });
+      Object.keys(snap).forEach(ni=>{ map[pre + ni] = snap[ni]; });
+    });
+    storeSet("pgw_habits", h);
+  } else {
+    const arr = it.results; it.results = newOrder.map(oi => arr[oi]);
+    const g = getGoals(); const pre = cycleId + "-r";
+    const snap = {};
+    newOrder.forEach((oi, ni)=>{ if(g[pre + oi] !== undefined) snap[ni] = g[pre + oi]; });
+    newOrder.forEach((oi)=>{ delete g[pre + oi]; });
+    Object.keys(snap).forEach(ni=>{ g[pre + ni] = snap[ni]; });
+    storeSet("pgw_goals", g);
+  }
+  setCycleItems(cycleId, it);
+}
+/* 长按 480ms 进入排序模式 */
+function lpStart(e){
+  if(SORT) return;
+  if(e.target.closest(".drag-handle")) return;
+  const el = e.target.closest("[data-press]");
+  if(!el) return;
+  clearTimeout(LP.timer);
+  LP.x = e.clientX; LP.y = e.clientY; LP.fired = false;
+  LP.timer = setTimeout(()=>{
+    LP.fired = true; LP.timer = null;
+    const p = (el.dataset.press || "").split("|");
+    if(p.length === 3) enterSortMode(p[0], p[1]);
+  }, 480);
+}
+function lpMove(e){
+  if(!LP.timer && !LP.fired) return;
+  if(Math.abs(e.clientX - LP.x) > 10 || Math.abs(e.clientY - LP.y) > 10){
+    clearTimeout(LP.timer); LP.timer = null;
+  }
+}
+function lpEnd(){
+  clearTimeout(LP.timer); LP.timer = null;
+  if(LP.fired){
+    suppressClick = true;
+    setTimeout(()=>{ suppressClick = false; }, 400);
+    LP.fired = false;
+  }
+}
+/* 把手拖动 */
+function dragStart(e){
+  if(!SORT) return;
+  let item = null, handle = e.target.closest(".drag-handle");
+  if(handle){
+    item = handle.closest(".li-wrap, .goal");
+  } else {
+    if(e.target.closest("button, input, select, textarea, a")) return;
+    item = e.target.closest(".li-wrap, .goal");
+  }
+  if(!item || !SORT.pb.contains(item)) return;
+  e.preventDefault(); e.stopPropagation();
+  handle = handle || item;
+  DRAG = { el:item, handle:handle };
+  item.classList.add("si-dragging","si-lift");
+  try{ handle.setPointerCapture(e.pointerId); }catch(_){}
+}
+function dragMove(e){
+  if(!DRAG || !SORT) return;
+  e.preventDefault();
+  const y = e.clientY;
+  const sibs = sortEls(SORT.pb);
+  for(const s of sibs){
+    if(s === DRAG.el) continue;
+    const r = s.getBoundingClientRect();
+    if(y >= r.top && y <= r.bottom){
+      const mid = (r.top + r.bottom) / 2;
+      const ref = (y < mid) ? s : nextSortable(s);
+      const cur = nextSortable(DRAG.el);
+      if(ref !== DRAG.el && ref !== cur) SORT.pb.insertBefore(DRAG.el, ref || null);
+      break;
+    }
+  }
+}
+function dragEnd(){
+  if(!DRAG) return;
+  DRAG.el.classList.remove("si-dragging","si-lift");
+  DRAG = null;
+}
+function initSortGestures(){
+  document.addEventListener("pointerdown", (e)=>{ lpStart(e); dragStart(e); }, {passive:false});
+  document.addEventListener("pointermove", (e)=>{ lpMove(e); dragMove(e); }, {passive:false});
+  document.addEventListener("pointerup", ()=>{ lpEnd(); dragEnd(); });
+  document.addEventListener("pointercancel", ()=>{ lpEnd(); dragEnd(); });
+  document.addEventListener("click", (e)=>{
+    if(suppressClick && e.target.closest("[data-press]")){ e.stopPropagation(); e.preventDefault(); }
+  }, true);
+}
 
 /* ===================== 交互 ===================== */
 function toggleGoal(gid){
@@ -1522,7 +1698,7 @@ function makePetals(){
   }
 }
 function init(){
-  initTitle(); makePetals();
+  initTitle(); makePetals(); initSortGestures();
   updateHeader(); render();
   let seen = false; try{ seen = sessionStorage.getItem("pgw_splash_seen")==="1"; }catch(e){}
   if(seen) document.getElementById("splash").classList.add("hidden");
