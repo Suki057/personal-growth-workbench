@@ -392,6 +392,22 @@
 .cycle-add-form input, .cycle-add-form textarea{ width:100%; box-sizing:border-box; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:var(--text-on-dark); padding:10px 12px; font-size:14px; font-family:inherit; }
 .cycle-add-form input{ margin-bottom:12px; }
 .cycle-add-form textarea{ resize:vertical; margin-top:2px; }
+/* —— 每日待办事项 —— */
+.todo-add-form{ background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:14px; margin:6px 0 14px; display:none; flex-direction:column; gap:10px; }
+.todo-add-form input, .todo-add-form select{ width:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none; min-width:0; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:var(--text-on-dark); padding:10px 12px; font-size:14px; font-family:inherit; }
+.todo-add-form input{ margin-bottom:12px; }
+.todo-add-form select{ margin-bottom:12px; }
+.todo-list{ display:flex; flex-direction:column; gap:12px; margin-top:6px; }
+.todo-card{ display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border-radius:12px; }
+.todo-card.done .todo-task{ text-decoration:line-through; opacity:.55; }
+.todo-card .chk{ margin-top:2px; flex:0 0 auto; }
+.todo-body{ flex:1; min-width:0; }
+.todo-task{ font-size:15px; font-weight:600; color:var(--text-on-dark); word-break:break-word; }
+.todo-meta{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; font-size:12px; color:var(--text-muted); }
+.todo-meta .urg{ padding:1px 8px; border-radius:999px; font-weight:700; }
+.urg-0{ background:rgba(255,255,255,0.12); color:var(--text-muted); }
+.urg-1{ background:rgba(240,168,92,0.18); color:#f0a85c; }
+.urg-2{ background:rgba(232,90,90,0.20); color:#ef7a7a; }
 .add-cycle-btn, .trash-entry{ width:100%; margin-top:4px; padding:12px; border-radius:12px; border:1px dashed rgba(246,215,138,0.5); background:transparent; color:var(--gold); font-size:14px; font-weight:700; cursor:pointer; }
 .trash-entry{ border-style:solid; border-color:rgba(255,255,255,0.14); color:var(--text-muted); margin-top:10px; }
 .row-btns{ display:flex; gap:10px; }
@@ -623,22 +639,7 @@ const CYCLES = [
   { id:"5y",   name:"5年期",   mission:"愿景落地", desc:"达成税后百万年收入、落地置业购车目标、掌握稳健投资能力、实现人生可控自由" },
 ];
 
-const DIMENSIONS = [
-  { name:"身心管理", items:["身材塑形","饮食运动","作息规律","情绪调控","心态抗压","身体健康养护"] },
-  { name:"财务资金", items:["日常记账","收支管控","强制储蓄","应急金搭建","金融投资学习","资产积累","房车置业规划"] },
-  { name:"主业事业", items:["稳定就业","赛道深耕","职场能力打磨","薪资提升","岗位核心竞争力搭建"] },
-  { name:"副业新媒体", items:["账号运营","内容创作输出","数据复盘","商业模式优化","个人IP打造","稳定变现增收"] },
-  { name:"认知&生活人际", items:["读书输入","自主内容输出","英语俄语学习","家庭照料","高质量社交","感情状态管理"] },
-];
-
-const HABITS = [
-  { name:"身体深耕", items:["固定频次运动","饮食管控","日常体态管理","作息维稳"] },
-  { name:"认知深耕", items:["持续读书输入","自主内容输出","所学内容落地学以致用"] },
-  { name:"技能深耕", items:["英语常态化固定学习","俄语常态化固定学习"] },
-  { name:"副业深耕", items:["新媒体账号稳定更新","数据复盘","内容迭代","优化变现路径"] },
-  { name:"财务深耕", items:["每日/每月记账","严控非必要开销","强制储蓄","持续学习财商与投资知识"] },
-  { name:"生活深耕", items:["极简自律生活","情绪快速自愈","杜绝内耗","规律作息"] },
-];
+/* 五大成长维度 / 每日深耕习惯 已移除：维度面板整块删除；深耕习惯改为「每日待办事项」（见 renderTodosPage + pgw_todos） */
 
 const REVIEWS = [
   { id:"week",  name:"周复盘", desc:"检查当周行动完成度、修正执行问题、微调下周计划" },
@@ -718,8 +719,7 @@ const CYCLE_DETAIL = {
 const SCENES = [
   { id:"north", emoji:"🌟", tone:"gold", title:"人生北极星", sub:"5年终极愿景" },
   { id:"cycles", emoji:"🪐", tone:"lavender", title:"成长时间", sub:"层层递进 · 闭环迭代" },
-  { id:"dims", emoji:"🧭", tone:"rose", title:"五大成长维度", sub:"终身固定 · 全赛道归类" },
-  { id:"habits", emoji:"🌱", tone:"cyan", title:"每日深耕复利", sub:"长期复利 · 每日执行" },
+  { id:"habits", emoji:"✅", tone:"cyan", title:"每日待办事项", sub:"今日规划 · 自主添加" },
   { id:"reviews", emoji:"🔄", tone:"earth", title:"复盘迭代体系", sub:"周 / 月 / 年 三级校准" },
 ];
 
@@ -733,6 +733,10 @@ function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<
 function getGoals(){ return storeGet("pgw_goals", {}); }
 function getHabits(){ return storeGet("pgw_habits", {}); }
 function getReviews(){ return storeGet("pgw_reviews", []); }
+
+/* 每日待办事项 */
+function getTodos(){ return storeGet("pgw_todos", []); }
+function setTodos(arr){ storeSet("pgw_todos", arr); }
 
 /* —— 成长时间 · 自定义周期 / 回收站 / 事项 / 标题 —— */
 function getCustomCycles(){ return storeGet("pgw_cycles_custom", []); }
@@ -805,8 +809,7 @@ function viewTitle(v){
   if(v === "home-map") return DEFAULT_TITLE;
   if(v === "north") return "人生北极星";
   if(v === "cycles") return "成长时间";
-  if(v === "dims") return "五大成长维度";
-  if(v === "habits") return "每日深耕复利";
+  if(v === "habits") return "每日待办事项";
   if(v === "reviews") return "复盘迭代体系";
   if(v === "cycle-trash") return "回收站";
   const cyc = getCycle(v);
@@ -820,8 +823,7 @@ function render(){
   if(currentView === "home-map") c.innerHTML = renderHomeMap();
   else if(currentView === "north") c.innerHTML = renderNorthPage();
   else if(currentView === "cycles") c.innerHTML = renderCyclesMenuPage();
-  else if(currentView === "dims") c.innerHTML = renderDimsPage();
-  else if(currentView === "habits") c.innerHTML = renderHabitsPage();
+  else if(currentView === "habits") c.innerHTML = renderTodosPage();
   else if(currentView === "reviews") c.innerHTML = renderReviewsPage();
   else if(currentView === "cycle-trash") c.innerHTML = renderTrashPage();
   else c.innerHTML = renderCycle(currentView);
@@ -917,39 +919,87 @@ function renderCyclesMenuPage(){
   `;
 }
 
-/* —— 五大成长维度页 —— */
-function renderDimsPage(){
-  return `
-    <div class="menu-title"><h2>五大成长维度</h2><p>全人生赛道 · 终身固定</p></div>
-    <div class="dim-grid">` + DIMENSIONS.map(d => `
-      <div class="glass-card dim-card">
-        <h3>◆ ${d.name}</h3>
-        <ul>${d.items.map(i=>`<li>${escapeHtml(i)}</li>`).join("")}</ul>
-      </div>`).join("") + `</div>`;
-}
-
-/* —— 每日深耕习惯页 —— */
-function renderHabitsPage(){
-  const habits = getHabits();
-  const today = habits[todayStr()] || {};
-  let html = `<div class="menu-title"><h2>每日深耕复利</h2><p>长期复利 · 每日执行</p></div>`;
-  HABITS.forEach((cat, ci) => {
-    html += `<section class="glass-card panel" style="margin-bottom:14px;">
-      <div class="panel-h" onclick="toggleCollapse(this)">
-        <div class="ph-main"><h2>${cat.name}</h2></div>
-        <span class="chev">▾</span>
+/* —— 每日待办事项页 —— */
+function renderTodosPage(){
+  const todos = getTodos();
+  let html = `<div class="menu-title"><h2>每日待办事项</h2><p>今日规划 · 自主添加</p></div>`;
+  html += `<button class="add-cycle-btn" onclick="toggleAddTodo()">＋ 添加待办</button>
+    <div class="todo-add-form" id="todoAddForm" style="display:none;">
+      <input type="date" id="todoDate" />
+      <input type="text" id="todoTask" placeholder="事情（要做的那件事）" />
+      <select id="todoUrg">
+        <option value="普通">普通</option>
+        <option value="紧急">紧急</option>
+        <option value="非常紧急">非常紧急</option>
+      </select>
+      <input type="date" id="todoDdl" placeholder="DDL 截止日期" />
+      <div class="row-btns">
+        <button class="btn btn-primary" onclick="addTodo()">保存</button>
+        <button class="btn btn-ghost" onclick="toggleAddTodo()">取消</button>
       </div>
-      <div class="panel-b">${cat.items.map((it, ii) => {
-        const hid = `h-${ci}-${ii}`;
-        const on = !!today[hid];
-        return `<div class="li">
-          <button class="chk ${on?'on':''}" onclick="toggleHabit('${hid}', this)"></button>
-          <div class="li-text">${escapeHtml(it)}</div>
-        </div>`;
-      }).join("")}</div>
-    </section>`;
-  });
+    </div>`;
+  if(!todos.length){
+    html += `<div class="empty glass-card">还没有待办事项，点上方「＋ 添加待办」开始规划今天的清单 ✨</div>`;
+  } else {
+    html += `<div class="todo-list">` + todos.map(t => {
+      const lv = t.urgency === "非常紧急" ? 2 : t.urgency === "紧急" ? 1 : 0;
+      return `<div class="todo-card glass-card ${t.done?'done':''}" id="todo_${t.id}">
+        <button class="chk ${t.done?'on':''}" onclick="toggleTodo('${t.id}')"></button>
+        <div class="todo-body">
+          <div class="todo-task">${escapeHtml(t.task)}</div>
+          <div class="todo-meta">
+            <span class="tm-date">📅 ${escapeHtml(t.date)}</span>
+            <span class="urg urg-${lv}">${escapeHtml(t.urgency)}</span>
+            <span class="tm-ddl">⏰ DDL ${escapeHtml(t.ddl || "—")}</span>
+          </div>
+        </div>
+        <button class="item-del" onclick="confirmDelTodo('${t.id}')" title="删除">🗑</button>
+      </div>`;
+    }).join("") + `</div>`;
+  }
   return html;
+}
+function toggleAddTodo(){
+  const f = document.getElementById("todoAddForm");
+  if(!f) return;
+  if(f.style.display === "none"){
+    document.getElementById("todoDate").value = todayStr();
+    f.style.display = "flex";
+  } else {
+    f.style.display = "none";
+  }
+}
+function addTodo(){
+  const task = (document.getElementById("todoTask").value || "").trim();
+  if(!task){ toast("请先填写「事情」"); return; }
+  const date = document.getElementById("todoDate").value || todayStr();
+  const urgency = document.getElementById("todoUrg").value || "普通";
+  const ddl = document.getElementById("todoDdl").value || "";
+  const todos = getTodos();
+  todos.push({ id: "t" + Date.now(), date:date, task:task, urgency:urgency, ddl:ddl, done:false });
+  setTodos(todos);
+  document.getElementById("todoTask").value = "";
+  document.getElementById("todoDdl").value = "";
+  document.getElementById("todoAddForm").style.display = "none";
+  render();
+}
+function toggleTodo(id){
+  const todos = getTodos(); const t = todos.find(x=>x.id===id);
+  if(!t) return;
+  t.done = !t.done; setTodos(todos); render();
+}
+function confirmDelTodo(id){
+  const todos = getTodos(); const t = todos.find(x=>x.id===id); if(!t) return;
+  showModal({
+    title: "删除待办？",
+    body: "「" + escapeHtml(t.task) + "」删除后不可恢复。",
+    confirmText: "确认删除",
+    onConfirm: ()=> delTodo(id)
+  });
+}
+function delTodo(id){
+  setTodos(getTodos().filter(x=>x.id!==id));
+  render();
 }
 
 /* —— 复盘页 —— */
@@ -1094,6 +1144,7 @@ let SORT = null;   // { cycleId, kind, pb, bar }
 let DRAG = null;   // { el, startY }
 let LP = { timer:null, x:0, y:0, fired:false };
 let suppressClick = false;
+let autoScrollTimer = null;
 function toast(msg){
   const old = document.querySelector(".toast"); if(old) old.remove();
   const d = document.createElement("div"); d.className = "toast"; d.textContent = msg;
@@ -1202,14 +1253,24 @@ function dragStart(e){
   if(!item || !SORT.pb.contains(item)) return;
   e.preventDefault(); e.stopPropagation();
   handle = handle || item;
-  DRAG = { el:item, handle:handle };
+  DRAG = { el:item, handle:handle, lastY:e.clientY };
   item.classList.add("si-dragging","si-lift");
   try{ handle.setPointerCapture(e.pointerId); }catch(_){}
+  clearInterval(autoScrollTimer);
+  autoScrollTimer = setInterval(()=>{
+    if(!DRAG || !SORT) return;
+    const dy = edgeScrollSpeed(DRAG.lastY);
+    if(dy){ window.scrollBy(0, dy); sortReorder(DRAG.lastY); }
+  }, 16);
 }
-function dragMove(e){
+function edgeScrollSpeed(y){
+  const H = window.innerHeight, EDGE = 92, MAX = 14;
+  if(y < EDGE) return -MAX * Math.min(1, (EDGE - y) / EDGE);
+  if(y > H - EDGE) return MAX * Math.min(1, (y - (H - EDGE)) / EDGE);
+  return 0;
+}
+function sortReorder(y){
   if(!DRAG || !SORT) return;
-  e.preventDefault();
-  const y = e.clientY;
   const sibs = sortEls(SORT.pb);
   for(const s of sibs){
     if(s === DRAG.el) continue;
@@ -1223,7 +1284,14 @@ function dragMove(e){
     }
   }
 }
+function dragMove(e){
+  if(!DRAG || !SORT) return;
+  e.preventDefault();
+  DRAG.lastY = e.clientY;
+  sortReorder(e.clientY);
+}
 function dragEnd(){
+  clearInterval(autoScrollTimer); autoScrollTimer = null;
   if(!DRAG) return;
   DRAG.el.classList.remove("si-dragging","si-lift");
   DRAG = null;
