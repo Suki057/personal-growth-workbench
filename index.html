@@ -427,6 +427,15 @@
 .note-btn:active{ background:rgba(246,215,138,0.22); }
 .tm-doneat{ background:rgba(138,200,140,0.18); color:#9fd39f; padding:1px 8px; border-radius:999px; font-weight:700; }
 .tm-overdue{ background:rgba(232,90,90,0.22); color:#ef7a7a; padding:1px 8px; border-radius:999px; font-weight:700; }
+.cat-chip{ padding:1px 8px; border-radius:999px; font-size:12px; font-weight:700; }
+.cat-0{ background:rgba(138,180,240,0.20); color:#8ab4f0; }
+.cat-1{ background:rgba(184,154,208,0.22); color:#c4a8e0; }
+.cat-2{ background:rgba(159,211,159,0.20); color:#9fd39f; }
+.cat-3{ background:rgba(246,215,138,0.20); color:#f0d78a; }
+.cat-4{ background:rgba(255,255,255,0.12); color:var(--text-muted); }
+.repeat-badge{ display:inline-block; margin-top:8px; padding:2px 10px; border-radius:999px; font-size:12px; font-weight:700; background:rgba(184,154,208,0.18); color:#c4a8e0; border:1px solid rgba(184,154,208,0.35); }
+.repeat-grid{ display:flex; flex-direction:column; gap:8px; }
+.repeat-opt{ width:100%; text-align:center; }
 .note-textarea{ width:100%; box-sizing:border-box; min-height:96px; resize:vertical; background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.18); border-radius:10px; color:var(--text-on-dark); padding:10px 12px; font-size:14px; font-family:inherit; margin-top:10px; }
 .doneat-row{ display:flex; align-items:center; gap:10px; margin-top:12px; }
 .doneat-row label{ font-weight:700; color:var(--gold); font-size:13px; flex:0 0 auto; }
@@ -955,28 +964,46 @@ function todoUrgencyLevel(u){
   if(u === "不紧急但重要" || u === "重要但不紧急") return 2;
   return 3; // 不紧急不重要 / 不紧急也不重要
 }
-function todoCardHtml(t){
-  const lv = todoUrgencyLevel(t.urgency);
-  const overdue = t.ddl && !t.done && Date.now() > new Date(t.ddl).getTime();
+function catIndex(c){ return c==="工作"?0 : c==="副业"?1 : c==="生活"?2 : c==="自我提升"?3 : 4; }
+function repeatPeriod(r){ return r==="daily"?1 : r==="week2"?4 : r==="week3"?3 : r==="week4"?2 : 1; }
+function repeatLabel(r){ return r==="daily"?"每日重复" : r==="week2"?"一周2次（间隔3天）" : r==="week3"?"一周3次（间隔2天）" : r==="week4"?"一周4次（间隔1天）" : ""; }
+function parseDate(s){ if(!s) return null; const m=/^(\d{4})-(\d{2})-(\d{2})/.exec(s); if(!m) return null; return new Date(+m[1], +m[2]-1, +m[3]); }
+function fmtDate(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function startOfDay(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
+function isOnSchedule(startStr, dateStr, repeat){
+  const s = parseDate(startStr), d = parseDate(dateStr);
+  if(!s || !d) return false;
+  const diff = Math.round((startOfDay(d) - startOfDay(s)) / 86400000);
+  if(diff < 0) return false;
+  return diff % repeatPeriod(repeat) === 0;
+}
+function getInst(){ return storeGet("pgw_todo_inst", {}); }
+function setInst(o){ storeSet("pgw_todo_inst", o); }
+function todoCardHtml(it){
+  const lv = todoUrgencyLevel(it.urgency);
+  const overdue = it.ddl && !it.done && Date.now() > new Date(it.ddl).getTime();
   const overdueHtml = overdue ? `<span class="tm-overdue">⌛ 已超期</span>` : "";
-  const doneAtHtml = (t.done && t.doneAt) ? `<span class="tm-doneat">🏁 完成时间 ${escapeHtml((t.doneAt||"").replace("T"," "))}</span>` : "";
-  const noteHtml = t.note ? `<div class="todo-note">📝 ${escapeHtml(t.note)}</div>` : "";
-  return `<div class="todo-card glass-card ${t.done?'done':''}" id="todo_${t.id}">
-    <button class="chk ${t.done?'on':''}" onclick="toggleTodo('${t.id}')"></button>
+  const doneAtHtml = (it.done && it.doneAt) ? `<span class="tm-doneat">🏁 完成时间 ${escapeHtml((it.doneAt||"").replace("T"," "))}</span>` : "";
+  const noteHtml = it.note ? `<div class="todo-note">📝 ${escapeHtml(it.note)}</div>` : "";
+  const repHtml = it.repeat ? `<div class="repeat-badge">🔁 ${repeatLabel(it.repeat)}</div>` : "";
+  return `<div class="todo-card glass-card ${it.done?'done':''}" id="todo_${it.key.replace(/:/g,'_')}">
+    <button class="chk ${it.done?'on':''}" onclick="toggleTodo('${it.key}')"></button>
     <div class="todo-body">
-      <div class="todo-task">${escapeHtml(t.task)}</div>
+      <div class="todo-task">${escapeHtml(it.task)}</div>
       <div class="todo-meta">
-        <span class="tm-date">📅 ${escapeHtml(t.date)}</span>
-        <span class="urg urg-${lv}">${escapeHtml(t.urgency)}</span>
-        <span class="tm-ddl">⏰ DDL ${escapeHtml((t.ddl||"").replace("T"," ") || "—")}</span>
+        <span class="cat-chip cat-${catIndex(it.category)}">${escapeHtml(it.category)}</span>
+        <span class="urg urg-${lv}">${escapeHtml(it.urgency)}</span>
+        <span class="tm-ddl">⏰ DDL ${escapeHtml((it.ddl||"").replace("T"," ") || "—")}</span>
         ${overdueHtml}${doneAtHtml}
       </div>
+      ${repHtml}
       ${noteHtml}
       <div class="todo-note-row">
-        <button class="note-btn" onclick="editTodoNote('${t.id}')">📝 备注</button>
+        <button class="note-btn" onclick="editTodoNote('${it.key}','${it.dateStr}')">📝 备注</button>
       </div>
     </div>
-    <button class="item-del" onclick="confirmDelTodo('${t.id}')" title="删除">🗑</button>
+    <button class="item-del" onclick="confirmDelTodo('${it.id}')" title="删除">🗑</button>
   </div>`;
 }
 function formatDateTitle(d){
@@ -988,14 +1015,51 @@ function formatDateTitle(d){
   const wk = ["周日","周一","周二","周三","周四","周五","周六"][dt.getDay()];
   return mo + "月" + da + "日 " + wk;
 }
-function ddlTimeOf(t){ return t.ddl ? new Date(t.ddl).getTime() : Infinity; }
-function sortTodos(list){
-  return list.slice().sort((a,b)=>{
-    if(a.done !== b.done) return a.done ? 1 : -1;       // 已完成沉到板块最下面
-    const ua = todoUrgencyLevel(a.urgency), ub = todoUrgencyLevel(b.urgency);
-    if(ua !== ub) return ua - ub;                        // 第一准则：紧急状态
-    return ddlTimeOf(a) - ddlTimeOf(b);                   // 第二准则：DDL 时间（早的在前）
+function makeDisplay(t, key, dateStr, state){
+  return {
+    key, id:t.id, task:t.task, urgency:t.urgency||"不紧急不重要",
+    category: t.category || "其它", ddl: t.ddl||"", repeat: t.repeat||null,
+    note: state.note || t.note || "", done: !!state.done,
+    doneAt: state.doneAt || t.doneAt || "", dateStr
+  };
+}
+function buildBoardItems(dateStr, todos){
+  const inst = getInst();
+  const items = [];
+  todos.forEach(t=>{
+    if(t.repeat){
+      if(!isOnSchedule(t.date, dateStr, t.repeat)) return;
+      const key = t.id + "::" + dateStr;
+      items.push(makeDisplay(t, key, dateStr, inst[key] || {}));
+    } else if(t.date === dateStr){
+      items.push(makeDisplay(t, t.id, dateStr, t));
+    }
   });
+  // 第一准则：分类（工作>副业>生活>自我提升>其它），第二准则：紧急状态，第三准则：DDL 时间
+  items.sort((a,b)=>{
+    const c = catIndex(a.category) - catIndex(b.category); if(c) return c;
+    const u = todoUrgencyLevel(a.urgency) - todoUrgencyLevel(b.urgency); if(u) return u;
+    const da = a.ddl ? new Date(a.ddl).getTime() : Infinity;
+    const db = b.ddl ? new Date(b.ddl).getTime() : Infinity;
+    return da - db;
+  });
+  items.sort((a,b)=> (a.done?1:0) - (b.done?1:0)); // 已完成沉到板块最下面（稳定排序保留分类内顺序）
+  return items;
+}
+function getBoardDates(todos){
+  const set = new Set();
+  const today = startOfDay(new Date());
+  const winStart = addDays(today, -30);
+  const winEnd = addDays(today, 30);
+  todos.forEach(t=>{
+    if(t.repeat){
+      const s = parseDate(t.date); if(!s) return;
+      let d = s < winStart ? winStart : s;
+      const P = repeatPeriod(t.repeat);
+      while(d <= winEnd){ set.add(fmtDate(d)); d = addDays(d, P); }
+    } else if(t.date){ set.add(t.date); }
+  });
+  return [...set].sort();
 }
 function renderTodosPage(){
   const todos = getTodos();
@@ -1004,6 +1068,13 @@ function renderTodosPage(){
     <div class="todo-add-form" id="todoAddForm" style="display:none;">
       <input type="date" id="todoDate" />
       <input type="text" id="todoTask" placeholder="事情（要做的那件事）" />
+      <select id="todoCat">
+        <option value="工作" selected>工作</option>
+        <option value="副业">副业</option>
+        <option value="生活">生活</option>
+        <option value="自我提升">自我提升</option>
+        <option value="其它">其它</option>
+      </select>
       <select id="todoUrg">
         <option value="紧急且重要">紧急且重要</option>
         <option value="紧急不重要">紧急不重要</option>
@@ -1022,11 +1093,10 @@ function renderTodosPage(){
   if(!todos.length){
     html += `<div class="empty glass-card todo-empty">点上方「＋ 添加待办」开始规划今天的清单 ✨</div>`;
   } else {
-    const groups = {};
-    todos.forEach(t=>{ const d = t.date || "未设日期"; (groups[d] = groups[d] || []).push(t); });
-    const dates = Object.keys(groups).sort(); // 板块按日期升序（最早的在最上）
+    const dates = getBoardDates(todos);
     dates.forEach(d=>{
-      const list = sortTodos(groups[d]);
+      const list = buildBoardItems(d, todos);
+      if(!list.length) return;
       const remaining = list.filter(t=>!t.done).length;
       html += `<section class="glass-card panel" style="margin-bottom:14px;">
         <div class="panel-h" onclick="toggleCollapse(this)">
@@ -1057,37 +1127,91 @@ function addTodo(){
   if(!task){ toast("请先填写「事情」"); return; }
   const date = document.getElementById("todoDate").value || todayStr();
   const urgency = document.getElementById("todoUrg").value || "不紧急不重要";
+  const category = document.getElementById("todoCat").value || "工作";
   const ddl = document.getElementById("todoDdl").value || "";
-  const todos = getTodos();
-  todos.push({ id: "t" + Date.now(), date:date, task:task, urgency:urgency, ddl:ddl, done:false });
-  setTodos(todos);
-  document.getElementById("todoTask").value = "";
-  document.getElementById("todoDdl").value = "";
-  document.getElementById("todoAddForm").style.display = "none";
-  render();
-}
-function toggleTodo(id){
-  const todos = getTodos(); const t = todos.find(x=>x.id===id);
-  if(!t) return;
-  if(!t.done){
-    if(t.ddl && Date.now() > new Date(t.ddl).getTime()){
-      promptDoneAt(t, todos);
-      return;
-    }
-    t.done = true; setTodos(todos); render();
+  const commit = (repeat)=>{
+    const todos = getTodos();
+    todos.push({ id:"t"+Date.now()+"_"+Math.random().toString(36).slice(2,6), date:date, task:task, urgency:urgency, category:category, ddl:ddl, repeat:repeat||null, done:false, note:"" });
+    setTodos(todos);
+    document.getElementById("todoTask").value = "";
+    document.getElementById("todoDdl").value = "";
+    document.getElementById("todoAddForm").style.display = "none";
+    render();
+  };
+  if(urgency === "不紧急但重要"){
+    showRepeatModal(commit);
   } else {
-    t.done = false; t.doneAt = ""; setTodos(todos); render();
+    commit(null);
   }
 }
-function editTodoNote(id){
-  const todos = getTodos(); const t = todos.find(x=>x.id===id); if(!t) return;
+function showRepeatModal(cb){
+  const opts = [
+    {k:"daily", t:"每日重复"},
+    {k:"week2", t:"一周2次（间隔3天）"},
+    {k:"week3", t:"一周3次（间隔2天）"},
+    {k:"week4", t:"一周4次（间隔1天）"},
+    {k:"none", t:"不重复（仅此一天）"}
+  ];
+  const ov = document.createElement('div'); ov.className='modal-overlay';
+  ov.innerHTML = `<div class='modal'><div class='modal-title'>设置重复频率</div>
+    <div class='modal-body'><p style='margin:0 0 12px;'>该事项为「不紧急但重要」，请选择重复频率：</p>
+    <div class='repeat-grid'>` +
+    opts.map(o=>`<button class='btn btn-primary repeat-opt' onclick='__chooseRepeat("${o.k}")'>${o.t}</button>`).join("") +
+    `</div></div>
+    <div class='modal-btns'><button class='btn btn-ghost' onclick='__closeRepeatModal()'>取消</button></div></div>`;
+  document.body.appendChild(ov);
+  window.__chooseRepeat = (k)=>{ ov.remove(); cb(k==="none"?null:k); };
+  window.__closeRepeatModal = ()=> ov.remove();
+}
+function toggleTodo(key){
+  const isInst = key.indexOf("::") >= 0;
+  if(isInst){
+    const [id, dateStr] = key.split("::");
+    const t = getTodos().find(x=>x.id===id); if(!t) return;
+    const inst = getInst(); const cur = inst[key] || {};
+    const willDone = !cur.done;
+    const instDate = parseDate(dateStr);
+    const overdue = willDone && instDate && instDate < startOfDay(new Date());
+    if(overdue){ promptDoneAtInstance(key, t.task, t.ddl); return; }
+    cur.done = willDone; cur.doneAt = willDone ? localNowLocal() : "";
+    inst[key] = cur; setInst(inst); render();
+  } else {
+    const todos = getTodos(); const t = todos.find(x=>x.id===key);
+    if(!t) return;
+    if(!t.done){
+      if(t.ddl && Date.now() > new Date(t.ddl).getTime()){
+        promptDoneAt(t, todos);
+        return;
+      }
+      t.done = true; t.doneAt = localNowLocal(); setTodos(todos); render();
+    } else {
+      t.done = false; t.doneAt = ""; setTodos(todos); render();
+    }
+  }
+}
+function editTodoNote(key, dateStr){
+  const isInst = key.indexOf("::") >= 0;
+  let cur = "", task = "";
+  if(isInst){
+    const id = key.split("::")[0];
+    const t = getTodos().find(x=>x.id===id); if(!t) return;
+    task = t.task; cur = (getInst()[key]||{}).note || "";
+  } else {
+    const t = getTodos().find(x=>x.id===key); if(!t) return;
+    task = t.task; cur = t.note || "";
+  }
   showModal({
-    title: "备注 · " + t.task,
-    body: "记录该事项的完成 / 未完成情况：<textarea id='todoNote' class='note-textarea' placeholder='例如：已完成，但比预期晚了2天；或尚未开始，原因是…'>" + escapeHtml(t.note||"") + "</textarea>",
+    title: "备注 · " + task,
+    body: "记录该事项的完成 / 未完成情况：<textarea id='todoNote' class='note-textarea' placeholder='例如：已完成，但比预期晚了2天；或尚未开始，原因是…'>" + escapeHtml(cur) + "</textarea>",
     confirmText: "保存",
     onConfirm: ()=>{
       const v = (document.getElementById('todoNote').value || "").trim();
-      t.note = v; setTodos(todos); render();
+      if(isInst){
+        const inst = getInst(); const c = inst[key] || {}; c.note = v; inst[key] = c; setInst(inst);
+      } else {
+        const todos = getTodos(); const t = todos.find(x=>x.id===key); if(t){ t.note = v; setTodos(todos); }
+      }
+      render();
     }
   });
 }
@@ -1100,6 +1224,18 @@ function promptDoneAt(t, todos){
     onConfirm: ()=>{
       const v = document.getElementById('doneAt').value || def;
       t.doneAt = v; t.done = true; setTodos(todos); render();
+    }
+  });
+}
+function promptDoneAtInstance(key, task, ddl){
+  const def = localNowLocal();
+  showModal({
+    title: "补记完成时间",
+    body: "「" + escapeHtml(task) + "」所在日期已过去且未完成，请选择实际完成时间：<div class='doneat-row'><label>完成时间</label><input type='datetime-local' id='doneAt' value='" + def + "'></div>",
+    confirmText: "完成",
+    onConfirm: ()=>{
+      const v = document.getElementById('doneAt').value || def;
+      const inst = getInst(); const cur = inst[key] || {}; cur.done = true; cur.doneAt = v; inst[key] = cur; setInst(inst); render();
     }
   });
 }
