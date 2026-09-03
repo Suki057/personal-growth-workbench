@@ -761,6 +761,8 @@ function getReviews(){ return storeGet("pgw_reviews", []); }
 /* 每日待办事项 */
 function getTodos(){ return storeGet("pgw_todos", []); }
 function setTodos(arr){ storeSet("pgw_todos", arr); }
+function getTodoTrash(){ return storeGet("pgw_todo_trash", []); }
+function setTodoTrash(arr){ storeSet("pgw_todo_trash", arr); }
 
 /* —— 成长时间 · 自定义周期 / 回收站 / 事项 / 标题 —— */
 function getCustomCycles(){ return storeGet("pgw_cycles_custom", []); }
@@ -786,6 +788,9 @@ function cleanupTrash(){
   const it=getItemTrash(); const ib=it.length;
   const ik=it.filter(x=> (now-(x.deletedAt||0)) < 7*86400000 );
   if(ik.length!==ib) storeSet("pgw_item_trash", ik);
+  const tt=getTodoTrash(); const tb=tt.length;
+  const tk=tt.filter(x=> (now-(x.deletedAt||0)) < 7*86400000 );
+  if(tk.length!==tb) storeSet("pgw_todo_trash", tk);
 }
 
 /* ===================== 状态 / 渲染 ===================== */
@@ -1022,6 +1027,7 @@ function renderTodosPage(){
       </section>`;
     }
   }
+  html += `<button class="trash-entry" onclick="openTrash()">🗑 回收站（${getTodoTrash().length}）</button>`;
   return html;
 }
 function toggleAddTodo(){
@@ -1093,13 +1099,29 @@ function confirmDelTodo(id){
   const todos = getTodos(); const t = todos.find(x=>x.id===id); if(!t) return;
   showModal({
     title: "删除待办？",
-    body: "「" + escapeHtml(t.task) + "」删除后不可恢复。",
+    body: "「" + escapeHtml(t.task) + "」删除后将进入回收站，可在回收站恢复；超过 7 天会自动永久删除。",
     confirmText: "确认删除",
     onConfirm: ()=> delTodo(id)
   });
 }
 function delTodo(id){
-  setTodos(getTodos().filter(x=>x.id!==id));
+  const todos = getTodos(); const t = todos.find(x=>x.id===id); if(!t) return;
+  t.deletedAt = Date.now();
+  const trash = getTodoTrash(); trash.push(t); setTodoTrash(trash);
+  setTodos(todos.filter(x=>x.id!==id));
+  render();
+}
+function restoreTodo(idx){
+  const trash = getTodoTrash(); const t = trash[idx]; if(!t) return;
+  const todos = getTodos();
+  if(!todos.find(x=>x.id===t.id)) todos.push(t);
+  setTodos(todos);
+  setTodoTrash(trash.filter((_,j)=>j!==idx));
+  render();
+}
+function purgeTodo(idx){
+  const trash = getTodoTrash();
+  setTodoTrash(trash.filter((_,j)=>j!==idx));
   render();
 }
 
@@ -1560,9 +1582,9 @@ function purgeItem(idx){
 function openTrash(){ cleanupTrash(); navigateTo("cycle-trash"); }
 function renderTrashPage(){
   cleanupTrash();
-  const trash = getTrash(); const itrash = getItemTrash();
+  const trash = getTrash(); const itrash = getItemTrash(); const ttrash = getTodoTrash();
   let html = `<div class="menu-title"><h2>回收站</h2><p>可恢复 · 7 天后自动永久删除</p></div>`;
-  if(!trash.length && !itrash.length){ html += `<div class="empty glass-card">回收站是空的 ✨</div>`; return html; }
+  if(!trash.length && !itrash.length && !ttrash.length){ html += `<div class="empty glass-card">回收站是空的 ✨</div>`; return html; }
   html += `<div class="trash-list">`;
   trash.forEach(t=>{
     const left = Math.max(0, Math.ceil((7*86400000 - (Date.now()-(t.deletedAt||0)))/86400000));
@@ -1590,6 +1612,20 @@ function renderTrashPage(){
       <div class="ti-btns">
         <button class="btn btn-primary" onclick="restoreItem(${idx})">恢复</button>
         <button class="btn btn-danger" onclick="purgeItem(${idx})">永久删除</button>
+      </div>
+    </div>`;
+  });
+  ttrash.forEach((t,idx)=>{
+    const left = Math.max(0, Math.ceil((7*86400000 - (Date.now()-(t.deletedAt||0)))/86400000));
+    const status = t.done ? "已完成" : "未完成";
+    html += `<div class="glass-card trash-item">
+      <div class="ti-main">
+        <div class="ti-name">${escapeHtml(t.task||"未命名")}</div>
+        <div class="ti-sub">待办事项 · ${status} · ${left} 天后永久删除</div>
+      </div>
+      <div class="ti-btns">
+        <button class="btn btn-primary" onclick="restoreTodo(${idx})">恢复</button>
+        <button class="btn btn-danger" onclick="purgeTodo(${idx})">永久删除</button>
       </div>
     </div>`;
   });
