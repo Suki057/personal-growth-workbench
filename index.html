@@ -951,9 +951,9 @@ function renderCyclesMenuPage(){
 /* —— 每日待办事项页 —— */
 function todoUrgencyLevel(u){
   if(u === "紧急且重要") return 0;
-  if(u === "重要但不紧急") return 1;
-  if(u === "紧急但不重要") return 2;
-  return 3; // 不紧急也不重要
+  if(u === "紧急不重要" || u === "紧急但不重要") return 1;
+  if(u === "不紧急但重要" || u === "重要但不紧急") return 2;
+  return 3; // 不紧急不重要 / 不紧急也不重要
 }
 function todoCardHtml(t){
   const lv = todoUrgencyLevel(t.urgency);
@@ -979,20 +979,36 @@ function todoCardHtml(t){
     <button class="item-del" onclick="confirmDelTodo('${t.id}')" title="删除">🗑</button>
   </div>`;
 }
+function formatDateTitle(d){
+  if(!d || d === "未设日期") return "未设日期";
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d);
+  if(!m) return d;
+  const y=+m[1], mo=+m[2], da=+m[3];
+  const dt = new Date(y, mo-1, da);
+  const wk = ["周日","周一","周二","周三","周四","周五","周六"][dt.getDay()];
+  return mo + "月" + da + "日 " + wk;
+}
+function ddlTimeOf(t){ return t.ddl ? new Date(t.ddl).getTime() : Infinity; }
+function sortTodos(list){
+  return list.slice().sort((a,b)=>{
+    if(a.done !== b.done) return a.done ? 1 : -1;       // 已完成沉到板块最下面
+    const ua = todoUrgencyLevel(a.urgency), ub = todoUrgencyLevel(b.urgency);
+    if(ua !== ub) return ua - ub;                        // 第一准则：紧急状态
+    return ddlTimeOf(a) - ddlTimeOf(b);                   // 第二准则：DDL 时间（早的在前）
+  });
+}
 function renderTodosPage(){
   const todos = getTodos();
-  const pending = todos.filter(t=>!t.done);
-  const done = todos.filter(t=>t.done);
-  let html = `<div class="menu-title"><h2>每日待办事项</h2><p>今日规划 · 自主添加</p></div>`;
+  let html = `<div class="menu-title"><h2>每日待办事项</h2><p>按日期分板块 · 自主添加</p></div>`;
   html += `<button class="add-cycle-btn" onclick="toggleAddTodo()">＋ 添加待办</button>
     <div class="todo-add-form" id="todoAddForm" style="display:none;">
       <input type="date" id="todoDate" />
       <input type="text" id="todoTask" placeholder="事情（要做的那件事）" />
       <select id="todoUrg">
         <option value="紧急且重要">紧急且重要</option>
-        <option value="重要但不紧急">重要但不紧急</option>
-        <option value="紧急但不重要">紧急但不重要</option>
-        <option value="不紧急也不重要" selected>不紧急也不重要</option>
+        <option value="紧急不重要">紧急不重要</option>
+        <option value="不紧急但重要">不紧急但重要</option>
+        <option value="不紧急不重要" selected>不紧急不重要</option>
       </select>
       <div class="ddl-row">
         <span class="ddl-label">DDL</span>
@@ -1006,26 +1022,22 @@ function renderTodosPage(){
   if(!todos.length){
     html += `<div class="empty glass-card todo-empty">点上方「＋ 添加待办」开始规划今天的清单 ✨</div>`;
   } else {
-    html += `<section class="glass-card panel" style="margin-bottom:14px;">
-      <div class="panel-h" onclick="toggleCollapse(this)">
-        <div class="ph-main"><h2>📝 待办事项</h2></div>
-        <div style="display:flex;align-items:center;gap:8px;"><span class="ph-sub">${pending.length}</span><span class="chev">▾</span></div>
-      </div>
-      <div class="panel-b">
-        ${pending.length ? `<div class="todo-list">${pending.map(todoCardHtml).join("")}</div>` : `<div class="empty">全部完成啦 ✨ 可以安心休息或添加新目标</div>`}
-      </div>
-    </section>`;
-    if(done.length){
-      html += `<section class="glass-card panel">
+    const groups = {};
+    todos.forEach(t=>{ const d = t.date || "未设日期"; (groups[d] = groups[d] || []).push(t); });
+    const dates = Object.keys(groups).sort(); // 板块按日期升序（最早的在最上）
+    dates.forEach(d=>{
+      const list = sortTodos(groups[d]);
+      const remaining = list.filter(t=>!t.done).length;
+      html += `<section class="glass-card panel" style="margin-bottom:14px;">
         <div class="panel-h" onclick="toggleCollapse(this)">
-          <div class="ph-main"><h2>✅ 已完成</h2></div>
-          <div style="display:flex;align-items:center;gap:8px;"><span class="ph-sub">${done.length}</span><span class="chev">▾</span></div>
+          <div class="ph-main"><h2>📅 ${formatDateTitle(d)}</h2></div>
+          <div style="display:flex;align-items:center;gap:8px;"><span class="ph-sub">${remaining}/${list.length}</span><span class="chev">▾</span></div>
         </div>
         <div class="panel-b">
-          <div class="todo-list">${done.map(todoCardHtml).join("")}</div>
+          <div class="todo-list">${list.map(todoCardHtml).join("")}</div>
         </div>
       </section>`;
-    }
+    });
   }
   html += `<button class="trash-entry" onclick="openTrash()">🗑 回收站（${getTodoTrash().length}）</button>`;
   return html;
@@ -1044,7 +1056,7 @@ function addTodo(){
   const task = (document.getElementById("todoTask").value || "").trim();
   if(!task){ toast("请先填写「事情」"); return; }
   const date = document.getElementById("todoDate").value || todayStr();
-  const urgency = document.getElementById("todoUrg").value || "不紧急也不重要";
+  const urgency = document.getElementById("todoUrg").value || "不紧急不重要";
   const ddl = document.getElementById("todoDdl").value || "";
   const todos = getTodos();
   todos.push({ id: "t" + Date.now(), date:date, task:task, urgency:urgency, ddl:ddl, done:false });
